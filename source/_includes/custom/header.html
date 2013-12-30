@@ -1,6 +1,15 @@
-<hgroup>
-  <h1><a href="{{ root_url }}/">{{ site.title }}</a></h1>
-  {% if site.subtitle %}
-    <h2>{{ site.subtitle }}</h2>
-  {% endif %}
-</hgroup>
+<div class="header jumbotron text-center visible-sm visible-xs">
+  <div class="row">
+    {% if site.gravatar_email %}
+    <section>
+      <span>
+        <img class="img-circle" src="{% gravatar_image 200 %}" alt="Gravatar of {{ site.author}} " title="Gravatar of {{ site.author }}" />
+      </span>
+    </section>
+    {% endif %}
+    <h1><a href="{{ root_url }}/">{{ site.title }}</a></h1>
+    {% if site.subtitle %}
+      <h2>{{ site.subtitle }}</h2>
+    {% endif %}
+  </div>
+</div>

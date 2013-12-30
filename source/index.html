@@ -31,7 +31,7 @@ navbar: Blog
   </div>
 
   {% unless site.default_asides == empty and site.blog_index_asides == empty %}
-    <aside class="sidebar col-md-3">
+    <aside class="sidebar col-md-3 hidden-xs hidden-sm">
       {% if site.blog_index_asides.size %}
         {% include_array blog_index_asides %}
       {% else %}

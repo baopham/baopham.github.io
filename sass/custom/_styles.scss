@@ -19,6 +19,12 @@ footer[role=contentinfo] {
   height: 60px;
 }
 
+.header.jumbotron {
+  // Negative indent by navbar's margin-bottom
+  margin-top: -20px;
+}
+
+
 /**** CONWAY GAME OF LIFE ****/
 #canvas_life {
   width: 100%;
