@@ -143,7 +143,7 @@ date: 2012/03/21
 - If your title has non-alphabet characters, keep the title in double quote like `title: "Emmy's Post"` or `title: "I-Like-Dashes"` and of course, name the file as **2012-03-21-emmys-post** or **2012-03-21-i---like---dashes** respectively
 
 - The article can be in markdown format or HTML  
-*Tips:* Alternately, you can make use of the provided **Rakefile** then you don't have to worry about how to name your article files: just type this in your terminal: **rake Rakefile new**, it will ask for your article's title and creates it for you:
+<span class="label label-info">Tips</span> Alternately, you can make use of the provided **Rakefile** then you don't have to worry about how to name your article files: just type this in your terminal: **rake Rakefile new**, it will ask for your article's title and creates it for you:
 
 ```bash
 $ rake Rakefile new
