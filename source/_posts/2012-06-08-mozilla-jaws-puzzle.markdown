@@ -8,8 +8,6 @@ categories: [JavaScript, Mozilla]
 ---
 
 I'm actually a little late for this [Jaw's programming puzzle](http://people.mozilla.org/~jwein/puzzle/), which I only discovered yesterday from reading [a blog](http://msujaws.wordpress.com/2012/05/02/wanna-join-the-firefox-team-at-mozilla-solve-the-puzzle/) written by a Mozilla employee. If I had seen this post a bit earlier, I might even have had a chance to work for them since I solved it! *yay*.
-<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" type="text/css" media="screen" />
-<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.pack.js"></script>
 
 (btw, if you love solving programming problems, please take a moment to go through the puzzle (it's really worth it) but note that this post contains **SPOILERS**.)
 <!--more-->
@@ -71,7 +69,9 @@ Oh, firefox has the new [3D feature](http://blog.mozilla.org/blog/2012/03/13/fir
 <a class="fancybox" rel="fancybox" href="http://farm8.staticflickr.com/7236/7352811076_823e27c4bd.jpg" title="1337">
   <img class="center img-border" src="http://farm8.staticflickr.com/7236/7352811076_823e27c4bd.jpg" alt="1337"/>
 </a>
-
+<center><strong>1337 !</strong></center>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" type="text/css" media="screen" />
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.pack.js"></script>
 <script>
 $(document).ready(function() {
   $(".fancybox").fancybox();
