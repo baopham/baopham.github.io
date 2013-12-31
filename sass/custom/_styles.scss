@@ -151,6 +151,16 @@ aside.sidebar {
   }
 }
 
+/**** OVERRIDE DEFAULT ****/
+a {
+  color: #3499B3;
+  text-decoration: none;
+  :hover {
+    color: #005580;
+    text-decoration: underline;
+    outline: 0px none;
+  }
+}
 
 /**** CONWAY GAME OF LIFE ****/
 #canvas_life {
