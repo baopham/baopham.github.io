@@ -12,6 +12,7 @@ html, body {
   margin: 0 auto -60px;
   /* Pad bottom by footer height */
   padding: 0 0 60px;
+  padding-top: 60px;
 }
 
 /* Set the fixed height of the footer here */
@@ -22,6 +23,110 @@ footer[role=contentinfo] {
 .header.jumbotron {
   // Negative indent by navbar's margin-bottom
   margin-top: -20px;
+/**** NAVBAR ****/
+.navbar {
+  .navbar-brand {
+    font-weight: bold;
+  }
+  .nav-vim {
+    &:after {
+      clear: both;
+    }
+  }
+  .nav-vim.vim-normal {
+    font-family: Consolas, monaco, monospace;
+    opacity: 0.9;
+    &:hover {
+      opacity: 1;
+    }
+    .vim-cmd {
+      background-color: rgb(161,211,6);
+      width: 10%;
+      color: rgb(50,130,21);
+      float: left;
+    }
+    .vim-vcs {
+      background-color: rgb(70,70,70);
+      width: 11%;
+      color: rgb(174,174,174);
+      float: left;
+    }
+    .vim-name {
+      background-color: rgb(70,70,70);
+      width: 11%;
+      color: rgb(174,174,174);
+      float: left;
+    }
+    .vim-middle {
+      background-color: rgb(36,36,36);
+      width: 29%;
+      float: left;
+    }
+    .vim-ff {
+      background-color: rgb(36,36,36);
+      width: 9%;
+      float: left;
+    }
+    .vim-ft {
+      background-color: rgb(36,36,36);
+      width: 9%;
+      float: left;
+    }
+    .vim-line-percent {
+      background-color: rgb(70,70,70);
+      width: 10%;
+      color: rgb(174,174,174);
+      float: left;
+    }
+    .vim-line-current {
+      background-color: rgb(197,197,197);
+      width: 11%;
+      float: left;
+    }
+  }
+  .nav-vim.vim-insert {
+    .vim-cmd {
+      background-color: white;
+      color: rgb(23,76,124); 
+      width: 10%;
+      float: left;
+    }
+    .vim-vcs {
+      background-color: rgb(35,116,159); 
+      color: rgb(119,206,255);
+      width: 11%;
+      float: left;
+    }
+    .vim-name {
+      background-color: rgb(35,116,159); 
+      color: white;
+      width: 11%;
+      float: left;
+    }
+    .vim-middle {
+      background-color: rgb(23,76,116);
+      width: 29%;
+      float: left;
+    }
+    .vim-ff, .vim-ft {
+      background-color: rgb(23,76,116); 
+      color: white;
+      width: 9%;
+      float: left;
+    }
+    .vim-line-percent {
+      background-color: rgb(35,116,159); 
+      color: white;
+      width: 10%;
+      float: left;
+    }
+    .vim-line-current {
+      background-color: rgb(119,206,255);
+      color: rgb(61,87,115);
+      width: 11%;
+      float: left;
+    }
+  }
 }
 
 

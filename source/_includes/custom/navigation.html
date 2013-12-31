@@ -1,4 +1,29 @@
-<nav class="navbar navbar-default" role="navigation">
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+
+    <div class="nav-vim vim-normal hidden-xs hidden-sm">
+	<div class="text-center nav-vim vim-cmd">NORMAL</div>
+
+	<div class="text-center nav-vim vim-vcs">
+	    <i class="fa fa-code-fork"></i>
+	    source <span class="pull-right">|</span>
+	</div>
+
+	<div class="text-center nav-vim vim-name">{{ page.navbar | downcase }}.html</div>
+
+	<div class="text-center nav-vim vim-middle">&nbsp;</div>
+
+	<div class="text-center nav-vim vim-ff">unix <span class="pull-right">|</span></div>
+
+	<div class="text-center nav-vim vim-ft">html</div>
+
+	<div class="text-center nav-vim vim-line-percent">0%</div>
+
+	<div class="text-center nav-vim vim-line-current">
+	    <i class="fa fa-bars"></i>
+	    <span class="vim-line-row">0</span>:1
+	</div>
+    </div>
+
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -38,7 +63,7 @@
                 <form class="search navbar-form navbar-right" action="{{ site.simple_search }}" method="GET">
                     <input type="hidden" name="q" value="site:{{ site.url | shorthand_url }}">
                     <div class="form-group">
-                        <input class="form-control" type="text" name="q" placeholder="Search">
+                        <input class="form-control" type="text" name="q" placeholder="/search">
                     </div>
                 </form>
             {% endif %}
