@@ -21,12 +21,17 @@ footer[role=contentinfo] {
   height: 60px;
 }
 
-.header.jumbotron {
 .noise-bg {
   background: url('/images/noise.png') repeat scroll left top #F8F8F8;
 }
+
+/**** HEADER ****/
+.header {
   // Negative indent by navbar's margin-bottom
   margin-top: -20px;
+  padding: 40px 20px 20px;
+}
+
 /**** POST CONTENT ****/
 .entry-content {
   line-height: 1.8em;
