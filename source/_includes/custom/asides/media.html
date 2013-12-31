@@ -1,0 +1,20 @@
+{% if site.github_user || site.email %}
+<section>
+    <ul class="media-list list-inline">
+        {% if site.github_user %}
+        <li class="media">
+            <a href="http://github.com/{{site.github_user}}">
+                <img class="media-object" src="{{ root.url }}/images/GitHub-Mark-32px.png" alt="My Github"/>
+            </a>
+        </li>
+        {% endif %}
+        {% if site.email %}
+        <li class="media">
+            <a href="mailto:{{site.email}}">
+                <img class="media-object" src="{{ root.url }}/images/email.png" alt="Email me"/>
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</section>
+{% endif %}
