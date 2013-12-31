@@ -1,6 +1,7 @@
 /* nice sticky footer, from http://getbootstrap.com/examples/sticky-footer/ */
 html, body {
   height: 100%;
+  color: #666;
 }
 
 /* Wrapper for page content to push down footer */
@@ -23,6 +24,12 @@ footer[role=contentinfo] {
 .header.jumbotron {
   // Negative indent by navbar's margin-bottom
   margin-top: -20px;
+/**** POST CONTENT ****/
+.entry-content {
+  line-height: 1.8em;
+  font-weight: 300;
+}
+
 /**** NAVBAR ****/
 .navbar {
   .navbar-brand {
