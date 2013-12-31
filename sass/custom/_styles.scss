@@ -22,6 +22,9 @@ footer[role=contentinfo] {
 }
 
 .header.jumbotron {
+.noise-bg {
+  background: url('/images/noise.png') repeat scroll left top #F8F8F8;
+}
   // Negative indent by navbar's margin-bottom
   margin-top: -20px;
 /**** POST CONTENT ****/
