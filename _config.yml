@@ -55,6 +55,7 @@ default_asides: [
     custom/asides/media.html,
     custom/asides/about.html,
     asides/recent_posts.html,
+    custom/asides/category_cloud.html,
     asides/github.html
 ]
 
