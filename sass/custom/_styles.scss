@@ -38,6 +38,13 @@ footer[role=contentinfo] {
   font-weight: 300;
 }
 
+/**** SIDEBAR ****/
+aside.sidebar {
+  height: 100%;
+  padding: 30px;
+  @extend .noise-bg;
+}
+
 /**** NAVBAR ****/
 .navbar {
   .navbar-brand {
