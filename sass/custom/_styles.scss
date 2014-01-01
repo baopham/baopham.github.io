@@ -13,7 +13,7 @@ html, body {
   margin: 0 auto -60px;
   /* Pad bottom by footer height */
   padding: 0 0 60px;
-  padding-top: 60px;
+  padding-top: 80px;
 }
 
 /* Set the fixed height of the footer here */
@@ -28,7 +28,7 @@ footer[role=contentinfo] {
 /**** HEADER ****/
 #top-header.header {
   // Negative indent by navbar's margin-bottom
-  margin-top: -20px;
+  margin-top: -40px;
   padding: 40px 20px 20px;
 }
 
@@ -40,7 +40,8 @@ footer[role=contentinfo] {
 
 /**** SIDEBAR ****/
 aside.sidebar {
-  padding: 30px;
+  margin-top: -10px;
+  padding: 40px 30px 30px;
   @extend .noise-bg;
 }
 
