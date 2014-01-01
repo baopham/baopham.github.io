@@ -20,6 +20,9 @@
         <li {% if page.navbar == 'Archives' %}class="active"{% endif %}>
           <a href="{{ root_url }}/blog/archives">Archives</a>
         </li>
+        <li {% if page.navbar == 'Tags' %}class="active visible-xs"{% else %}class="visible-xs"{% endif %}>
+          <a href="{{ root_url }}/blog/tags">Tags</a>
+        </li>
         <li {% if page.navbar == 'Resume' %}class="active"{% endif %}>
           <a href="{{ root_url }}/about/resume">Resume</a>
         </li>
