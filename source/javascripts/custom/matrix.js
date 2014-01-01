@@ -181,7 +181,7 @@ function computeMatrix(){
       answer.append(prettify(ans, 'Answer'));
       answer.append(notDisplayCorr);
       $("#not-display-correctly").click(function(){
-        answer.append($('<div />').append(prettify2(ans, 'Answer')));
+        answer.append($('<p />').append(prettify2(ans, 'Answer')));
       });
     }
     else if(func == 'add'){
@@ -189,7 +189,7 @@ function computeMatrix(){
       answer.append(prettify(ans, 'Answer'));
       answer.append(notDisplayCorr);
       $("#not-display-correctly").click(function(){
-        answer.append($('<div />').append(prettify2(ans, 'Answer')));
+        answer.append($('<p />').append(prettify2(ans, 'Answer')));
       });
     }
     else if(func == 'subtract'){
@@ -197,7 +197,7 @@ function computeMatrix(){
       answer.append(prettify(ans, 'Answer'));
       answer.append(notDisplayCorr);
       $("#not-display-correctly").click(function(){
-        answer.append($('<div />').append(prettify2(ans, 'Answer')));
+        answer.append($('<p />').append(prettify2(ans, 'Answer')));
       });
     }
     else if(func == 'transpose'){
@@ -209,8 +209,8 @@ function computeMatrix(){
         answer.append($('<div />').append(prettify(ansB, 'Matrix 2')));
         answer.append(notDisplayCorr);
         $("#not-display-correctly").click(function(){
-          answer.append($('<div />').append(prettify2(ansA, 'Matrix 1')));
-          answer.append($('<div />').append(prettify2(ansB, 'Matrix 2')));
+          answer.append($('<p />').append(prettify2(ansA, 'Matrix 1')));
+          answer.append($('<p />').append(prettify2(ansB, 'Matrix 2')));
         });
 
       }
@@ -219,7 +219,7 @@ function computeMatrix(){
         answer.append($('<div />').append(prettify(ansA, 'Matrix 1')));
         answer.append(notDisplayCorr);
         $("#not-display-correctly").click(function(){
-          answer.append($('<div />').append(prettify2(ansA, 'Matrix 1')));
+          answer.append($('<p />').append(prettify2(ansA, 'Matrix 1')));
         });
       }
       else if(matrixB.length !== 0){
@@ -227,7 +227,7 @@ function computeMatrix(){
         answer.append($('<div />').append(prettify(ansB, 'Matrix 2')));
         answer.append(notDisplayCorr);
         $("#not-display-correctly").click(function(){
-          answer.append($('<div />').append(prettify2(ansB, 'Matrix 2')));
+          answer.append($('<p />').append(prettify2(ansB, 'Matrix 2')));
         });
       }
     }
