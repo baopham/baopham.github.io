@@ -1,12 +1,6 @@
 <div id="top-header" class="header noise-bg text-center visible-sm visible-xs hidden-print">
   <div class="row">
-    {% if site.gravatar_email %}
-    <section>
-      <span>
-        <img class="img-circle" src="{% gravatar_image 200 %}" alt="Gravatar of {{ site.author}} " title="Gravatar of {{ site.author }}" />
-      </span>
-    </section>
-    {% endif %}
+    {% include custom/asides/gravatar.html %}
     {% include custom/asides/media.html %}
     {% if site.subtitle %}
       <h2>{{ site.subtitle }}</h2>
