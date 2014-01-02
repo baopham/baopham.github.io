@@ -34,8 +34,9 @@ footer[role=contentinfo] {
 
 /**** POST CONTENT ****/
 .entry-content {
-  line-height: 1.8em;
+  line-height: 30px;
   font-weight: 300;
+  font-size: 18px;
 }
 
 /**** SIDEBAR ****/
@@ -160,6 +161,12 @@ a {
     text-decoration: underline;
     outline: 0px none;
   }
+}
+
+.lead {
+  // Always the same size.
+  // Default bootstrap decreases the size on smaller screen.
+  font-size: 21px;
 }
 
 /**** CONWAY GAME OF LIFE ****/
