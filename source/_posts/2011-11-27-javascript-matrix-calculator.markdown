@@ -45,16 +45,24 @@ categories: [JavaScript, Math]
       </div>
     </div>
   </div>
-  <div id="selection">
-    <input type="radio" name="method" id="multiply" value="multiply" checked="checked">
-    <label for="multiply">Multiply</label>
-    <input type="radio" name="method" id="transpose" value="transpose"/>
-    <label for="transpose">Transpose</label>
-    <input type="radio" name="method" id="add" value="add"/>
-    <label for="add">Addition</label>
-    <input type="radio" name="method" id="substract" value="subtract"/>
-    <label for="substract">Subtraction</label>
-  </div>
+  <ul class="list-inline">
+    <li> 
+      <input type="radio" name="method" id="multiply" value="multiply" checked="checked">
+      <label for="multiply">Multiply</label>
+    </li>
+    <li>
+      <input type="radio" name="method" id="transpose" value="transpose"/>
+      <label for="transpose">Transpose</label>
+    </li>
+    <li>
+      <input type="radio" name="method" id="add" value="add"/>
+      <label for="add">Addition</label>
+    </li>
+    <li>
+      <input type="radio" name="method" id="substract" value="subtract"/>
+      <label for="substract">Subtraction</label>
+    </li>
+  </ul>
   <div id="compute">
     <input class="btn btn-info" type="button" value="Compute"/>
   </div>

@@ -199,19 +199,6 @@ a {
   padding-bottom: 10px;
 }
 
-/* Radio buttons */
-#selection {
-  input.radio {
-    display: inline;
-    position: relative;
-    margin-left: 0.2em;
-  }
-  label {
-    display: inline;
-    position: relative;
-  }
-}
-
 /**** CHESS ****/
 table.chess {
   max-width: 100%;
@@ -250,6 +237,7 @@ table.chess {
 [draggable=true] {
   -khtml-user-drag: element;
   -webkit-user-drag: element;
+
   -khtml-user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
