@@ -129,7 +129,7 @@ function check(matrix){
 }
 
 function computeMatrix(){
-  var notDisplayCorr = '<div><a id="not-display-correctly">Not display correctly? Click here</a></div>';
+  var notDisplayCorr = '<div><a id="not-display-correctly">Not displaying correctly? Click here</a></div>';
   $(".add").click(function(){
     var inputMatrix = $(this).closest(".matrix").find(".inputMatrix");
     inputMatrix.append("<div class='matrix-row'><input type='text'></input></div>");
