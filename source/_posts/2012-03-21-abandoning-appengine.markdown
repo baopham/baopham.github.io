@@ -12,7 +12,7 @@ These last 2 days have been insane!! You know why? Let me tell you the story:
 I was sick. It was a random cold that I caught from someone. But now I'm glad I had it because if not because of it, I wouldn't have had the time to wander around [github](https://github.com), looking at people's repos, and then stumbled upon this project [toto](https://github.com/cloudhead/toto). And now, it's like a dream come true!.
 <!--more-->
 
-**toto** is really the tiniest and coolest blogging engine yet! It has all that I love: git and ruby on rails. It makes everything so easy to manage and configure, from archiving all the posts you wrote, to having a markdown converter by default, and articles embeded with metadata (which makes it easy to add tags/categories), etc.
+**toto** is really the tiniest and coolest blogging engine yet! It has all that I love: git and ruby. It makes everything so easy to manage and configure, from archiving all the posts you wrote, to having a markdown converter by default, and articles embeded with metadata (which makes it easy to add tags/categories), etc.
 
 I'm not going to explain all **toto**'s features but as a future reference for myself, I'd like to summarize all the steps that I took during the last 2 days to port my old website from [Google AppEngine](http://code.google.com/appengine/) to [toto](https://github.com/cloudhead/toto) and [Heroku](http://www.heroku.com/).
 
@@ -160,4 +160,4 @@ Those are the few things that I picked up from playing with **toto** for 2 days
 
 ### Deploy to Heroku
 
-2 days to learn Rack, ERB templates, discover [disqus](http://disqus.com/), and many more interesting projects, finally... goodbye Google AppEngine and Django, I'm joining the Ruby and Rails community!
+2 days to learn Rack, ERB templates, discover [disqus](http://disqus.com/), and many more interesting projects, finally... goodbye Google AppEngine and Django, I'm joining the Ruby community!
