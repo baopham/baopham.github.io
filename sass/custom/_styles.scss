@@ -46,6 +46,11 @@ aside.sidebar {
   @extend .noise-bg;
 }
 
+.gravatar-img {
+  width: 200px;
+  height: 200px;
+}
+
 /**** NAVBAR ****/
 .navbar {
   .navbar-brand {
