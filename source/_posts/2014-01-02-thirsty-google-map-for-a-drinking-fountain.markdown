@@ -8,7 +8,7 @@ categories: [JavaScript, Knockout.js, Node.js, Semantic-UI, Web Development]
 
 Or you can head over to [Vancouver Fountain Finder][fountain] and search for the nearest drinking fountain in Vancouver, BC.  
 
-This is a small project I built during the school break to learn [Node.js][nodejs]. I have always wanted to learn [Node.js][nodejs] and use [Google Maps API](gmap-v3) so I tried to think of features that will let me learn new things as much as possible. Before this, I also built a simple [timer][timer] just to get started with [Node.js][nodejs] and become familiar with [Knockout.js][ko] and [Semantic-UI][semanticui]. <!--more-->I guess [Semantic-UI][semanticui] is still relatively new so I still prefer [Bootstrap][bootstrap]. A [timer][timer] because I saw my Math teacher struggling with the [online stopwatch][online-stopwatch] to set up the time for the exam... And the ads were quite distracting...
+This is a small project I built during the school break to learn [Node.js][nodejs]. I have always wanted to learn [Node.js][nodejs] and use [Google Maps API](gmap-v3) so I tried to think of features that will let me learn new things as much as possible. Before this, I also built a simple [timer][timer] just to get started with [Node.js][nodejs] and become familiar with [Knockout.js][ko] and [Semantic-UI][semanticui]. <!--more-->I guess [Semantic-UI][semanticui] is still relatively new so I still prefer [Bootstrap][bootstrap] or maybe I am just biased... Anyway, a [timer][timer] because I saw my Math teacher struggling with the [online stopwatch][online-stopwatch] before the exam... And the ads were quite distracting...
 
 Just a quick update since now I'm back to school. Back to studying.
 
