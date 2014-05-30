@@ -3,7 +3,7 @@ layout: post
 title: "A Command Line Interface for Vundle"
 date: 2014-05-29 21:30:24 -0700
 comments: true
-categories: [VimL, Ruby]
+categories: [Vim, Ruby]
 ---
 
 I'm a die hard fan of Vim and sometimes can be obsessed with trying out new plugins. I really like [Vundle](https://github.com/gmarik/Vundle.vim) - a Vim plugin manager that simplifies plugin installation. I recently reorganized my [.vimrc](https://github.com/baopham/vim/blob/master/vimrc) so that it's easier to keep track of my plugin configurations. My [.vim](https://github.com/baopham/vim) folder now has a sub directory `settings` that contains different files for each plugin configuration:
