@@ -39,6 +39,10 @@ Rather than explaining what each command does, I think a gif would do a much bet
 
 <img src="/images/vundlecli.gif" alt="Vundle CLI gif" class="center"/>
 
+The locations of `.vimrc` file, `.vim` and `settings` directories can be specified with options `--vimrc`, `--vimdir`, `--settings` respectively.  Otherwise, the default values are `~/.vimrc`, `~/.vim`, and `~/.vim/settings`. It should also be able to follow symlinks.
+
+I still need to write tests but I'm leaving it for the future when I have more time and energy.
+
 [Vundle CLI](https://github.com/baopham/vundle-cli) is a Ruby gem so to install it, run this in your terminal: 
 
 ```bash
