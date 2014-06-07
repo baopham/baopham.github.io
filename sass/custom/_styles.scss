@@ -166,9 +166,9 @@ aside.sidebar {
 a {
   color: #3499B3;
   text-decoration: none;
-  :hover {
+  &:hover {
     color: #005580;
-    text-decoration: underline;
+    text-decoration: none;
     outline: 0px none;
   }
 }
