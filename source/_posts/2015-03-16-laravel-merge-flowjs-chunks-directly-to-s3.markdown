@@ -12,7 +12,7 @@ categories: [PHP, Laravel, S3, Flowjs]
 
 We could extend this class so that it uses [S3 Stream Wrapper](http://docs.aws.amazon.com/aws-sdk-php/guide/latest/feature-s3-stream-wrapper.html):
 
-```
+```php
 <?php namespace Bao\Flow;
 
 use Flow\ConfigInterface;
