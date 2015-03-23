@@ -9,6 +9,7 @@ categories: Laravel, Php, Angularjs
 The thing with uploading files via AJAX is that users can just keep uploading files to the server without having to save the form. This leaves a lot of junk files around if you don't clean them up later. But we don't want to delete the files that are actually being used. This means we need to keep records of uploaded files.
 
 This pattern is working for me - assuming we want to keep files on S3:
+<!--more-->
 
 **1.** A table to store records of uploaded files.
 
