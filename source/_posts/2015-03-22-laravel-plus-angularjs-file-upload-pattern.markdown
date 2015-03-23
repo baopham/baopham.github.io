@@ -197,15 +197,15 @@ Set a scheduler for it:
 ```php
 // app/Console/Kernel.php
 
-    protected $commands = [
-        'CRT\Console\Commands\CleanupFiles',
-    ];
+protected $commands = [
+    'CRT\Console\Commands\CleanupFiles',
+];
 
-    protected function schedule(Schedule $schedule)
-    {
-        $schedule->command('files:clean')
-                ->hourly();
-    }
+protected function schedule(Schedule $schedule)
+{
+    $schedule->command('files:clean')
+            ->hourly();
+}
 ```
 
 And then setup cronjob:
