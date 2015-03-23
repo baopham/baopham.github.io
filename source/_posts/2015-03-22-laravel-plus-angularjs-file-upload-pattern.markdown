@@ -3,7 +3,7 @@ layout: post
 title: "Laravel + Angularjs: file upload pattern"
 date: 2015-03-22 22:36:38 -0700
 comments: true
-categories: Laravel, Php, Angularjs
+categories: [Laravel, PHP, Angularjs]
 ---
 
 The thing with uploading files via AJAX is that users can just keep uploading files to the server without having to save the form. This leaves a lot of junk files around if you don't clean them up later. But we don't want to delete the files that are actually being used. This means we need to keep records of uploaded files.
