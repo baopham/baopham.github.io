@@ -34,3 +34,5 @@ But don't use `.` in your disk name as it will confuse with the array dot notati
         return $this->app['config']["filesystems.disks.{$name}"];
     }
 ```
+
+And then you can call: `Storage::disk('s3-stage')` like any other disk.
