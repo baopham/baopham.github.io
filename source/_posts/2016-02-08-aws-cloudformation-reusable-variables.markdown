@@ -57,8 +57,8 @@ Example: Here we have a custom resource `DBInfo` to hold the DB information.
     "Type": "AWS::IAM::Role",
     "Properties": {
       "AssumeRolePolicyDocument": {
-      "Version": "2012-10-17",
-      "Statement": [{ "Effect": "Allow", "Principal": {"Service": ["lambda.amazonaws.com"]}, "Action": ["sts:AssumeRole"] }]
+        "Version": "2012-10-17",
+        "Statement": [{ "Effect": "Allow", "Principal": {"Service": ["lambda.amazonaws.com"]}, "Action": ["sts:AssumeRole"] }]
       },
       "Path": "/",
       "Policies": [{
