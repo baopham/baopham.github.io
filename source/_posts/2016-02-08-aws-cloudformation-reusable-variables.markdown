@@ -16,60 +16,60 @@ Example: Here we have a custom resource `DBInfo` to hold the DB information.
 
 ```javascript
 "Resources": {
-    "DBInfo": {
+  "DBInfo": {
     "Type": "Custom::DBInfo",
     "Properties": {
-        "ServiceToken": { "Fn::GetAtt": ["GetDBInfo", "Arn"] },
-        "BuildVersion": { "Ref": "BuildVersion" }
+      "ServiceToken": { "Fn::GetAtt": ["GetDBInfo", "Arn"] },
+      "BuildVersion": { "Ref": "BuildVersion" }
     }
-    },
-    "GetDBInfo": {
+  },
+  "GetDBInfo": {
     "Type": "AWS::Lambda::Function",
     "Properties": {
-        "Handler": "index.handler",
-        "Role": { "Fn::GetAtt" : ["LambdaExecutionRole", "Arn"] },
-        "Code": {
+      "Handler": "index.handler",
+      "Role": { "Fn::GetAtt" : ["LambdaExecutionRole", "Arn"] },
+      "Code": {
         "ZipFile":  { "Fn::Join": ["", [
-            "var response = require('cfn-response');",
-            "exports.handler = function(event, context) {",
-            "   var password = '",
-            { "Fn::GetAtt": [ "GeneratedDBPassword", "Value" ] },
-            "';",
-            "   var username = '",
-            {
-                "Fn::Join": [ "_", [ {"Ref": "AppName"}, {"Ref": "AppEnv"} ] ]
-            },
-            "   var database = '",
-            {
-                "Fn::Join": [ "_", [ {"Ref": "AppName"}, {"Ref": "AppEnv"} ] ]
-            },
-            "';",
-            "   var responseData = { Password: password, Username: username, Database: database };",
-            "   response.send(event, context, response.SUCCESS, responseData);",
-            "};"
-            ]]
-        },
-        "Runtime": "nodejs"
+          "var response = require('cfn-response');",
+          "exports.handler = function(event, context) {",
+          "   var password = '",
+          { "Fn::GetAtt": [ "GeneratedDBPassword", "Value" ] },
+          "';",
+          "   var username = '",
+          {
+              "Fn::Join": [ "_", [ {"Ref": "AppName"}, {"Ref": "AppEnv"} ] ]
+          },
+          "   var database = '",
+          {
+              "Fn::Join": [ "_", [ {"Ref": "AppName"}, {"Ref": "AppEnv"} ] ]
+          },
+          "';",
+          "   var responseData = { Password: password, Username: username, Database: database };",
+          "   response.send(event, context, response.SUCCESS, responseData);",
+          "};"
+          ]]
         }
+      },
+      "Runtime": "nodejs"
     }
-    },
-    "LambdaExecutionRole": {
+  },
+  "LambdaExecutionRole": {
     "Type": "AWS::IAM::Role",
     "Properties": {
-        "AssumeRolePolicyDocument": {
-        "Version": "2012-10-17",
-        "Statement": [{ "Effect": "Allow", "Principal": {"Service": ["lambda.amazonaws.com"]}, "Action": ["sts:AssumeRole"] }]
-        },
-        "Path": "/",
-        "Policies": [{
+      "AssumeRolePolicyDocument": {
+      "Version": "2012-10-17",
+      "Statement": [{ "Effect": "Allow", "Principal": {"Service": ["lambda.amazonaws.com"]}, "Action": ["sts:AssumeRole"] }]
+      },
+      "Path": "/",
+      "Policies": [{
         "PolicyName": "root",
         "PolicyDocument": {
-            "Version": "2012-10-17",
-            "Statement": [{ "Effect": "Allow", "Action": ["logs:*"], "Resource": "arn:aws:logs:*:*:*" }]
+          "Version": "2012-10-17",
+          "Statement": [{ "Effect": "Allow", "Action": ["logs:*"], "Resource": "arn:aws:logs:*:*:*" }]
         }
-        }]
+      }]
     }
-    }
+  }
 }
 ```
 3 - Reference the custom resource with `Fn::GetAtt`:
@@ -83,9 +83,9 @@ Example: Here we have a custom resource `DBInfo` to hold the DB information.
 
 ```
 "Parameters": {
-    "BuildVersion": {
+  "BuildVersion": {
     "Description": "Build Version. Needs to be different everytime you make an update",
     "Type": "String"
-    }
+  }
 }
 ```
