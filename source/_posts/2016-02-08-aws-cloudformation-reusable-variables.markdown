@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "AWS CloudFormation reusable "variables""
+title: "AWS CloudFormation reusable variables"
 date: 2016-02-08 07:46:33 -0800
 comments: true
 categories: [AWS, CloudFormation]
