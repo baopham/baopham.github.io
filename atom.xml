@@ -4,7 +4,7 @@
   <title><![CDATA[:baopham]]></title>
   <link href="http://baopham.github.io/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-02-08T09:11:59-08:00</updated>
+  <updated>2016-02-08T09:13:09-08:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -161,10 +161,10 @@
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 </pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="s2">&quot;Parameters&quot;</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>    <span class="s2">&quot;BuildVersion&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>  <span class="s2">&quot;BuildVersion&quot;</span><span class="o">:</span> <span class="p">{</span>
 </span><span class='line'>    <span class="s2">&quot;Description&quot;</span><span class="o">:</span> <span class="s2">&quot;Build Version. Needs to be different everytime you make an update&quot;</span><span class="p">,</span>
 </span><span class='line'>    <span class="s2">&quot;Type&quot;</span><span class="o">:</span> <span class="s2">&quot;String&quot;</span>
-</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
