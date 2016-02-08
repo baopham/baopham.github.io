@@ -32,9 +32,6 @@ Example: Here we have a custom resource `DBInfo` to hold the DB information.
         "ZipFile":  { "Fn::Join": ["", [
             "var response = require('cfn-response');",
             "exports.handler = function(event, context) {",
-            "   var host = '",
-            { "Fn::GetAtt": [ "Database", "Endpoint.Address" ] },
-            "';",
             "   var password = '",
             { "Fn::GetAtt": [ "GeneratedDBPassword", "Value" ] },
             "';",
@@ -47,7 +44,7 @@ Example: Here we have a custom resource `DBInfo` to hold the DB information.
                 "Fn::Join": [ "_", [ {"Ref": "AppName"}, {"Ref": "AppEnv"} ] ]
             },
             "';",
-            "   var responseData = { Host: host, Password: password, Username: username, Database: database };",
+            "   var responseData = { Password: password, Username: username, Database: database };",
             "   response.send(event, context, response.SUCCESS, responseData);",
             "};"
             ]]
@@ -78,7 +75,7 @@ Example: Here we have a custom resource `DBInfo` to hold the DB information.
 3 - Reference the custom resource with `Fn::GetAtt`:
 
 ```javascript
-{ "Fn::GetAtt": [ "DBInfo", "Host" ] },
+{ "Fn::GetAtt": [ "DBInfo", "Username" ] },
 { "Fn::GetAtt": [ "DBInfo", "Password" ] }
 ...
 ```
