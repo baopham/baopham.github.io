@@ -257,9 +257,6 @@
 <span class='line-number'>54</span>
 <span class='line-number'>55</span>
 <span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
 </pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="s2">&quot;Resources&quot;</span><span class="o">:</span> <span class="p">{</span>
 </span><span class='line'>    <span class="s2">&quot;DBInfo&quot;</span><span class="o">:</span> <span class="p">{</span>
 </span><span class='line'>    <span class="s2">&quot;Type&quot;</span><span class="o">:</span> <span class="s2">&quot;Custom::DBInfo&quot;</span><span class="p">,</span>
@@ -277,9 +274,6 @@
 </span><span class='line'>        <span class="s2">&quot;ZipFile&quot;</span><span class="o">:</span>  <span class="p">{</span> <span class="s2">&quot;Fn::Join&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="p">[</span>
 </span><span class='line'>            <span class="s2">&quot;var response = require(&#39;cfn-response&#39;);&quot;</span><span class="p">,</span>
 </span><span class='line'>            <span class="s2">&quot;exports.handler = function(event, context) {&quot;</span><span class="p">,</span>
-</span><span class='line'>            <span class="s2">&quot;   var host = &#39;&quot;</span><span class="p">,</span>
-</span><span class='line'>            <span class="p">{</span> <span class="s2">&quot;Fn::GetAtt&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;Database&quot;</span><span class="p">,</span> <span class="s2">&quot;Endpoint.Address&quot;</span> <span class="p">]</span> <span class="p">},</span>
-</span><span class='line'>            <span class="s2">&quot;&#39;;&quot;</span><span class="p">,</span>
 </span><span class='line'>            <span class="s2">&quot;   var password = &#39;&quot;</span><span class="p">,</span>
 </span><span class='line'>            <span class="p">{</span> <span class="s2">&quot;Fn::GetAtt&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;GeneratedDBPassword&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span> <span class="p">]</span> <span class="p">},</span>
 </span><span class='line'>            <span class="s2">&quot;&#39;;&quot;</span><span class="p">,</span>
@@ -292,7 +286,7 @@
 </span><span class='line'>                <span class="s2">&quot;Fn::Join&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="p">[</span> <span class="p">{</span><span class="s2">&quot;Ref&quot;</span><span class="o">:</span> <span class="s2">&quot;AppName&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;Ref&quot;</span><span class="o">:</span> <span class="s2">&quot;AppEnv&quot;</span><span class="p">}</span> <span class="p">]</span> <span class="p">]</span>
 </span><span class='line'>            <span class="p">},</span>
 </span><span class='line'>            <span class="s2">&quot;&#39;;&quot;</span><span class="p">,</span>
-</span><span class='line'>            <span class="s2">&quot;   var responseData = { Host: host, Password: password, Username: username, Database: database };&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="s2">&quot;   var responseData = { Password: password, Username: username, Database: database };&quot;</span><span class="p">,</span>
 </span><span class='line'>            <span class="s2">&quot;   response.send(event, context, response.SUCCESS, responseData);&quot;</span><span class="p">,</span>
 </span><span class='line'>            <span class="s2">&quot;};&quot;</span>
 </span><span class='line'>            <span class="p">]]</span>
@@ -327,7 +321,7 @@
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">{</span> <span class="s2">&quot;Fn::GetAtt&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;DBInfo&quot;</span><span class="p">,</span> <span class="s2">&quot;Host&quot;</span> <span class="p">]</span> <span class="p">},</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">{</span> <span class="s2">&quot;Fn::GetAtt&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;DBInfo&quot;</span><span class="p">,</span> <span class="s2">&quot;Username&quot;</span> <span class="p">]</span> <span class="p">},</span>
 </span><span class='line'><span class="p">{</span> <span class="s2">&quot;Fn::GetAtt&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;DBInfo&quot;</span><span class="p">,</span> <span class="s2">&quot;Password&quot;</span> <span class="p">]</span> <span class="p">}</span>
 </span><span class='line'><span class="p">...</span>
 </span></code></pre></td></tr></table></div></figure>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: CloudFormation | :baopham]]></title>
   <link href="http://baopham.github.io/blog/categories/cloudformation/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-02-08T08:16:57-08:00</updated>
+  <updated>2016-02-08T08:51:12-08:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -45,9 +45,6 @@
     "ZipFile":  { "Fn::Join": ["", [
         "var response = require('cfn-response');",
         "exports.handler = function(event, context) {",
-        "   var host = '",
-        { "Fn::GetAtt": [ "Database", "Endpoint.Address" ] },
-        "';",
         "   var password = '",
         { "Fn::GetAtt": [ "GeneratedDBPassword", "Value" ] },
         "';",
@@ -60,7 +57,7 @@
             "Fn::Join": [ "_", [ {"Ref": "AppName"}, {"Ref": "AppEnv"} ] ]
         },
         "';",
-        "   var responseData = { Host: host, Password: password, Username: username, Database: database };",
+        "   var responseData = { Password: password, Username: username, Database: database };",
         "   response.send(event, context, response.SUCCESS, responseData);",
         "};"
         ]]
@@ -93,7 +90,7 @@
 3 - Reference the custom resource with</code>Fn::GetAtt`:</p>
 
 <p><code>javascript
-{ "Fn::GetAtt": [ "DBInfo", "Host" ] },
+{ "Fn::GetAtt": [ "DBInfo", "Username" ] },
 { "Fn::GetAtt": [ "DBInfo", "Password" ] }
 ...
 </code>
