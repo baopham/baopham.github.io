@@ -86,7 +86,8 @@ Example: Here we have a custom resource `DBInfo` to hold the DB information.
 "Parameters": {
   "BuildVersion": {
     "Description": "Build Version. Needs to be different everytime you make an update",
-    "Type": "String"
+    "Type": "String",
+    "MinLength": 1
   }
 }
 ```
