@@ -39,6 +39,7 @@ Example: Here we have a custom resource `DBInfo` to hold the DB information.
           {
               "Fn::Join": [ "_", [ {"Ref": "AppName"}, {"Ref": "AppEnv"} ] ]
           },
+          "';",
           "   var database = '",
           {
               "Fn::Join": [ "_", [ {"Ref": "AppName"}, {"Ref": "AppEnv"} ] ]
