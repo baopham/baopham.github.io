@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Semantic-UI | :baopham]]></title>
+  <link href="http://baopham.github.io/blog/categories/semantic-ui/atom.xml" rel="self"/>
+  <link href="http://baopham.github.io/"/>
+  <updated>2016-02-08T08:11:11-08:00</updated>
+  <id>http://baopham.github.io/</id>
+  <author>
+    <name><![CDATA[Bao Pham]]></name>
+    <email><![CDATA[gbaopham@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Thirsty? Google map for a drinking fountain]]></title>
+    <link href="http://baopham.github.io/blog/2014/01/02/thirsty-google-map-for-a-drinking-fountain/"/>
+    <updated>2014-01-02T08:05:30-08:00</updated>
+    <id>http://baopham.github.io/blog/2014/01/02/thirsty-google-map-for-a-drinking-fountain</id>
+    <content type="html"><![CDATA[<p>Or you can head over to <a href="http://vancouverfountains.herokuapp.com/" title="Vancouver Fountain Finder">Vancouver Fountain Finder</a> and search for the nearest drinking fountain in Vancouver, BC.</p>
+
+<p>This is a small project I built during the school break to learn <a href="http://nodejs.org/" title="Node.js">Node.js</a>. I have always wanted to learn <a href="http://nodejs.org/" title="Node.js">Node.js</a> and use <a href="gmap-v3">Google Maps API</a> so I tried to think of features that will let me learn new things as much as possible. Before this, I also built a simple <a href="http://bpmtimer.herokuapp.com/" title="Timer">timer</a> just to get started with <a href="http://nodejs.org/" title="Node.js">Node.js</a> and become familiar with <a href="http://knockoutjs.com/" title="Knockout.js">Knockout.js</a> and <a href="http://semantic-ui.com/" title="Semantic-UI">Semantic-UI</a>. <!--more-->I guess <a href="http://semantic-ui.com/" title="Semantic-UI">Semantic-UI</a> is still relatively new so I still prefer <a href="http://getbootstrap.com/" title="Bootstrap">Bootstrap</a> or maybe I am just biased&hellip; Anyway, a <a href="http://bpmtimer.herokuapp.com/" title="Timer">timer</a> because I saw my Math teacher struggling with the <a href="http://online-stopwatch.com/" title="Online Stopwatch">online stopwatch</a> before the exam&hellip; And the ads were quite distracting&hellip;</p>
+
+<p>Just a quick update since now I&rsquo;m back to school. Back to studying.</p>
+]]></content>
+  </entry>
+  
+</feed>

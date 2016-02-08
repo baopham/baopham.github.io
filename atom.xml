@@ -1,0 +1,1722 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[:baopham]]></title>
+  <link href="http://baopham.github.io/atom.xml" rel="self"/>
+  <link href="http://baopham.github.io/"/>
+  <updated>2016-02-08T08:11:11-08:00</updated>
+  <id>http://baopham.github.io/</id>
+  <author>
+    <name><![CDATA[Bao Pham]]></name>
+    <email><![CDATA[gbaopham@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[AWS CloudFormation Reusable Variables]]></title>
+    <link href="http://baopham.github.io/blog/2016/02/08/aws-cloudformation-reusable-variables/"/>
+    <updated>2016-02-08T07:46:33-08:00</updated>
+    <id>http://baopham.github.io/blog/2016/02/08/aws-cloudformation-reusable-variables</id>
+    <content type="html"><![CDATA[<p>Here is a way to create reusable strings / numbers / etc. in CloudFormation.</p>
+
+<ol>
+<li>Create Lambda resource to build the values you need.</li>
+<li><p>Create a custom resource to store the value returned from the Lambda</p>
+
+<p> Example: Here we have a custom resource <code>DBInfo</code> to hold the DB information.</p>
+
+<p> <code>javascript
+ "Resources": {
+   "DBInfo": {
+     "Type": "Custom::DBInfo",
+     "Properties": {
+       "ServiceToken": { "Fn::GetAtt": ["GetDBInfo", "Arn"] },
+       "BuildVersion": { "Ref": "BuildVersion" }
+     }
+   },
+   "GetDBInfo": {
+     "Type": "AWS::Lambda::Function",
+     "Properties": {
+       "Handler": "index.handler",
+       "Role": { "Fn::GetAtt" : ["LambdaExecutionRole", "Arn"] },
+       "Code": {
+         "ZipFile":  { "Fn::Join": ["", [
+             "var response = require('cfn-response');",
+             "exports.handler = function(event, context) {",
+             "   var host = '",
+             { "Fn::GetAtt": [ "Database", "Endpoint.Address" ] },
+             "';",
+             "   var password = '",
+             { "Fn::GetAtt": [ "GeneratedDBPassword", "Value" ] },
+             "';",
+             "   var username = '",
+             {
+               "Fn::Join": [ "_", [ {"Ref": "AppName"}, {"Ref": "AppEnv"} ] ]
+             },
+             "   var database = '",
+             {
+               "Fn::Join": [ "_", [ {"Ref": "AppName"}, {"Ref": "AppEnv"} ] ]
+             },
+             "';",
+             "   var responseData = { Host: host, Password: password, Username: username, Database: database };",
+             "   response.send(event, context, response.SUCCESS, responseData);",
+             "};"
+           ]]
+         },
+         "Runtime": "nodejs"
+       }
+     }
+   },
+   "LambdaExecutionRole": {
+     "Type": "AWS::IAM::Role",
+     "Properties": {
+       "AssumeRolePolicyDocument": {
+         "Version": "2012-10-17",
+         "Statement": [{ "Effect": "Allow", "Principal": {"Service": ["lambda.amazonaws.com"]}, "Action": ["sts:AssumeRole"] }]
+       },
+       "Path": "/",
+       "Policies": [{
+         "PolicyName": "root",
+         "PolicyDocument": {
+           "Version": "2012-10-17",
+           "Statement": [{ "Effect": "Allow", "Action": ["logs:*"], "Resource": "arn:aws:logs:*:*:*" }]
+         }
+       }]
+     }
+   }
+ }
+</code></p></li>
+<li><p>Reference the custom resource with <code>Fn::GetAtt</code>:</p>
+
+<p> <code>javascript
+ { "Fn::GetAtt": [ "DBInfo", "Host" ] },
+ { "Fn::GetAtt": [ "DBInfo", "Password" ] }
+ ...
+</code></p></li>
+<li><p>Create a parameter <code>BuildVersion</code>. This is the key to make sure the custom resource <code>DBInfo</code> is updated when you update your CloudFormation</p>
+
+<p> <code>
+ "Parameters": {
+   "BuildVersion": {
+     "Description": "Build Version. Needs to be different everytime you make an update",
+     "Type": "String"
+   }
+ }
+</code></p></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[A DynamoDb Wrapper for Laravel Model]]></title>
+    <link href="http://baopham.github.io/blog/2015/09/22/a-dynamodb-wrapper-for-laravel-model/"/>
+    <updated>2015-09-22T00:21:39-07:00</updated>
+    <id>http://baopham.github.io/blog/2015/09/22/a-dynamodb-wrapper-for-laravel-model</id>
+    <content type="html"><![CDATA[<p>With this package <a href="https://packagist.org/packages/baopham/dynamodb">baopham/dynamodb</a>, you can do:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">class</span> <span class="nc">Campaign</span> <span class="k">extends</span> <span class="nx">BaoPham\DynamoDb\DynamoDbModel</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">protected</span> <span class="nv">$table</span> <span class="o">=</span> <span class="s1">&#39;dynamodb_table_for_campaign&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">protected</span> <span class="nv">$fillable</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$campaign</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Campaign</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$campaign</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="s1">&#39;campaign-id&#39;</span><span class="p">);</span> <span class="c1">// it&#39;s best to use UUID instead of incremented id - less work since you have to set the id attribute yourself.</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// or</span>
+</span><span class='line'><span class="nv">$campaign</span><span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;foo&#39;</span><span class="p">)</span>
+</span><span class='line'>        <span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="k">true</span><span class="p">)</span>
+</span><span class='line'>        <span class="o">-&gt;</span><span class="na">get</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// or</span>
+</span><span class='line'><span class="nv">$campaign</span><span class="o">-&gt;</span><span class="na">first</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// or</span>
+</span><span class='line'><span class="nv">$campaign</span><span class="o">-&gt;</span><span class="na">update</span><span class="p">([</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;foo2&#39;</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;bar2&#39;</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span> <span class="o">=&gt;</span> <span class="k">false</span><span class="p">]);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// or</span>
+</span><span class='line'><span class="nv">$campaign</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="s1">&#39;campaign-id&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>For more, <code>README</code>, tests and code are available here: <a href="https://github.com/baopham/laravel-dynamodb">https://github.com/baopham/laravel-dynamodb</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Laravel - Upload to a Non-default S3 Bucket]]></title>
+    <link href="http://baopham.github.io/blog/2015/09/22/laravel-upload-to-a-non-default-s3-bucket/"/>
+    <updated>2015-09-22T00:11:45-07:00</updated>
+    <id>http://baopham.github.io/blog/2015/09/22/laravel-upload-to-a-non-default-s3-bucket</id>
+    <content type="html"><![CDATA[<p>Very easy. Define a new &ldquo;disk&rdquo; in <code>config/filesystems.php</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'>    <span class="s1">&#39;s3-stage&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
+</span><span class='line'>        <span class="s1">&#39;driver&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;s3&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;key&#39;</span>    <span class="o">=&gt;</span> <span class="nx">env</span><span class="p">(</span><span class="s1">&#39;S3_STAGE_KEY&#39;</span><span class="p">),</span>
+</span><span class='line'>        <span class="s1">&#39;secret&#39;</span> <span class="o">=&gt;</span> <span class="nx">env</span><span class="p">(</span><span class="s1">&#39;S3_STAGE_SECRET&#39;</span><span class="p">),</span>
+</span><span class='line'>        <span class="s1">&#39;region&#39;</span> <span class="o">=&gt;</span> <span class="nx">env</span><span class="p">(</span><span class="s1">&#39;S3_STAGE_REGION&#39;</span><span class="p">),</span>
+</span><span class='line'>        <span class="s1">&#39;bucket&#39;</span> <span class="o">=&gt;</span> <span class="nx">env</span><span class="p">(</span><span class="s1">&#39;S3_STAGE_BUCKET&#39;</span><span class="p">),</span>
+</span><span class='line'>    <span class="p">],</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>But don&rsquo;t use <code>.</code> in your disk name as it will confuse with the array dot notation:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1"># Illuminate\Filesystem\FilesystemManager</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="sd">/**</span>
+</span><span class='line'><span class="sd">     * Get the filesystem connection configuration.</span>
+</span><span class='line'><span class="sd">     *</span>
+</span><span class='line'><span class="sd">     * @param  string  $name</span>
+</span><span class='line'><span class="sd">     * @return array</span>
+</span><span class='line'><span class="sd">     */</span>
+</span><span class='line'>    <span class="k">protected</span> <span class="k">function</span> <span class="nf">getConfig</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">app</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s2">&quot;filesystems.disks.</span><span class="si">{</span><span class="nv">$name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And then you can call: <code>Storage::disk('s3-stage')</code> like any other disk.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Laravel + Angularjs: File Upload Pattern]]></title>
+    <link href="http://baopham.github.io/blog/2015/03/22/laravel-plus-angularjs-file-upload-pattern/"/>
+    <updated>2015-03-22T22:36:38-07:00</updated>
+    <id>http://baopham.github.io/blog/2015/03/22/laravel-plus-angularjs-file-upload-pattern</id>
+    <content type="html"><![CDATA[<p>The thing with uploading files via AJAX is that users can just keep uploading files to the server without having to save the form. This leaves a lot of junk files around if you don&rsquo;t clean them up later. But we don&rsquo;t want to delete the files that are actually being used. This means we need to keep records of uploaded files.</p>
+
+<p>This pattern is working for me &ndash; assuming we want to keep files on S3:</p>
+
+<!--more-->
+
+
+<p><strong>1.</strong> A table to store records of uploaded files.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">// database/migrations/2015_03_05_004850_create_files_table.php</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">public</span> <span class="k">function</span> <span class="nf">up</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nx">Schema</span><span class="o">::</span><span class="na">create</span><span class="p">(</span><span class="s1">&#39;files&#39;</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nx">Blueprint</span> <span class="nv">$table</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="mi">36</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">primary</span><span class="p">();</span>
+</span><span class='line'>        <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">(</span><span class="s1">&#39;mime&#39;</span><span class="p">,</span> <span class="mi">255</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">(</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="mi">255</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">bigInteger</span><span class="p">(</span><span class="s1">&#39;size&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">unsigned</span><span class="p">();</span>
+</span><span class='line'>        <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">(</span><span class="s1">&#39;storage_path&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">unique</span><span class="p">();</span>
+</span><span class='line'>        <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">(</span><span class="s1">&#39;disk&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">boolean</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">timestamps</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// app/Models/File.php</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">use</span> <span class="nx">CRT\Models\BaseModel</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nx">Illuminate\Support\Facades\Storage</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">File</span> <span class="k">extends</span> <span class="nx">BaseModel</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">protected</span> <span class="nv">$fillable</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mime&#39;</span><span class="p">,</span> <span class="s1">&#39;storage_path&#39;</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">,</span> <span class="s1">&#39;disk&#39;</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">boot</span><span class="p">()</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="k">parent</span><span class="o">::</span><span class="na">boot</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">static</span><span class="o">::</span><span class="na">deleting</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$model</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="nx">Storage</span><span class="o">::</span><span class="na">disk</span><span class="p">(</span><span class="nv">$model</span><span class="o">-&gt;</span><span class="na">disk</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">(</span><span class="nv">$model</span><span class="o">-&gt;</span><span class="na">storage_path</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">});</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>2.</strong> Use Javascript library to upload files thru AJAX (<a href="https://github.com/flowjs">Flowjs</a>, <a href="http://www.dropzonejs.com/">Dropzonejs</a>, etc.)</p>
+
+<p><strong>3.</strong> In the controller&rsquo;s upload method:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">// app/Http/Controllers/FileUploadController.php</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">use</span> <span class="nx">CRT\Models\File</span> <span class="k">as</span> <span class="nx">FileModel</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">use</span> <span class="nx">Flow\Config</span> <span class="k">as</span> <span class="nx">FlowConfig</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nx">Flow\Request</span> <span class="k">as</span> <span class="nx">FlowRequest</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nx">Flow\ConfigInterface</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nx">Flow\RequestInterface</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">public</span> <span class="k">function</span> <span class="nf">upload</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nv">$config</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FlowConfig</span><span class="p">();</span>
+</span><span class='line'>    <span class="nv">$config</span><span class="o">-&gt;</span><span class="na">setTempDir</span><span class="p">(</span><span class="nx">storage_path</span><span class="p">()</span> <span class="o">.</span> <span class="s1">&#39;/tmp&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="nv">$config</span><span class="o">-&gt;</span><span class="na">setDeleteChunksOnSave</span><span class="p">(</span><span class="k">false</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nv">$request</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FlowRequest</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nv">$totalSize</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getTotalSize</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$totalSize</span> <span class="o">&amp;&amp;</span> <span class="nv">$totalSize</span> <span class="o">&gt;</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">4</span><span class="p">))</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">responseWithError</span><span class="p">(</span><span class="s1">&#39;File size exceeds 4MB&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nv">$uploadFile</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getFile</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">list</span><span class="p">(</span><span class="nv">$path</span><span class="p">,</span> <span class="nv">$destination</span><span class="p">)</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getDestinationPathInfo</span><span class="p">(</span><span class="nv">$uploadFile</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// @see: http://baopham.github.io/blog/2015/03/16/laravel-merge-flowjs-chunks-directly-to-s3</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nx">\Bao\Flow\Basic</span><span class="o">::</span><span class="na">save</span><span class="p">(</span><span class="nv">$destination</span><span class="p">,</span> <span class="nv">$config</span><span class="p">,</span> <span class="nv">$request</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">s3Client</span><span class="p">))</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$file</span> <span class="o">=</span> <span class="nx">FileModel</span><span class="o">::</span><span class="na">create</span><span class="p">([</span>
+</span><span class='line'>            <span class="s1">&#39;mime&#39;</span> <span class="o">=&gt;</span> <span class="nv">$uploadFile</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">],</span>
+</span><span class='line'>            <span class="s1">&#39;size&#39;</span> <span class="o">=&gt;</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getTotalSize</span><span class="p">(),</span>
+</span><span class='line'>            <span class="s1">&#39;storage_path&#39;</span> <span class="o">=&gt;</span> <span class="nv">$path</span><span class="p">,</span>
+</span><span class='line'>            <span class="s1">&#39;filename&#39;</span> <span class="o">=&gt;</span> <span class="nv">$uploadFile</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+</span><span class='line'>            <span class="s1">&#39;disk&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;s3&#39;</span><span class="p">,</span>
+</span><span class='line'>            <span class="s1">&#39;status&#39;</span> <span class="o">=&gt;</span> <span class="k">false</span><span class="p">,</span>
+</span><span class='line'>        <span class="p">]);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">// Send JSON response.</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">responseWithData</span><span class="p">(</span><span class="nv">$file</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">else</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="c1">// Indicate that we are not done with all the chunks.</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">responseWithData</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="mi">204</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will save the <a href="http://baopham.github.io/blog/2015/03/16/laravel-merge-flowjs-chunks-directly-to-s3/">uploaded file to S3 directly</a>.</p>
+
+<p><strong>4.</strong> Angular side will store the response that has the file&rsquo;s info (id, size, filename, etc.) &ndash; mark this file as new, e.g:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// public/assets/js/thing/controller.js</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">vm</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</span><span class='line'><span class="nx">vm</span><span class="p">.</span><span class="nx">processFileSuccess</span> <span class="o">=</span> <span class="nx">processFileSuccess</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// ...</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">processFileSuccess</span><span class="p">(</span><span class="nx">file</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">file</span><span class="p">.</span><span class="nx">isNew</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+</span><span class='line'>    <span class="nx">vm</span><span class="p">.</span><span class="nx">files</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">file</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>5.</strong> When user saves the form, we submit the form including the file&rsquo;s info.</p>
+
+<p><strong>6.</strong> Then in the backend, we process the file and mark the file&rsquo;s status as <code>true</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$store</span> <span class="o">=</span> <span class="nx">Input</span><span class="o">::</span><span class="na">all</span><span class="p">();</span>
+</span><span class='line'><span class="k">foreach</span> <span class="p">(</span><span class="nv">$store</span><span class="p">[</span><span class="s1">&#39;files&#39;</span><span class="p">]</span> <span class="k">as</span> <span class="o">&amp;</span><span class="nv">$fileInput</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nx">array_get</span><span class="p">(</span><span class="nv">$fileInput</span><span class="p">,</span> <span class="s1">&#39;isNew&#39;</span><span class="p">))</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$file</span> <span class="o">=</span> <span class="nx">FileModel</span><span class="o">::</span><span class="na">find</span><span class="p">(</span><span class="nv">$fileInput</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]);</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nv">$file</span><span class="o">-&gt;</span><span class="na">disk</span> <span class="o">==</span> <span class="s1">&#39;s3&#39;</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="c1">// move file to a different S3 folder</span>
+</span><span class='line'>            <span class="o">...</span>
+</span><span class='line'>            <span class="c1">// update file&#39;s storage path and status</span>
+</span><span class='line'>            <span class="nv">$file</span><span class="o">-&gt;</span><span class="na">storage_path</span> <span class="o">=</span> <span class="o">...</span><span class="p">;</span>
+</span><span class='line'>            <span class="nv">$file</span><span class="o">-&gt;</span><span class="na">status</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+</span><span class='line'>            <span class="nv">$file</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">();</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="k">else</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="c1">// upload local file to S3 then update the file&#39;s record if needed or just delete it:</span>
+</span><span class='line'>            <span class="nv">$file</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">();</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="c1">// update the file input info before saving it to DB - store the S3 URL for example:</span>
+</span><span class='line'>        <span class="nv">$fileInput</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// then save $store in DB.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>7.</strong> Create a command to clean up tmp files that are older than x hours: <code>php artisan make:console CleanupFiles</code></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">// app/Console/Commands/CleanupFiles.php</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">/**</span>
+</span><span class='line'><span class="sd"> * The console command name.</span>
+</span><span class='line'><span class="sd"> *</span>
+</span><span class='line'><span class="sd"> * @var string</span>
+</span><span class='line'><span class="sd"> */</span>
+</span><span class='line'><span class="k">protected</span> <span class="nv">$name</span> <span class="o">=</span> <span class="s1">&#39;files:clean&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">/**</span>
+</span><span class='line'><span class="sd"> * Execute the console command.</span>
+</span><span class='line'><span class="sd"> *</span>
+</span><span class='line'><span class="sd"> * @return mixed</span>
+</span><span class='line'><span class="sd"> */</span>
+</span><span class='line'><span class="k">public</span> <span class="k">function</span> <span class="nf">fire</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nv">$date</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DateTime</span><span class="p">;</span>
+</span><span class='line'>    <span class="nv">$date</span><span class="o">-&gt;</span><span class="na">modify</span><span class="p">(</span><span class="s1">&#39;-3 hours&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="nv">$formatted</span> <span class="o">=</span> <span class="nv">$date</span><span class="o">-&gt;</span><span class="na">format</span><span class="p">(</span><span class="s1">&#39;Y-m-d H:i:s&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">FileModel</span><span class="o">::</span><span class="na">where</span><span class="p">(</span><span class="s1">&#39;updated_at&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;=&#39;</span><span class="p">,</span> <span class="nv">$formatted</span><span class="p">)</span>
+</span><span class='line'>        <span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="s1">&#39;=&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>        <span class="o">-&gt;</span><span class="na">get</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">each</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$file</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="nv">$file</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">();</span>
+</span><span class='line'>        <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">\Flow\Uploader</span><span class="o">::</span><span class="na">pruneChunks</span><span class="p">(</span><span class="nx">config</span><span class="p">(</span><span class="s1">&#39;filesystems.disks.local.root&#39;</span><span class="p">)</span> <span class="o">.</span> <span class="s1">&#39;/tmp&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">);</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">info</span><span class="p">(</span><span class="s1">&#39;Files older than 3 hours have been cleaned up.&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Set a scheduler for it:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">// app/Console/Kernel.php</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">protected</span> <span class="nv">$commands</span> <span class="o">=</span> <span class="p">[</span>
+</span><span class='line'>    <span class="s1">&#39;CRT\Console\Commands\CleanupFiles&#39;</span><span class="p">,</span>
+</span><span class='line'><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">protected</span> <span class="k">function</span> <span class="nf">schedule</span><span class="p">(</span><span class="nx">Schedule</span> <span class="nv">$schedule</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nv">$schedule</span><span class="o">-&gt;</span><span class="na">command</span><span class="p">(</span><span class="s1">&#39;files:clean&#39;</span><span class="p">)</span>
+</span><span class='line'>            <span class="o">-&gt;</span><span class="na">hourly</span><span class="p">();</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And then setup cronjob:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">*</span> <span class="o">*</span> <span class="o">*</span> <span class="o">*</span> <span class="o">*</span> <span class="nx">php</span> <span class="o">/</span><span class="nx">home</span><span class="o">/</span><span class="nx">vagrant</span><span class="o">/</span><span class="nx">projects</span><span class="o">/</span><span class="nx">CRT</span><span class="o">/</span><span class="nx">artisan</span> <span class="nx">schedule</span><span class="o">:</span><span class="nx">run</span> <span class="mi">1</span><span class="o">&gt;&gt;</span> <span class="o">/</span><span class="nx">dev</span><span class="o">/</span><span class="k">null</span> <span class="mi">2</span><span class="o">&gt;&amp;</span><span class="mi">1</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Laravel - Merge Flowjs Chunks Directly to S3]]></title>
+    <link href="http://baopham.github.io/blog/2015/03/16/laravel-merge-flowjs-chunks-directly-to-s3/"/>
+    <updated>2015-03-16T23:02:03-07:00</updated>
+    <id>http://baopham.github.io/blog/2015/03/16/laravel-merge-flowjs-chunks-directly-to-s3</id>
+    <content type="html"><![CDATA[<p><strong>Motivation</strong>: <a href="http://laravel.com/docs/5.0/filesystem">Laravel 5</a> now has support for Cloud storage.</p>
+
+<p><strong>Problem</strong>: <a href="https://github.com/flowjs/flow.js">Flowjs</a> library allows files to be uploaded in chunks making it possible to upload large files but by default it <a href="https://github.com/flowjs/flow-php-server/blob/84c928090c060238d15e89dd7e252acf8eff1140/src/Flow/File.php#L147">saves the final file to local storage</a>.</p>
+
+<p>We could extend this class so that it uses <a href="http://docs.aws.amazon.com/aws-sdk-php/guide/latest/feature-s3-stream-wrapper.html">S3 Stream Wrapper</a>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+<span class='line-number'>107</span>
+<span class='line-number'>108</span>
+<span class='line-number'>109</span>
+<span class='line-number'>110</span>
+<span class='line-number'>111</span>
+<span class='line-number'>112</span>
+<span class='line-number'>113</span>
+<span class='line-number'>114</span>
+<span class='line-number'>115</span>
+<span class='line-number'>116</span>
+<span class='line-number'>117</span>
+<span class='line-number'>118</span>
+<span class='line-number'>119</span>
+<span class='line-number'>120</span>
+<span class='line-number'>121</span>
+<span class='line-number'>122</span>
+<span class='line-number'>123</span>
+<span class='line-number'>124</span>
+<span class='line-number'>125</span>
+<span class='line-number'>126</span>
+<span class='line-number'>127</span>
+<span class='line-number'>128</span>
+<span class='line-number'>129</span>
+<span class='line-number'>130</span>
+<span class='line-number'>131</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span> <span class="k">namespace</span> <span class="nx">Bao\Flow</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">use</span> <span class="nx">Flow\ConfigInterface</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nx">Flow\RequestInterface</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nx">Flow\FileOpenException</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nx">Flow\FileLockException</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">use</span> <span class="nx">Illuminate\Support\Facades\Storage</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nx">League\Flysystem\FilesystemInterface</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">use</span> <span class="nx">Aws\S3\S3Client</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">use</span> <span class="nx">Exception</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">File</span> <span class="k">extends</span> <span class="nx">\Flow\File</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="sd">/**</span>
+</span><span class='line'><span class="sd">     * @var \Flow\RequestInterface</span>
+</span><span class='line'><span class="sd">     */</span>
+</span><span class='line'>    <span class="k">private</span> <span class="nv">$request</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="sd">/**</span>
+</span><span class='line'><span class="sd">     * @var \Flow\ConfigInterface</span>
+</span><span class='line'><span class="sd">     */</span>
+</span><span class='line'>    <span class="k">private</span> <span class="nv">$config</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="sd">/**</span>
+</span><span class='line'><span class="sd">     * @var \Aws\S3\S3Client</span>
+</span><span class='line'><span class="sd">     */</span>
+</span><span class='line'>    <span class="k">private</span> <span class="nv">$s3Client</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">ConfigInterface</span> <span class="nv">$config</span><span class="p">,</span> <span class="nx">RequestInterface</span> <span class="nv">$request</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nx">S3Client</span> <span class="nv">$s3Client</span> <span class="o">=</span> <span class="k">null</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">(</span><span class="nv">$config</span><span class="p">,</span> <span class="nv">$request</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">config</span> <span class="o">=</span> <span class="nv">$config</span><span class="p">;</span>
+</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">request</span> <span class="o">=</span> <span class="nv">$request</span><span class="p">;</span>
+</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">s3Client</span> <span class="o">=</span> <span class="nv">$s3Client</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="sd">/**</span>
+</span><span class='line'><span class="sd">     * Merge all chunks to single file</span>
+</span><span class='line'><span class="sd">     *</span>
+</span><span class='line'><span class="sd">     * @param string $destination final file location</span>
+</span><span class='line'><span class="sd">     *</span>
+</span><span class='line'><span class="sd">     * @throws FileLockException</span>
+</span><span class='line'><span class="sd">     * @throws FileOpenException</span>
+</span><span class='line'><span class="sd">     * @throws \Exception</span>
+</span><span class='line'><span class="sd">     *</span>
+</span><span class='line'><span class="sd">     * @return bool indicates if file was saved</span>
+</span><span class='line'><span class="sd">     */</span>
+</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">save</span><span class="p">(</span><span class="nv">$destination</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$toS3</span> <span class="o">=</span> <span class="o">!</span><span class="k">empty</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">s3Client</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$local</span> <span class="o">=</span> <span class="o">!</span><span class="nv">$toS3</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nv">$toS3</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">starts_with</span><span class="p">(</span><span class="nv">$destination</span><span class="p">,</span> <span class="s1">&#39;s3://&#39;</span><span class="p">))</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="c1">// @see http://docs.aws.amazon.com/aws-sdk-php/guide/latest/feature-s3-stream-wrapper.html</span>
+</span><span class='line'>            <span class="k">throw</span> <span class="k">new</span> <span class="nx">Exception</span><span class="p">(</span><span class="s1">&#39;Not a valid S3 protocol&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nv">$toS3</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">s3Client</span><span class="o">-&gt;</span><span class="na">registerStreamWrapper</span><span class="p">();</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nv">$fh</span> <span class="o">=</span> <span class="nb">fopen</span><span class="p">(</span><span class="nv">$destination</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$fh</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="k">throw</span> <span class="k">new</span> <span class="nx">FileOpenException</span><span class="p">(</span><span class="s1">&#39;failed to open destination file: &#39;</span> <span class="o">.</span> <span class="nv">$destination</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nv">$local</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nb">flock</span><span class="p">(</span><span class="nv">$fh</span><span class="p">,</span> <span class="nx">LOCK_EX</span> <span class="o">|</span> <span class="nx">LOCK_NB</span><span class="p">,</span> <span class="nv">$blocked</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>            <span class="c1">// @codeCoverageIgnoreStart</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="nv">$blocked</span><span class="p">)</span>
+</span><span class='line'>            <span class="p">{</span>
+</span><span class='line'>                <span class="c1">// Concurrent request has requested a lock.</span>
+</span><span class='line'>                <span class="c1">// File is being processed at the moment.</span>
+</span><span class='line'>                <span class="c1">// Warning: lock is not checked in windows.</span>
+</span><span class='line'>                <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>            <span class="c1">// @codeCoverageIgnoreEnd</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="k">throw</span> <span class="k">new</span> <span class="nx">FileLockException</span><span class="p">(</span><span class="s1">&#39;failed to lock file: &#39;</span> <span class="o">.</span> <span class="nv">$destination</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nv">$totalChunks</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">request</span><span class="o">-&gt;</span><span class="na">getTotalChunks</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">try</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="nv">$preProcessChunk</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">config</span><span class="o">-&gt;</span><span class="na">getPreprocessCallback</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="k">for</span> <span class="p">(</span><span class="nv">$i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;=</span> <span class="nv">$totalChunks</span><span class="p">;</span> <span class="nv">$i</span><span class="o">++</span><span class="p">)</span>
+</span><span class='line'>            <span class="p">{</span>
+</span><span class='line'>                <span class="nv">$file</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getChunkPath</span><span class="p">(</span><span class="nv">$i</span><span class="p">);</span>
+</span><span class='line'>                <span class="nv">$chunk</span> <span class="o">=</span> <span class="nb">fopen</span><span class="p">(</span><span class="nv">$file</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$chunk</span><span class="p">)</span>
+</span><span class='line'>                <span class="p">{</span>
+</span><span class='line'>                    <span class="k">throw</span> <span class="k">new</span> <span class="nx">FileOpenException</span><span class="p">(</span><span class="s1">&#39;failed to open chunk: &#39;</span> <span class="o">.</span> <span class="nv">$file</span><span class="p">);</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="k">if</span> <span class="p">(</span><span class="nv">$preProcessChunk</span> <span class="o">!==</span> <span class="k">null</span><span class="p">)</span>
+</span><span class='line'>                <span class="p">{</span>
+</span><span class='line'>                    <span class="nb">call_user_func</span><span class="p">(</span><span class="nv">$preProcessChunk</span><span class="p">,</span> <span class="nv">$chunk</span><span class="p">);</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="nb">stream_copy_to_stream</span><span class="p">(</span><span class="nv">$chunk</span><span class="p">,</span> <span class="nv">$fh</span><span class="p">);</span>
+</span><span class='line'>                <span class="nb">fclose</span><span class="p">(</span><span class="nv">$chunk</span><span class="p">);</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="k">catch</span> <span class="p">(</span><span class="nx">\Exception</span> <span class="nv">$e</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="nv">$local</span><span class="p">)</span> <span class="nb">flock</span><span class="p">(</span><span class="nv">$fh</span><span class="p">,</span> <span class="nx">LOCK_UN</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="nb">fclose</span><span class="p">(</span><span class="nv">$fh</span><span class="p">);</span>
+</span><span class='line'>            <span class="k">throw</span> <span class="nv">$e</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">config</span><span class="o">-&gt;</span><span class="na">getDeleteChunksOnSave</span><span class="p">())</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">deleteChunks</span><span class="p">();</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nv">$local</span><span class="p">)</span> <span class="nb">flock</span><span class="p">(</span><span class="nv">$fh</span><span class="p">,</span> <span class="nx">LOCK_UN</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nb">fclose</span><span class="p">(</span><span class="nv">$fh</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[A Command Line Interface for Vundle]]></title>
+    <link href="http://baopham.github.io/blog/2014/05/29/a-command-line-interface-for-vundle/"/>
+    <updated>2014-05-29T21:30:24-07:00</updated>
+    <id>http://baopham.github.io/blog/2014/05/29/a-command-line-interface-for-vundle</id>
+    <content type="html"><![CDATA[<p>I&rsquo;m a die hard fan of Vim and sometimes can be obsessed with trying out new plugins. I really like <a href="https://github.com/gmarik/Vundle.vim">Vundle</a> &ndash; a Vim plugin manager that simplifies plugin installation. I recently reorganized my <a href="https://github.com/baopham/vim/blob/master/vimrc">.vimrc</a> so that it&rsquo;s easier to keep track of my plugin configurations. My <a href="https://github.com/baopham/vim">.vim</a> folder now has a sub directory <code>settings</code> that contains different files for each plugin configuration:</p>
+
+<!--more-->
+
+
+<p><img src="http://f.cl.ly/items/2p3c0E1q3f053K0L1N2M/Screen%20Shot%202014-05-29%20at%209.53.32%20PM.png" class="center"></p>
+
+<p>and <code>.vimrc</code> file will source these files one by one:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">for</span> fpath <span class="k">in</span> split<span class="p">(</span>globpath<span class="p">(</span><span class="s1">&#39;~/.vim/settings&#39;</span><span class="p">,</span> <span class="s1">&#39;*.vim&#39;</span><span class="p">),</span> <span class="s1">&#39;\n&#39;</span><span class="p">)</span>
+</span><span class='line'>  exe <span class="s1">&#39;source&#39;</span> fpath
+</span><span class='line'><span class="k">endfor</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The only problem is whenever I uninstall a plugin, I have to remember to remove the configuration file for that plugin in the <code>settings</code> directory. Of course I don&rsquo;t always remember, and so <a href="https://github.com/baopham/vundle-cli">Vundle CLI</a> is built for this.</p>
+
+<p>To quote from the <code>README.md</code>:</p>
+
+<blockquote><p>Available commands:</p>
+
+<ul>
+<li><code>rm</code> remove a plugin</li>
+<li><code>list</code> list all installed plugins</li>
+<li><code>find</code> find an installed plugin</li>
+<li><code>clean</code> clean up unused plugin related files</li>
+</ul>
+
+
+<p><code>rm</code> will remove the line <code>Bundle plugin_name</code> or <code>Plugin plugin_name</code> in your <code>.vimrc</code>,
+delete the configuration file for this plugin in the specified settings directory,
+and the plugin folder. Before anything is deleted, the command will prompt you
+for confirmation unless the <code>--force</code> switch is on.</p></blockquote>
+
+<p>Rather than explaining what each command does, I think a gif would do a much better job:</p>
+
+<p><img src="http://baopham.github.io/images/vundlecli.gif" alt="Vundle CLI gif" class="center"/></p>
+
+<p>The locations of <code>.vimrc</code> file, <code>.vim</code> and <code>settings</code> directories can be specified with options <code>--vimrc</code>, <code>--vimdir</code>, <code>--settings</code> respectively.  Otherwise, the default values are <code>~/.vimrc</code>, <code>~/.vim</code>, and <code>~/.vim/settings</code>. It should also be able to follow symlinks.</p>
+
+<p>I still need to write tests but I&rsquo;m leaving it for the future when I have more time and energy.</p>
+
+<p><a href="https://github.com/baopham/vundle-cli">Vundle CLI</a> is a Ruby gem so to install it, run this in your terminal:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>gem install vundle-cli
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[TabRenderer - Quick Preview for Your Tabular Data]]></title>
+    <link href="http://baopham.github.io/blog/2014/05/14/tabrenderer-quick-preview-for-your-tabular-data/"/>
+    <updated>2014-05-14T20:05:26-07:00</updated>
+    <id>http://baopham.github.io/blog/2014/05/14/tabrenderer-quick-preview-for-your-tabular-data</id>
+    <content type="html"><![CDATA[<p>I recently learned from a friend that <a href="https://help.github.com/articles/rendering-csv-and-tsv-data">Github renders tabular data</a> (.csv and .tsv) as interactive table, which is really neat. However, it won&rsquo;t work if there&rsquo;s a mismatched column or illegal quoting so I quickly built a <a href="http://tabrenderer.herokuapp.com/">tabrenderer</a> to help people preview their data before pushing them to Github. At first, I was going to use JavaScript to parse the data but was afraid that it will not work the same way as Github&rsquo;s parser. After browsing their repos, I thought it&rsquo;s very likely that they use Ruby to do this given how often they use Ruby for their own projects. <!--more-->Besides, Ruby has its built-in class <a href="http://ruby-doc.org/stdlib-1.9.2/libdoc/csv/rdoc/CSV.html">CSV</a> that takes care of almost everything.</p>
+
+<p>So far, <a href="http://tabrenderer.herokuapp.com/">tabrenderer</a> notifies users of errors that prevent the parser to work such as illegal quoting. It will jump to the row that has such errors but will not scream if there&rsquo;s a mismatched column (it will be obvious to the users though to see some rows don&rsquo;t have columns). The users can either upload their file or simply type the data in the text box.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Thirsty? Google Map for a Drinking Fountain]]></title>
+    <link href="http://baopham.github.io/blog/2014/01/02/thirsty-google-map-for-a-drinking-fountain/"/>
+    <updated>2014-01-02T08:05:30-08:00</updated>
+    <id>http://baopham.github.io/blog/2014/01/02/thirsty-google-map-for-a-drinking-fountain</id>
+    <content type="html"><![CDATA[<p>Or you can head over to <a href="http://vancouverfountains.herokuapp.com/" title="Vancouver Fountain Finder">Vancouver Fountain Finder</a> and search for the nearest drinking fountain in Vancouver, BC.</p>
+
+<p>This is a small project I built during the school break to learn <a href="http://nodejs.org/" title="Node.js">Node.js</a>. I have always wanted to learn <a href="http://nodejs.org/" title="Node.js">Node.js</a> and use <a href="gmap-v3">Google Maps API</a> so I tried to think of features that will let me learn new things as much as possible. Before this, I also built a simple <a href="http://bpmtimer.herokuapp.com/" title="Timer">timer</a> just to get started with <a href="http://nodejs.org/" title="Node.js">Node.js</a> and become familiar with <a href="http://knockoutjs.com/" title="Knockout.js">Knockout.js</a> and <a href="http://semantic-ui.com/" title="Semantic-UI">Semantic-UI</a>. <!--more-->I guess <a href="http://semantic-ui.com/" title="Semantic-UI">Semantic-UI</a> is still relatively new so I still prefer <a href="http://getbootstrap.com/" title="Bootstrap">Bootstrap</a> or maybe I am just biased&hellip; Anyway, a <a href="http://bpmtimer.herokuapp.com/" title="Timer">timer</a> because I saw my Math teacher struggling with the <a href="http://online-stopwatch.com/" title="Online Stopwatch">online stopwatch</a> before the exam&hellip; And the ads were quite distracting&hellip;</p>
+
+<p>Just a quick update since now I&rsquo;m back to school. Back to studying.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Facebook App Warm-up]]></title>
+    <link href="http://baopham.github.io/blog/2013/05/02/facebook-app-warm-up/"/>
+    <updated>2013-05-02T00:00:00-07:00</updated>
+    <id>http://baopham.github.io/blog/2013/05/02/facebook-app-warm-up</id>
+    <content type="html"><![CDATA[<p>This week I decided to try to build a Facebook app. It turns out to be not too bad. Facebook API and Heroku really make things easier. If you do a few googling around, I&rsquo;m sure you can find many good tutorials on how to build a Facebook app &ndash; if you&rsquo;re interested in making one yourself.</p>
+
+<p>There are a few challenges / nuisances I faced during the making though:</p>
+
+<!--more-->
+
+
+<ul>
+<li>First, of course, is the question: what kind of app? Ideally, I would like to build a game, but with the time constraint of only a few hours and my main focus was to get a taste of building a Facebook app, I decided to go with a simple app: Horoscope.</li>
+<li><p>After registering to be a Facebook developer, I selected Heroku to host my PHP app. Heroku then generated a dummy app so the next step is to download the sample code to local dev (Side note: remember to use <code>--recursive</code> with <code>git clone</code> if you also want to get the Facebook PHP SDK). But it doesn&rsquo;t work out of the box unless you have a proper Apache configuration. It took me a while to dig things out and set things up. Solution to this really depends on your OS and environtment so I&rsquo;m not going to go into details about it.</p></li>
+<li><p>Next, read the code, learn the api, write some class, add more stuff, edit the content, test it&hellip; That was easy&hellip; Until I bumped into an annoying <a href="https://developers.facebook.com/bugs/524245490930206?browse=search_50f87d9e8869a5e06191882#">FB&rsquo;s Javascript bug</a>. I did not find this post until much much later though so it was quite frustrating to see the page not reloaded after the user logged in. If you scroll down the post to see the comments, you can see some suggested fixes. I tried one of them and it works :)</p></li>
+</ul>
+
+
+<p><strong>UPDATE</strong>: Looks like the fix is ready as of now.</p>
+
+<p>In total, it took me about ~5 hours to finish this app. I think putting a time limit on how long I can work on a problem really helps. It pushes me to be more alert and work more efficiently. It is also to make sure that I have time to do my homework!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Mozilla Jaw's Puzzle]]></title>
+    <link href="http://baopham.github.io/blog/2012/08/06/mozilla-jaws-puzzle/"/>
+    <updated>2012-08-06T00:00:00-07:00</updated>
+    <id>http://baopham.github.io/blog/2012/08/06/mozilla-jaws-puzzle</id>
+    <content type="html"><![CDATA[<p>I&rsquo;m actually a little late for this <a href="http://people.mozilla.org/~jwein/puzzle/">Jaw&rsquo;s programming puzzle</a>, which I only discovered yesterday from reading <a href="http://msujaws.wordpress.com/2012/05/02/wanna-join-the-firefox-team-at-mozilla-solve-the-puzzle/">a blog</a> written by a Mozilla employee. If I had seen this post a bit earlier, I might even have had a chance to work for them since I solved it! <em>yay</em>.</p>
+
+<p>(btw, if you love solving programming problems, please take a moment to go through the puzzle (it&rsquo;s really worth it) but note that this post contains <strong>SPOILERS</strong>.)</p>
+
+<!--more-->
+
+
+<p>At first, I was a bit unsure about the complicated-and-low-level-looking javascript in the source code:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">_0x9827</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;\x67\x65\x74\x45\x6C\x65\x6D\x65\x6E\x74\x42\x79\x49\x64&quot;</span><span class="p">,</span><span class="s2">&quot;\x66\x69\x6E\x61\x6C&quot;</span><span class="p">,</span><span class="s2">&quot;\x63&quot;</span><span class="p">,</span><span class="s2">&quot;\x32\x64&quot;</span><span class="p">,</span><span class="s2">&quot;\x67\x65\x74\x43\x6F\x6E\x74\x65\x78\x74&quot;</span><span class="p">,</span><span class="s2">&quot;\x77\x69\x64\x74\x68&quot;</span><span class="p">,</span><span class="s2">&quot;\x34\x35\x30&quot;</span><span class="p">,</span><span class="s2">&quot;\x68\x65\x69\x67\x68\x74&quot;</span><span class="p">,</span><span class="s2">&quot;\x31\x35&quot;</span><span class="p">,</span><span class="s2">&quot;\x66\x6F\x6E\x74&quot;</span><span class="p">,</span><span class="s2">&quot;\x31\x35\x70\x78\x20\x43\x6F\x75\x72\x69\x65\x72\x20\x4E\x65\x77&quot;</span><span class="p">,</span><span class="s2">&quot;\x66\x69\x6C\x6C\x53\x74\x79\x6C\x65&quot;</span><span class="p">,</span><span class="s2">&quot;\x23\x30\x30\x30\x30\x30\x30&quot;</span><span class="p">,</span><span class="s2">&quot;\x21\x62\x21\x21\x2C\x47\x21\x21\x21\x21\x21\x21\x21\x41\x21\x70\x7B\x21\x21\x21\x62\x21\x21\x21\x6E&quot;</span><span class="p">,</span><span class="s2">&quot;\x6B\x21\x78\x74\x21\x21\x59\x51\x56\x5B\x5B\x4D\x46\x21\x6E\x21\x21\x6A\x6D\x6D\x21\x2F\x64\x70\x21&quot;</span><span class="p">,</span><span class="s2">&quot;\x6B\x62\x78\x74\x2C\x58\x4A\x4F\x4F\x46\x53\x58\x4A\x4F\x4F\x46\x53\x41\x6E\x70\x7B\x6A\x6D\x6D\x62\x2F\x64\x70\x6E&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="s2">&quot;\x63\x68\x61\x72\x43\x6F\x64\x65\x41\x74&quot;</span><span class="p">,</span><span class="s2">&quot;\x66\x72\x6F\x6D\x43\x68\x61\x72\x43\x6F\x64\x65&quot;</span><span class="p">,</span><span class="s2">&quot;\x66\x69\x6C\x6C\x54\x65\x78\x74&quot;</span><span class="p">,</span><span class="s2">&quot;\x70&quot;</span><span class="p">,</span><span class="s2">&quot;\x63\x72\x65\x61\x74\x65\x45\x6C\x65\x6D\x65\x6E\x74&quot;</span><span class="p">,</span><span class="s2">&quot;\x53\x74\x65\x70\x20\x32\x2E\x20\x54\x68\x65\x72\x65\x20\x69\x73\x20\x61\x20\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x64\x65\x66\x69\x6E\x65\x64\x20\x69\x6E\x20\x74\x68\x69\x73\x20\x70\x61\x67\x65\x20\x63\x61\x6C\x6C\x65\x64\x20\x76\x65\x72\x69\x66\x79\x28\x29\x2E\x20\x49\x74\x20\x74\x61\x6B\x65\x73\x20\x6F\x6E\x65\x20\x61\x72\x67\x75\x6D\x65\x6E\x74\x20\x77\x68\x69\x63\x68\x20\x69\x73\x20\x61\x20\x70\x72\x6F\x78\x79\x20\x6F\x62\x6A\x65\x63\x74\x2E\x20\x54\x68\x65\x20\x70\x72\x6F\x78\x79\x20\x6F\x62\x6A\x65\x63\x74\x20\x6E\x65\x65\x64\x73\x20\x74\x6F\x20\x72\x65\x74\x75\x72\x6E\x20\x74\x68\x65\x20\x72\x65\x76\x65\x72\x73\x65\x64\x20\x73\x74\x72\x69\x6E\x67\x20\x6F\x66\x20\x74\x68\x65\x20\x72\x65\x71\x75\x65\x73\x74\x65\x64\x20\x70\x72\x6F\x70\x65\x72\x74\x79\x20\x6E\x61\x6D\x65\x2E\x20\x46\x6F\x72\x20\x65\x78\x61\x6D\x70\x6C\x65\x2C\x20\x6F\x62\x6A\x2E\x66\x6F\x6F\x20\x73\x68\x6F\x75\x6C\x64\x20\x72\x65\x74\x75\x72\x6E\x20\x27\x6F\x6F\x66\x27\x2E\x20\x54\x6F\x20\x63\x6F\x6D\x70\x6C\x65\x74\x65\x20\x73\x74\x65\x70\x20\x32\x2C\x20\x63\x72\x65\x61\x74\x65\x20\x79\x6F\x75\x72\x20\x6F\x77\x6E\x20\x50\x72\x6F\x78\x79\x20\x6F\x62\x6A\x65\x63\x74\x20\x61\x6E\x64\x20\x63\x61\x6C\x6C\x20\x76\x65\x72\x69\x66\x79\x20\x77\x69\x74\x68\x20\x69\x74\x2E&quot;</span><span class="p">,</span><span class="s2">&quot;\x74\x65\x78\x74\x43\x6F\x6E\x74\x65\x6E\x74&quot;</span><span class="p">,</span><span class="s2">&quot;\x66\x69\x6E\x50&quot;</span><span class="p">,</span><span class="s2">&quot;\x69\x6E\x73\x65\x72\x74\x42\x65\x66\x6F\x72\x65&quot;</span><span class="p">,</span><span class="s2">&quot;\x70\x61\x72\x65\x6E\x74\x4E\x6F\x64\x65&quot;</span><span class="p">,</span><span class="s2">&quot;\x33&quot;</span><span class="p">,</span><span class="s2">&quot;\x66\x69\x72\x65\x66\x6F\x78&quot;</span><span class="p">,</span><span class="s2">&quot;\x78\x6F\x66\x65\x72\x69\x66&quot;</span><span class="p">,</span><span class="s2">&quot;\x74\x68\x75\x6E\x64\x65\x72\x62\x69\x72\x64&quot;</span><span class="p">,</span><span class="s2">&quot;\x64\x72\x69\x62\x72\x65\x64\x6E\x75\x68\x74&quot;</span><span class="p">,</span><span class="s2">&quot;\x6D\x6F\x7A\x69\x6C\x6C\x61&quot;</span><span class="p">,</span><span class="s2">&quot;\x61\x6C\x6C\x69\x7A\x6F\x6D&quot;</span><span class="p">,</span><span class="s2">&quot;\x6E\x70\x64\x2F\x62\x6D\x6D\x6A\x7B\x70\x6E\x41\x53\x46\x4F\x4F\x4A\x58\x53\x46\x4F\x4F\x4A\x58\x2C\x74\x78\x62\x6B&quot;</span><span class="p">,</span><span class="s2">&quot;\x47\x72\x65\x61\x74\x20\x6A\x6F\x62\x21\x20\x54\x68\x65\x20\x65\x6D\x61\x69\x6C\x20\x61\x64\x64\x72\x65\x73\x73\x20\x68\x61\x73\x20\x62\x65\x65\x6E\x20\x75\x70\x64\x61\x74\x65\x64\x20\x74\x6F\x20\x73\x68\x6F\x77\x20\x79\x6F\x75\x72\x20\x74\x72\x75\x65\x20\x31\x33\x33\x37\x2D\x6E\x65\x73\x73\x2E\x20\x45\x76\x65\x72\x20\x73\x65\x65\x20\x61\x20\x77\x65\x62\x70\x61\x67\x65\x20\x69\x6E\x20\x33\x44\x20\x62\x65\x66\x6F\x72\x65\x3F\x20\x54\x69\x6C\x74\x20\x74\x68\x65\x20\x70\x61\x67\x65\x20\x74\x6F\x20\x66\x69\x6E\x64\x20\x77\x68\x61\x74\x20\x79\x6F\x75\x20\x63\x61\x6E\x20\x70\x75\x74\x20\x61\x73\x20\x79\x6F\x75\x72\x20\x73\x75\x62\x6A\x65\x63\x74\x20\x6F\x66\x20\x74\x68\x65\x20\x65\x6D\x61\x69\x6C\x20\x3A\x29&quot;</span><span class="p">,</span><span class="s2">&quot;\x77\x72\x61\x70\x70\x65\x72&quot;</span><span class="p">,</span><span class="s2">&quot;\x64\x69\x73\x70\x6C\x61\x79&quot;</span><span class="p">,</span><span class="s2">&quot;\x73\x74\x79\x6C\x65&quot;</span><span class="p">,</span><span class="s2">&quot;\x62\x6C\x6F\x63\x6B&quot;</span><span class="p">];</span><span class="kd">var</span> <span class="nx">_0x1a</span><span class="o">=</span><span class="nb">document</span><span class="p">;</span><span class="kd">var</span> <span class="nx">_0x1j</span><span class="o">=</span><span class="nx">_0x1a</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">0</span><span class="p">]];</span><span class="kd">var</span> <span class="nx">_0x1b</span><span class="o">=</span><span class="nx">_0x1a</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">0</span><span class="p">]](</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span><span class="kd">var</span> <span class="nx">_0x1c</span><span class="o">=</span><span class="nx">_0x1a</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">0</span><span class="p">]](</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span><span class="kd">var</span> <span class="nx">_0x1d</span><span class="o">=</span><span class="nx">_0x1c</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">4</span><span class="p">]](</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">3</span><span class="p">]);</span><span class="nx">_0x1c</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">5</span><span class="p">]]</span><span class="o">=</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">6</span><span class="p">];</span><span class="nx">_0x1c</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">7</span><span class="p">]]</span><span class="o">=</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">8</span><span class="p">];</span><span class="nx">_0x1d</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">9</span><span class="p">]]</span><span class="o">=</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span><span class="nx">_0x1d</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">11</span><span class="p">]]</span><span class="o">=</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">12</span><span class="p">];</span><span class="nx">_0x1k</span><span class="p">(</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">13</span><span class="p">]);</span><span class="kd">var</span> <span class="nx">_0x1e</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="kd">function</span> <span class="nx">_0x1k</span><span class="p">(</span><span class="nx">_0x8543x8</span><span class="p">){</span><span class="k">if</span><span class="p">(</span><span class="nx">_0x8543x8</span><span class="o">!=</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">14</span><span class="p">]</span><span class="o">&amp;&amp;</span><span class="nx">_0x8543x8</span><span class="o">!=</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">13</span><span class="p">]</span><span class="o">&amp;&amp;</span><span class="nx">_0x8543x8</span><span class="o">!=</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">15</span><span class="p">]){</span><span class="k">return</span> <span class="p">;}</span> <span class="p">;</span><span class="kd">var</span> <span class="nx">_0x8543x9</span><span class="o">=</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">16</span><span class="p">];</span><span class="kd">var</span> <span class="nx">_0x8543xa</span><span class="p">,</span><span class="nx">_0x8543xb</span><span class="p">;</span><span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">_0x8543xc</span> <span class="k">in</span> <span class="nx">_0x8543x8</span><span class="p">){</span><span class="nx">_0x8543x9</span><span class="o">+=</span><span class="nb">String</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">18</span><span class="p">]](</span><span class="nx">_0x8543x8</span><span class="p">[</span><span class="nx">_0x8543xc</span><span class="p">][</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">17</span><span class="p">]](</span><span class="mi">0</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">);}</span> <span class="p">;</span><span class="nx">_0x1d</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">19</span><span class="p">]](</span><span class="nx">_0x8543x9</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span><span class="k">if</span><span class="p">(</span><span class="o">++</span><span class="nx">_0x1e</span><span class="o">==</span><span class="mi">2</span><span class="p">){</span><span class="kd">var</span> <span class="nx">_0x8543xd</span><span class="o">=</span><span class="nx">_0x1a</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">21</span><span class="p">]](</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">20</span><span class="p">]);</span><span class="kd">var</span> <span class="nx">_0x8543xe</span><span class="o">=</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">22</span><span class="p">]][</span><span class="mi">0</span><span class="p">];</span><span class="nx">_0x8543xd</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">23</span><span class="p">]]</span><span class="o">=</span><span class="nx">_0x8543xe</span><span class="p">;</span><span class="nx">_0x8543xa</span><span class="o">=</span><span class="nx">_0x1a</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">0</span><span class="p">]](</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">24</span><span class="p">]);</span><span class="nx">_0x8543xa</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">26</span><span class="p">]][</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">25</span><span class="p">]](</span><span class="nx">_0x8543xd</span><span class="p">,</span><span class="nx">_0x8543xa</span><span class="p">);</span><span class="nx">_0x1b</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">23</span><span class="p">]]</span><span class="o">=</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">27</span><span class="p">];}</span> <span class="p">;}</span> <span class="p">;</span><span class="kd">function</span> <span class="nx">verify</span><span class="p">(</span><span class="nx">_0x8543x10</span><span class="p">){</span><span class="kd">var</span> <span class="nx">_0x8543x11</span><span class="o">=</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">28</span><span class="p">],</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">29</span><span class="p">],</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">30</span><span class="p">],</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">31</span><span class="p">],</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">32</span><span class="p">],</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">33</span><span class="p">]];</span><span class="k">if</span><span class="p">(</span><span class="nx">_0x8543x10</span><span class="p">[</span><span class="nx">_0x8543x11</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">==</span><span class="nx">_0x8543x11</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">&amp;&amp;</span><span class="nx">_0x8543x10</span><span class="p">[</span><span class="nx">_0x8543x11</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span><span class="o">==</span><span class="nx">_0x8543x11</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">&amp;&amp;</span><span class="nx">_0x8543x10</span><span class="p">[</span><span class="nx">_0x8543x11</span><span class="p">[</span><span class="mi">4</span><span class="p">]]</span><span class="o">==</span><span class="nx">_0x8543x11</span><span class="p">[</span><span class="mi">5</span><span class="p">]){</span><span class="nx">_0x1c</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">5</span><span class="p">]]</span><span class="o">=</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">6</span><span class="p">];</span><span class="nx">_0x1c</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">7</span><span class="p">]]</span><span class="o">=</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">8</span><span class="p">];</span><span class="nx">_0x1d</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">9</span><span class="p">]]</span><span class="o">=</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span><span class="nx">_0x1d</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">11</span><span class="p">]]</span><span class="o">=</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">12</span><span class="p">];</span><span class="nx">_0x1k</span><span class="p">(</span><span class="nx">_0x8543x10</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">34</span><span class="p">]]);</span><span class="kd">var</span> <span class="nx">_0x8543xd</span><span class="o">=</span><span class="nx">_0x1a</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">21</span><span class="p">]](</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">20</span><span class="p">]);</span><span class="nx">_0xabb2</span><span class="o">=</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">35</span><span class="p">]];</span><span class="nx">_0x8543xd</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">23</span><span class="p">]]</span><span class="o">=</span><span class="nx">_0xabb2</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="nx">_0xabb3</span><span class="o">=</span><span class="nx">_0x1a</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">0</span><span class="p">]](</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">36</span><span class="p">]);</span><span class="nx">_0xabb3</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">26</span><span class="p">]][</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">25</span><span class="p">]](</span><span class="nx">_0x8543xd</span><span class="p">,</span><span class="nx">_0xabb3</span><span class="p">);</span><span class="nx">_0xabb3</span><span class="p">[</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">38</span><span class="p">]][</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">37</span><span class="p">]]</span><span class="o">=</span><span class="nx">_0x9827</span><span class="p">[</span><span class="mi">39</span><span class="p">];}</span> <span class="p">;}</span> <span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Yeah, but it&rsquo;s okay, <a href="http://getfirebug.com/">firebug</a> will make life much easier for us. So first thing we need to do is to find out what this javascript code does. It looks like the variable <code>_0x9827</code> holds some sort of information, so let&rsquo;s check it out in the DOM:
+<a class="fancybox" rel="fancybox" href="http://farm8.staticflickr.com/7233/7170645001_2a3b963519_z.jpg" title="var _0x9827">
+  <img class="center img-border" src="http://farm8.staticflickr.com/7233/7170645001_2a3b963519_z.jpg" alt="var _0x9827"/>
+</a>
+Now expand it:
+<a class="fancybox" rel="fancybox" href="http://farm8.staticflickr.com/7079/7352747356_88d84fa81c_b.jpg" title="expanded _0x9827">
+  <img class="center img-border" src="http://farm8.staticflickr.com/7079/7352747356_88d84fa81c_z.jpg" alt="expanded _0x9827"/>
+</a>
+Sweet! Now I have some clue:</p>
+
+<blockquote><p>&ldquo;Step 2. There is a function defined in this page called verify(). It takes one argument which is a proxy object. The proxy object needs to return the reversed string of the requested property name. For example, obj.foo should return &lsquo;oof&rsquo;. To complete step 2, create your own Proxy object and call verify with it.&rdquo;</p></blockquote>
+
+<p>But I didn&rsquo;t know what a proxy object was so for this one Google is the best answer. I found <a href="http://soft.vub.ac.be/~tvcutsem/proxies/">an example</a> of creating a proxy object:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">p</span> <span class="o">=</span> <span class="nx">Proxy</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">get</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">proxy</span><span class="p">,</span> <span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s1">&#39;Hello, &#39;</span><span class="o">+</span> <span class="nx">name</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">World</span><span class="p">);</span> <span class="c1">// should print &#39;Hello, World&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Easy enough, now all I need to do is create my own proxy that reverses the string of the requested property name, then call the verify() function with it:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">proxy</span> <span class="o">=</span> <span class="nx">Proxy</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">get</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">proxy</span><span class="p">,</span> <span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">name</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">).</span><span class="nx">reverse</span><span class="p">().</span><span class="nx">join</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'><span class="nx">verify</span><span class="p">(</span><span class="nx">proxy</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then put the snippet in the javascript source code using firebug (in the HTML section, right click on the javascript line then select &ldquo;Edit HTML&rdquo;):
+<a class="fancybox" rel="fancybox" href="http://farm9.staticflickr.com/8141/7167576505_0d4079cc65_z.jpg" title="edit js on firebug">
+  <img class="center img-border" src="http://farm9.staticflickr.com/8141/7167576505_0d4079cc65_z.jpg" alt="edit js"/>
+</a>
+And it works!
+<a class="fancybox" rel="fancybox" href="http://farm8.staticflickr.com/7241/7167580677_1229fdedaa_c.jpg" title="answer">
+  <img class="center img-border" src="http://farm8.staticflickr.com/7241/7167580677_1229fdedaa_c.jpg" alt="answer"/>
+</a>
+Ok cool, the answer is: <code>jaws+WINNERWINNER@mozilla.com</code></p>
+
+<p>But there&rsquo;s one more bonus puzzle:</p>
+
+<blockquote><p>Ever see a webpage in 3D before? Tilt the page to find what you can put as your subject of the email :)</p></blockquote>
+
+<p>Oh, firefox has the new <a href="http://blog.mozilla.org/blog/2012/03/13/firefox-adds-new-developer-tools-and-add-on-sync/">3D feature</a>, which is extremely cool. To activate it, right click on the page and select &ldquo;Inspect Element&rdquo; (and not &ldquo;Inspect Element with Firebug&rdquo;). You will see at the bottom of your browser there&rsquo;s a button &ldquo;3D View&rdquo;, click on it. (If your browser complains, it&rsquo;s probably because you don&rsquo;t have the <a href="https://addons.mozilla.org/en-US/firefox/addon/tilt/?src=search">Tilt add-on</a> installed). Play around, tilt the page, zoom it in and out to see the magic:
+<a class="fancybox" rel="fancybox" href="http://farm8.staticflickr.com/7236/7352811076_823e27c4bd.jpg" title="1337">
+  <img class="center img-border" src="http://farm8.staticflickr.com/7236/7352811076_823e27c4bd.jpg" alt="1337"/>
+</a></p>
+
+<center><strong>1337 !</strong></center>
+
+
+<p><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" type="text/css" media="screen" /></p>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.pack.js"></script>
+
+
+<script>
+$(document).ready(function() {
+  $(".fancybox").fancybox();
+});
+</script>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Tag Cloud for Toto]]></title>
+    <link href="http://baopham.github.io/blog/2012/05/05/tag-cloud-for-toto/"/>
+    <updated>2012-05-05T00:00:00-07:00</updated>
+    <id>http://baopham.github.io/blog/2012/05/05/tag-cloud-for-toto</id>
+    <content type="html"><![CDATA[<p>As I mentioned in the <a href="" title="/2012/03/21/abandoning-appengine/">previous post</a> about <a href="" title="http://cloudhead.io/toto">toto</a> blog engine, and how I have made some customizations, I still felt like something was missing.</p>
+
+<p>Okay, I have sitemap, pagination, mobile redirect, tags&hellip; what else could be missing that would appear in most blog websites?</p>
+
+<!--more-->
+
+
+<p><strong>tag cloud</strong> of course!! Duh&hellip;</p>
+
+<p><a href="http://www.flickr.com/photos/willrad/209637446/" title="DUH. by Willrad, on Flickr"><img class="img-border" src="http://farm1.staticflickr.com/66/209637446_ee265fbfa6.jpg" width="400" height="275" alt="DUH."></a><br/>
+<small><em>Just joking&hellip;</em></small></p>
+
+<p>Anyway, so I went back and fired an issue on the <a href="" title="https://github.com/5v3n/karakuri">karakuri</a> rack plugin github to see if this feature is possible to implement. Long story short, I made a pull request and with the support of the <a href="" title="https://github.com/5v3n">author</a>, now you can have the tag cloud feature. Isn&rsquo;t it sweet?</p>
+
+<blockquote><p>   <strong>Tag Cloud</strong><br/>
+   Example usage:</p>
+
+<pre><code>  &lt;h1&gt;Tags&lt;/h1&gt;
+  &lt;%  Karakuri::tag_cloud(@articles).each do |tag, freq| %&gt;
+      &lt;%= %|&lt;a href="http://baopham.github.io/tagged?tag=#{tag}" title="articles concerning #{tag}" style="font-size: #{10 * freq}px"&gt;#{tag}&lt;/a&gt;| %&gt;
+  &lt;% end %&gt;
+</code></pre></blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Abandoning AppEngine]]></title>
+    <link href="http://baopham.github.io/blog/2012/03/21/abandoning-appengine/"/>
+    <updated>2012-03-21T00:00:00-07:00</updated>
+    <id>http://baopham.github.io/blog/2012/03/21/abandoning-appengine</id>
+    <content type="html"><![CDATA[<p>These last 2 days have been insane!! You know why? Let me tell you the story:</p>
+
+<p>I was sick. It was a random cold that I caught from someone. But now I&rsquo;m glad I had it because if not because of it, I wouldn&rsquo;t have had the time to wander around <a href="https://github.com">github</a>, looking at people&rsquo;s repos, and then stumbled upon this project <a href="https://github.com/cloudhead/toto">toto</a>. And now, it&rsquo;s like a dream come true!.</p>
+
+<!--more-->
+
+
+<p><strong>toto</strong> is really the tiniest and coolest blogging engine yet! It has all that I love: git and ruby. It makes everything so easy to manage and configure, from archiving all the posts you wrote, to having a markdown converter by default, and articles embeded with metadata (which makes it easy to add tags/categories), etc.</p>
+
+<p>I&rsquo;m not going to explain all <strong>toto</strong>&rsquo;s features but as a future reference for myself, I&rsquo;d like to summarize all the steps that I took during the last 2 days to port my old website from <a href="http://code.google.com/appengine/">Google AppEngine</a> to <a href="https://github.com/cloudhead/toto">toto</a> and <a href="http://www.heroku.com/">Heroku</a>.</p>
+
+<h3>Installation</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>gem install toto
+</span><span class='line'>git clone git://github.com/cloudhead/dorothy.git myblog
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>dorothy</strong> is <strong>toto</strong>&rsquo;s default template. This gives you the bone structure of your blog</p>
+
+<h3>config.ru</h3>
+
+<p>Add personal settings to <code>config.ru</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;toto&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="no">File</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="s1">&#39;../sitemap&#39;</span><span class="p">,</span> <span class="bp">__FILE__</span><span class="p">)</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;rack/mobile-detect&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># Rack config</span>
+</span><span class='line'><span class="n">use</span> <span class="ss">Rack</span><span class="p">:</span><span class="ss">:Static</span><span class="p">,</span>
+</span><span class='line'>    <span class="ss">:urls</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s1">&#39;/css&#39;</span><span class="p">,</span> <span class="s1">&#39;/js&#39;</span><span class="p">,</span> <span class="s1">&#39;/images&#39;</span><span class="p">,</span> <span class="s1">&#39;/favicon.ico&#39;</span><span class="p">,</span> <span class="s1">&#39;/Resume.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;BingSiteAuth.xml&#39;</span><span class="p">,</span> <span class="s1">&#39;/robots.txt&#39;</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>    <span class="ss">:root</span> <span class="o">=&gt;</span> <span class="s1">&#39;public&#39;</span>
+</span><span class='line'><span class="n">use</span> <span class="ss">Rack</span><span class="p">:</span><span class="ss">:CommonLogger</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># Redirect to mobile site</span>
+</span><span class='line'><span class="n">use</span> <span class="ss">Rack</span><span class="p">:</span><span class="ss">:MobileDetect</span><span class="p">,</span> <span class="ss">:catchall</span> <span class="o">=&gt;</span> <span class="sr">/[Bb]lack[Bb]erry|i[Pp]hone|[Aa]ndroid/</span><span class="p">,</span>
+</span><span class='line'>                        <span class="ss">:redirect_to</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://baopham-mobile.heroku.com/&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="no">ENV</span><span class="o">[</span><span class="s1">&#39;RACK_ENV&#39;</span><span class="o">]</span> <span class="o">==</span> <span class="s1">&#39;development&#39;</span>
+</span><span class='line'>    <span class="n">use</span> <span class="ss">Rack</span><span class="p">:</span><span class="ss">:ShowExceptions</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">Toto</span><span class="o">::</span><span class="no">Site</span>
+</span><span class='line'>    <span class="n">alias_method</span> <span class="ss">:old_go</span><span class="p">,</span> <span class="ss">:go</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">go</span> <span class="n">route</span><span class="p">,</span> <span class="n">env</span> <span class="o">=</span> <span class="p">{},</span> <span class="n">type</span> <span class="o">=</span> <span class="ss">:html</span>
+</span><span class='line'>        <span class="k">if</span> <span class="ow">not</span> <span class="n">route</span><span class="o">.</span><span class="n">first</span> <span class="o">=~</span> <span class="sr">/\d{4}/</span> <span class="ow">and</span> <span class="n">route</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">route</span><span class="o">.</span><span class="n">last</span> <span class="o">=~</span> <span class="sr">/(\d+)/</span>
+</span><span class='line'>            <span class="vi">@config</span><span class="o">[</span><span class="ss">:id</span><span class="o">]</span> <span class="o">=</span> <span class="n">route</span><span class="o">.</span><span class="n">last</span><span class="o">.</span><span class="n">to_i</span>
+</span><span class='line'>            <span class="n">route</span><span class="o">.</span><span class="n">pop</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>        <span class="n">ret</span> <span class="o">=</span> <span class="n">old_go</span> <span class="n">route</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">type</span>
+</span><span class='line'>        <span class="vi">@config</span><span class="o">.</span><span class="n">delete</span> <span class="ss">:id</span>
+</span><span class='line'>        <span class="n">ret</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">toto</span> <span class="o">=</span> <span class="ss">Toto</span><span class="p">:</span><span class="ss">:Server</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span>
+</span><span class='line'>    <span class="c1">#</span>
+</span><span class='line'>    <span class="c1"># Add your settings here</span>
+</span><span class='line'>    <span class="c1"># set [:setting], [value]</span>
+</span><span class='line'>    <span class="c1">#</span>
+</span><span class='line'>    <span class="n">set</span> <span class="ss">:author</span><span class="p">,</span>    <span class="s2">&quot;Bao Pham&quot;</span>                                  <span class="c1"># blog author</span>
+</span><span class='line'>    <span class="n">set</span> <span class="ss">:title</span><span class="p">,</span>     <span class="s2">&quot;Bao Pham&quot;</span>
+</span><span class='line'>    <span class="n">set</span> <span class="ss">:url</span><span class="p">,</span>       <span class="s2">&quot;http://baopham.heroku.com&quot;</span>
+</span><span class='line'>    <span class="n">set</span> <span class="ss">:root</span><span class="p">,</span>      <span class="s2">&quot;page&quot;</span>                                      <span class="c1"># page to load on /</span>
+</span><span class='line'>    <span class="n">set</span> <span class="ss">:articles_per_page</span><span class="p">,</span>     <span class="mi">6</span>
+</span><span class='line'>    <span class="n">set</span> <span class="ss">:date</span><span class="p">,</span>      <span class="nb">lambda</span> <span class="p">{</span><span class="o">|</span><span class="n">now</span><span class="o">|</span> <span class="n">now</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%d/%m/%Y&quot;</span><span class="p">)</span> <span class="p">}</span>    <span class="c1"># date format for articles</span>
+</span><span class='line'>    <span class="n">set</span> <span class="ss">:markdown</span><span class="p">,</span>  <span class="ss">:smart</span>                                      <span class="c1"># use markdown + smart-mode</span>
+</span><span class='line'>    <span class="n">set</span> <span class="ss">:disqus</span><span class="p">,</span>    <span class="s2">&quot;bpmsworld&quot;</span>                                 <span class="c1"># disqus id, or false</span>
+</span><span class='line'>    <span class="n">set</span> <span class="ss">:summary</span><span class="p">,</span>   <span class="ss">:max</span> <span class="o">=&gt;</span> <span class="mi">150</span><span class="p">,</span> <span class="ss">:delim</span> <span class="o">=&gt;</span> <span class="sr">/~/</span>                  <span class="c1"># length of article summary and delimiter</span>
+</span><span class='line'>    <span class="n">set</span> <span class="ss">:ext</span><span class="p">,</span>       <span class="s1">&#39;txt&#39;</span>                                       <span class="c1"># file extension for articles</span>
+</span><span class='line'>    <span class="n">set</span> <span class="ss">:cache</span><span class="p">,</span>     <span class="mi">28800</span>                                       <span class="c1"># cache duration, in seconds</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">set</span> <span class="ss">:date</span><span class="p">,</span>      <span class="nb">lambda</span> <span class="p">{</span><span class="o">|</span><span class="n">now</span><span class="o">|</span> <span class="n">now</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%B </span><span class="si">#{</span><span class="n">now</span><span class="o">.</span><span class="n">day</span><span class="o">.</span><span class="n">ordinal</span><span class="si">}</span><span class="s2"> %Y&quot;</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">set</span> <span class="ss">:error</span><span class="p">,</span>     <span class="nb">lambda</span> <span class="p">{</span><span class="o">|</span><span class="n">code</span><span class="o">|</span>
+</span><span class='line'>        <span class="no">ERB</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="no">File</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s2">&quot;templates/pages/</span><span class="si">#{</span><span class="n">code</span><span class="si">}</span><span class="s2">.rhtml&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">result</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">run</span> <span class="n">toto</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Some changes I made:</p>
+
+<ul>
+<li><p>Add sitemap builder (line 2): <a href="#sitemap">sitemap</a></p></li>
+<li><p>Redirect for mobile view (line 11): <a href="#useragent">useragent</a></p></li>
+<li><p>Class <code>Toto::Site</code> (lines 19-31): <a href="#paginate">pagination</a></p></li>
+<li><p>Set <code>:root</code> to <code>"page"</code> (line 41): <a href="#paginate">pagination</a></p></li>
+<li><p>Changed the default number of articles per page to 6 (line 42)</p></li>
+<li><p>Added customed error pages in <code>templates/pages</code> (line 52)</p></li>
+</ul>
+
+
+<h3 id="sitemap">Sitemap</h3>
+
+
+<p>Just follow the instruction from <a href="http://artemk.name/2011/06/01/sitemap-in-toto/">this article</a>, you&rsquo;ll have a sitemap automatically</p>
+
+<h3 id="useragent">Mobile UserAgent Detect</h3>
+
+
+<p>This project is very neat. It detects mobile user-agents (iphone, ipad, android, blackberry,etc) and has options for you to redirect to other link. You can specifies specific link for different user-agents.</p>
+
+<p>Github repo: <a href="https://github.com/talison/rack-mobile-detect">talison/rack-mobile-detect</a></p>
+
+<h3 id="paginate">Pagination</h3>
+
+
+<p>It took me a while to get it to understand and make it work: <a href="http://vincentwoo.com/2011/02/23/cheap-toto-pagination/">cheap toto pagination</a></p>
+
+<ul>
+<li><p>So first add the class <code>Toto::Site</code> to your <code>config.ru</code> (now you see why i have it there)</p></li>
+<li><p>Remember to set your <code>:root</code> to <code>"page"</code> instead of <code>"index"</code></p></li>
+<li><p>Next, add <code>templates/pages/page.rhtml</code></p></li>
+<li><p>Replace the <code>...</code> with your <code>index.rhtml</code> content</p></li>
+</ul>
+
+
+<h3>Add Articles</h3>
+
+<p>Now adding articles are a piece of cake. Only a few things you need to watch out for:</p>
+
+<ul>
+<li><p>Name your article (text file) in folder <strong>articles</strong> exactly in this format: <strong>YYYY-MM-DD-article-title</strong>, which follows closely with the article&rsquo;s URL: <strong>YYYY/MM/DD/article-title</strong></p></li>
+<li><p>If you article title has characters like: <strong>:</strong> , <strong>.</strong> , <strong>&lsquo;</strong> , they are ignored in the URL, so that I noticed</p></li>
+<li><p>Before writing your article, add a few lines of metadata:</p></li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="ss">title</span><span class="p">:</span> <span class="no">My</span> <span class="no">Post</span> <span class="no">Title</span>
+</span><span class='line'><span class="ss">author</span><span class="p">:</span> <span class="no">Bao</span> <span class="no">Pham</span>
+</span><span class='line'><span class="ss">date</span><span class="p">:</span> <span class="mi">2012</span><span class="o">/</span><span class="mo">03</span><span class="o">/</span><span class="mi">21</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li><p>If your title has non-alphabet characters, keep the title in double quote like <code>title: "Emmy's Post"</code> or <code>title: "I-Like-Dashes"</code> and of course, name the file as <strong>2012-03-21-emmys-post</strong> or <strong>2012-03-21-i&mdash;-like&mdash;-dashes</strong> respectively</p></li>
+<li><p>The article can be in markdown format or HTML<br/>
+<span class="label label-info">Tips</span> Alternately, you can make use of the provided <strong>Rakefile</strong> then you don&rsquo;t have to worry about how to name your article files: just type this in your terminal: <strong>rake Rakefile new</strong>, it will ask for your article&rsquo;s title and creates it for you:</p></li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>rake Rakefile new
+</span><span class='line'>Title: Emmy<span class="err">&#39;</span>s Post
+</span><span class='line'>
+</span><span class='line'>  toto ~ an article was created <span class="k">for </span>you at articles/2012-04-11-emmys-post.txt.
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Those are the few things that I picked up from playing with <strong>toto</strong> for 2 days</p>
+
+<h3>Tags/Categories</h3>
+
+<p><strong>toto</strong> lacks support for tags unfortunately but no worries you have <a href="https://github.com/5v3n/karakuri">karakuri</a>. Follow the README and you&rsquo;re all set to go!</p>
+
+<h3>Deploy to Heroku</h3>
+
+<p>2 days to learn Rack, ERB templates, discover <a href="http://disqus.com/">disqus</a>, and many more interesting projects, finally&hellip; goodbye Google AppEngine and Django, I&rsquo;m joining the Ruby community!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Bootstrap Experiment]]></title>
+    <link href="http://baopham.github.io/blog/2012/03/07/bootstrap-experiment/"/>
+    <updated>2012-03-07T00:00:00-08:00</updated>
+    <id>http://baopham.github.io/blog/2012/03/07/bootstrap-experiment</id>
+    <content type="html"><![CDATA[<p>You&rsquo;ve probably heard of <a href="http://getbootstrap.com">Twitter Bootstrap</a>? If not, follow the link and you&rsquo;ll see what magics it does. I&rsquo;ve grown tired of my old website theme and decided to try out Bootstrap. Although Bootstrap gives people the opportunity to be lazy in putting more personal touch in their website&rsquo;s design, it&rsquo;s a great starting point for a newbie like me. Hopefully, from here onwards, I can create something more uniquely looking&hellip;</p>
+
+<!--more-->
+
+
+<p>Not only Bootstrap that makes a (major) change in the look of this website, from <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a>, I converted to <a href="http://code.google.com/p/google-code-prettify/">Google Code Prettify</a>, which is also pretty cool since it can guess what language the code snippet is. However, it doesn&rsquo;t support as many languages as SyntaxHighlighter.</p>
+
+<p>This could be a permanent change or just temporary, who knows if tomorrow I will see something even cooler than this?
+&nbsp;&#10047;</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Project Euler: Practice Your Math and Programming Skills]]></title>
+    <link href="http://baopham.github.io/blog/2012/01/25/project-euler-practice-your-math-and-programming-skills/"/>
+    <updated>2012-01-25T00:00:00-08:00</updated>
+    <id>http://baopham.github.io/blog/2012/01/25/project-euler-practice-your-math-and-programming-skills</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve recently started to participate in this site <a href="http://projecteuler.net/">Project Euler</a>. It&rsquo;s a website with a series of mathematics/programming problems, ranging from easy to very hard. Some problems, if not solved using the right algorithm, can take more than 5 minutes to get the result (personal experience, I forgot that it was running&hellip;). So it only matters if you use correct and efficient algorithms. These problems are meant to be solved in only less than a minute.</p>
+
+<!--more-->
+
+
+<p>Now I&rsquo;m quite addicted to the thrilling feeling of getting the right answer. There are certainly numerous solutions out there on the web (and I admit, sometimes I have to resort to them when I&rsquo;m stuck), but it&rsquo;s always more exciting to try and learn new algorithms and apply them to the problems.</p>
+
+<p>Check out my Git repository of my solutions (mostly in Python because I find it faster and neater to code, no?) to some of the Euler questions: <a href="https://github.com/baopham/projectEuler">baopham/projectEuler</a></p>
+
+<p><img src="http://projecteuler.net/profile/baopham.png" alt="My Euler badge" /></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Chess]]></title>
+    <link href="http://baopham.github.io/blog/2011/12/05/chess/"/>
+    <updated>2011-12-05T00:00:00-08:00</updated>
+    <id>http://baopham.github.io/blog/2011/12/05/chess</id>
+    <content type="html"><![CDATA[<p>Want to play some chess? Here is a chess board for you written in HTML5 using the drag and drop feature. Make sure your browser supports HTML5. Now drag away!</p>
+
+<p><strong>UPDATE:</strong> Now the chess rules are enforced. It won&rsquo;t move unless you follow the rules :)</p>
+
+<!--more-->
+
+
+<script src="http://baopham.github.io/javascripts/custom/chess.js" type="text/javascript"></script>
+
+
+
+
+<div ondragstart="dragStart(event);" ondragover="return dragOver(event);" ondrop="return drop(event);">
+    <table class="chess" border="1">
+        <tr>
+            <td id="1-rook" class="black odd" draggable="true">&#9820;</td>
+            <td id="2-knight" class="black even" draggable="true">&#9822;</td>
+            <td id="3-bishop" class="black odd" draggable="true">&#9821;</td>
+            <td id="4-queen" class="black even" draggable="true">&#9819;</td>
+            <td id="5-king" class="black odd" draggable="true">&#9818;</td>
+            <td id="6-bishop" class="black even" draggable="true">&#9821;</td>
+            <td id="7-knight" class="black odd" draggable="true">&#9822;</td>
+            <td id="8-rook" class="black even" draggable="true">&#9820;</td>
+        </tr>
+        <tr>
+            <td id="9-pawn" class="black even" draggable="true">&#9823;</td>
+            <td id="10-pawn" class="black odd" draggable="true">&#9823;</td>
+            <td id="11-pawn" class="black even" draggable="true">&#9823;</td>
+            <td id="12-pawn" class="black odd" draggable="true">&#9823;</td>
+            <td id="13-pawn" class="black even" draggable="true">&#9823;</td>
+            <td id="14-pawn" class="black odd" draggable="true">&#9823;</td>
+            <td id="15-pawn" class="black even" draggable="true">&#9823;</td>
+            <td id="16-pawn" class="black odd" draggable="true">&#9823;</td>
+        </tr>
+        <tr>
+            <td id="17" class="none odd">&nbsp;</td>
+            <td id="18" class="none even">&nbsp;</td>
+            <td id="19" class="none odd">&nbsp;</td>
+            <td id="20" class="none even">&nbsp;</td>
+            <td id="21" class="none odd">&nbsp;</td>
+            <td id="22" class="none even">&nbsp;</td>
+            <td id="23" class="none odd">&nbsp;</td>
+            <td id="24" class="none even">&nbsp;</td>
+        </tr>
+        <tr>
+            <td id="25" class="none even">&nbsp;</td>
+            <td id="26" class="none odd">&nbsp;</td>
+            <td id="27" class="none even">&nbsp;</td>
+            <td id="28" class="none odd">&nbsp;</td>
+            <td id="29" class="none even">&nbsp;</td>
+            <td id="30" class="none odd">&nbsp;</td>
+            <td id="31" class="none even">&nbsp;</td>
+            <td id="32" class="none odd">&nbsp;</td>
+        </tr>
+        <tr>
+            <td id="33" class="none odd">&nbsp;</td>
+            <td id="34" class="none even">&nbsp;</td>
+            <td id="35" class="none odd">&nbsp;</td>
+            <td id="36" class="none even">&nbsp;</td>
+            <td id="37" class="none odd">&nbsp;</td>
+            <td id="38" class="none even">&nbsp;</td>
+            <td id="39" class="none odd">&nbsp;</td>
+            <td id="40" class="none even">&nbsp;</td>
+        </tr>
+        <tr>
+            <td id="41" class="none even">&nbsp;</td>
+            <td id="42" class="none odd">&nbsp;</td>
+            <td id="43" class="none even">&nbsp;</td>
+            <td id="44" class="none odd">&nbsp;</td>
+            <td id="45" class="none even">&nbsp;</td>
+            <td id="46" class="none odd">&nbsp;</td>
+            <td id="47" class="none even">&nbsp;</td>
+            <td id="48" class="none odd">&nbsp;</td>
+        </tr>
+        <tr>
+            <td id="49-pawn" class="white odd" draggable="true">&#9817;</td>
+            <td id="50-pawn" class="white even" draggable="true">&#9817;</td>
+            <td id="51-pawn" class="white odd" draggable="true">&#9817;</td>
+            <td id="52-pawn" class="white even" draggable="true">&#9817;</td>
+            <td id="53-pawn" class="white odd" draggable="true">&#9817;</td>
+            <td id="54-pawn" class="white even" draggable="true">&#9817;</td>
+            <td id="55-pawn" class="white odd" draggable="true">&#9817;</td>
+            <td id="56-pawn" class="white even" draggable="true">&#9817;</td>
+        </tr>
+        <tr>
+            <td id="57-rook" class="white even" draggable="true">&#9814;</td>
+            <td id="58-knight" class="white odd" draggable="true">&#9816;</td>
+            <td id="59-bishop" class="white even" draggable="true">&#9815;</td>
+            <td id="60-queen" class="white odd" draggable="true">&#9813;</td>
+            <td id="61-king" class="white even" draggable="true">&#9812;</td>
+            <td id="62-bishop" class="white odd" draggable="true">&#9815;</td>
+            <td id="63-knight" class="white even" draggable="true">&#9816;</td>
+            <td id="64-rook" class="white odd" draggable="true">&#9814;</td>
+        </tr>
+    </table>
+</div>
+
+
+
+
+<br>
+
+
+<p><strong>BONUS:</strong> <a href="http://en.wikipedia.org/wiki/LocalStorage">HTML localStorage</a> and <a href="http://www.w3.org/TR/html5/editing.html#contenteditable">contentEditable</a>.
+Features that allow you to edit a page&rsquo;s section on the browser and store your scribbles on the client-side database:</p>
+
+<div id="editable-sec">
+    <section id="editable" contenteditable="true" onkeyup="storeNotes(this.id);">
+    </section>
+    <div style="padding-top: 5px;">
+        <input class="btn" type="button" id="resetChess" value="Reset game" />
+        <input class="btn" type="button" id="clearNotes" value="Clear local storage" />
+    </div>
+    <small>Click &#8220;clear local storage&#8221; if you don&#8217;t want your notes to be remembered (If your notes are not remembered, it means your browser has <i>localStorage</i> turned off or doesn&#8217;t support it unfortunately)</small>
+</div>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[JavaScript: Matrix Calculator]]></title>
+    <link href="http://baopham.github.io/blog/2011/11/27/javascript-matrix-calculator/"/>
+    <updated>2011-11-27T00:00:00-08:00</updated>
+    <id>http://baopham.github.io/blog/2011/11/27/javascript-matrix-calculator</id>
+    <content type="html"><![CDATA[<div class="matrix-post">
+  <p>A matrix calculator written in JavaScript :)</p>
+  <div class="matrix">
+    <div style="margin: 10px 0">
+      <b>Matrix 1</b>
+      <input style="float:right" class="add btn btn-default" type="button" value="+"/>
+      <input style="float:right" class="remove btn btn-default" type="button" value="&#8211;"/>
+    </div>
+    <div class="matrixA inputMatrix">
+      <div class="matrix-row">
+    <input type="text" value="1, 2, 3"/>
+      </div>
+      <div class="matrix-row">
+    <input type="text" value="4, 5, 6"/>
+      </div>
+      <div class="matrix-row">
+    <input type="text" value="7, 8, 9"/>
+      </div>
+    </div>
+  </div>
+  <div class="matrix">
+    <div style="margin: 10px 0">
+      <b>Matrix 2</b>
+      <input style="float: right;" class="add btn btn-default" type="button" value="+"/>
+      <input style="float: right;" class="remove btn btn-default" type="button" value="&#8211;"/>
+    </div>
+    <div class="matrixB inputMatrix">
+      <div class="matrix-row">
+    <input type="text" value="1, 2, 3"/>
+      </div>
+      <div class="matrix-row">
+    <input type="text" value="4, 5, 6"/>
+      </div>
+      <div class="matrix-row">
+    <input type="text" value="7, 8, 9"/>
+      </div>
+    </div>
+  </div>
+  <div class="clearfix"></div>
+  <div>
+    <ul class="list-inline">
+      <li> 
+        <input type="radio" name="method" id="multiply" value="multiply" checked="checked">
+        <label for="multiply">Multiply</label>
+      </li>
+      <li>
+        <input type="radio" name="method" id="transpose" value="transpose"/>
+        <label for="transpose">Transpose</label>
+      </li>
+      <li>
+        <input type="radio" name="method" id="add" value="add"/>
+        <label for="add">Addition</label>
+      </li>
+      <li>
+        <input type="radio" name="method" id="substract" value="subtract"/>
+        <label for="substract">Subtraction</label>
+      </li>
+    </ul>
+    <div id="compute">
+      <input class="btn btn-info" type="button" value="Compute"/>
+    </div>
+    <div id="answer"></div>
+  </div>
+  <script src="http://baopham.github.io/javascripts/custom/matrix.js" type="text/javascript"></script>
+</div>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[TextMate: Configure Python Bundle for iTerm]]></title>
+    <link href="http://baopham.github.io/blog/2011/11/08/textmate-configure-python-bundle-for-iterm/"/>
+    <updated>2011-11-08T00:00:00-08:00</updated>
+    <id>http://baopham.github.io/blog/2011/11/08/textmate-configure-python-bundle-for-iterm</id>
+    <content type="html"><![CDATA[<p>Ever since I migrated to iTerm2, it&rsquo;s become frustrating that I cannot run my Python scripts in iTerm through my editor TextMate, so I decided to dig in the bundle editor:</p>
+
+<p>To run your Python scripts in <a href="http://www.iterm2.com/">iTerm2</a> or <a href="http://iterm.sourceforge.net/">iTerm</a>:</p>
+
+<p>Go to TextMate&rsquo;s menu: <strong>Bundles</strong> &#8594; <strong>Bundle Editor</strong> &#8594; <strong>Show Bundle Editor</strong>.
+Now go to the Python bundle, duplicate the <strong>Run Script (Terminal)</strong> and rename it to <strong>Run Script (iTerm)</strong>, then replace the whole command(s) section with:</p>
+
+<!--more-->
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'><span class="nv">TPY</span><span class="o">=</span><span class="k">${</span><span class="nv">TM_PYTHON</span><span class="k">:-</span><span class="nv">python</span><span class="k">}</span>
+</span><span class='line'>
+</span><span class='line'>esc <span class="o">()</span> <span class="o">{</span>
+</span><span class='line'><span class="nv">STR</span><span class="o">=</span><span class="s2">&quot;$1&quot;</span> ruby &amp;lt;&amp;lt;<span class="s2">&quot;RUBY&quot;</span>
+</span><span class='line'><span class="nv">str</span> <span class="o">=</span> ENV<span class="o">[</span><span class="s1">&#39;STR&#39;</span><span class="o">]</span>
+</span><span class='line'><span class="nv">str</span> <span class="o">=</span> str.gsub<span class="o">(</span>/<span class="s1">&#39;/, &quot;&#39;</span><span class="se">\\\\</span><span class="s1">&#39;&#39;</span><span class="s2">&quot;)</span>
+</span><span class='line'><span class="s2">str = str.gsub(/[\\&quot;</span><span class="o">]</span>/, <span class="s1">&#39;\\\\\\0&#39;</span><span class="o">)</span>
+</span><span class='line'>print <span class="s2">&quot;&#39;#{str}&#39;&quot;</span>
+</span><span class='line'>RUBY
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>osascript &amp;lt;&amp;lt;- APPLESCRIPT
+</span><span class='line'>tell application <span class="s2">&quot;iTerm&quot;</span>
+</span><span class='line'>    activate
+</span><span class='line'>    make new terminal
+</span><span class='line'>    tell the first terminal
+</span><span class='line'>        launch session <span class="s2">&quot;Default Session&quot;</span>
+</span><span class='line'>        tell the last session
+</span><span class='line'>            write text <span class="s2">&quot;python $TM_FILEPATH&quot;</span>
+</span><span class='line'>        end tell
+</span><span class='line'>    end tell
+</span><span class='line'>end tell
+</span><span class='line'>APPLESCRIPT
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Next one is <strong>Debug script in Terminal</strong>. This one is easier because you can just replace this line <code>TP=${TM_TERM_PROG:=Terminal}</code> with <code>TP=${TM_TERM_PROG:=iTerm}</code>, and now rename your command.<br/>
+DONE!</p>
+
+<p>Now you can run your scripts in iTerm through the specified shortcuts and not the old school Terminal.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[JavaScript and Canvas: Conway's Game of Life]]></title>
+    <link href="http://baopham.github.io/blog/2011/07/03/javascript-and-canvas-conways-game-of-life/"/>
+    <updated>2011-07-03T05:59:00-07:00</updated>
+    <id>http://baopham.github.io/blog/2011/07/03/javascript-and-canvas-conways-game-of-life</id>
+    <content type="html"><![CDATA[<p>Being inspired by my school project from CS111 <b>Introduction to Computation</b>, I implemented the game again in JavaScript and used HTML5 canvas to display the cells and animation (HTML5 browser support is required).</p>
+
+
+<p><strong>Supported Browsers:</strong></p>
+
+<ul>
+<li>Firefox 4+</li>
+<li>Google Chrome</li>
+<li>Opera 10.6+</li>
+<li>Apple Safari 4+</li>
+<li>Internet Explorer 9</li>
+</ul>
+
+
+<!--more-->
+
+
+
+
+<script src="http://baopham.github.io/javascripts/custom/life.js" type="text/javascript"></script>
+
+
+<p><strong>From wikipedia:</strong></p>
+
+<blockquote><p>  &#8220;The Game of Life, also known simply as Life, is a <a href="http://en.wikipedia.org/wiki/Cellular_automaton">cellular automaton</a> devised by the British mathematician <a href="http://en.wikipedia.org/wiki/John_Horton_Conway">John Horton Conway</a> in 1970<br/>
+  <strong>Rules:</strong><br/>
+   1.  Any live cell with fewer than two live neighbours dies, as if caused by under-population.<br/>
+   2.  Any live cell with two or three live neighbours lives on to the next generation.<br/>
+   3.  Any live cell with more than three live neighbours dies, as if by overcrowding.<br/>
+   4.  Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.&#8221;</p></blockquote>
+
+<p><canvas id="canvas_life"></canvas></p>
+
+<div id="buttons_life">
+    <button class="btn" id="generate" type="button">Generate Random Cells</button>
+    <button class="btn" id="run" type="button">Run</button>
+    <button class="btn" id="stop" type="button">Stop</button>
+    <button class="btn" id="clear" type="button">Clear</button>
+</div>
+
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Math | :baopham]]></title>
+  <link href="http://baopham.github.io/blog/categories/math/atom.xml" rel="self"/>
+  <link href="http://baopham.github.io/"/>
+  <updated>2016-02-08T08:11:11-08:00</updated>
+  <id>http://baopham.github.io/</id>
+  <author>
+    <name><![CDATA[Bao Pham]]></name>
+    <email><![CDATA[gbaopham@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Project Euler: Practice Your Math and Programming Skills]]></title>
+    <link href="http://baopham.github.io/blog/2012/01/25/project-euler-practice-your-math-and-programming-skills/"/>
+    <updated>2012-01-25T00:00:00-08:00</updated>
+    <id>http://baopham.github.io/blog/2012/01/25/project-euler-practice-your-math-and-programming-skills</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve recently started to participate in this site <a href="http://projecteuler.net/">Project Euler</a>. It&rsquo;s a website with a series of mathematics/programming problems, ranging from easy to very hard. Some problems, if not solved using the right algorithm, can take more than 5 minutes to get the result (personal experience, I forgot that it was running&hellip;). So it only matters if you use correct and efficient algorithms. These problems are meant to be solved in only less than a minute.</p>
+
+<!--more-->
+
+
+<p>Now I&rsquo;m quite addicted to the thrilling feeling of getting the right answer. There are certainly numerous solutions out there on the web (and I admit, sometimes I have to resort to them when I&rsquo;m stuck), but it&rsquo;s always more exciting to try and learn new algorithms and apply them to the problems.</p>
+
+<p>Check out my Git repository of my solutions (mostly in Python because I find it faster and neater to code, no?) to some of the Euler questions: <a href="https://github.com/baopham/projectEuler">baopham/projectEuler</a></p>
+
+<p><img src="http://projecteuler.net/profile/baopham.png" alt="My Euler badge" /></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[JavaScript: Matrix Calculator]]></title>
+    <link href="http://baopham.github.io/blog/2011/11/27/javascript-matrix-calculator/"/>
+    <updated>2011-11-27T00:00:00-08:00</updated>
+    <id>http://baopham.github.io/blog/2011/11/27/javascript-matrix-calculator</id>
+    <content type="html"><![CDATA[<div class="matrix-post">
+  <p>A matrix calculator written in JavaScript :)</p>
+  <div class="matrix">
+    <div style="margin: 10px 0">
+      <b>Matrix 1</b>
+      <input style="float:right" class="add btn btn-default" type="button" value="+"/>
+      <input style="float:right" class="remove btn btn-default" type="button" value="&#8211;"/>
+    </div>
+    <div class="matrixA inputMatrix">
+      <div class="matrix-row">
+    <input type="text" value="1, 2, 3"/>
+      </div>
+      <div class="matrix-row">
+    <input type="text" value="4, 5, 6"/>
+      </div>
+      <div class="matrix-row">
+    <input type="text" value="7, 8, 9"/>
+      </div>
+    </div>
+  </div>
+  <div class="matrix">
+    <div style="margin: 10px 0">
+      <b>Matrix 2</b>
+      <input style="float: right;" class="add btn btn-default" type="button" value="+"/>
+      <input style="float: right;" class="remove btn btn-default" type="button" value="&#8211;"/>
+    </div>
+    <div class="matrixB inputMatrix">
+      <div class="matrix-row">
+    <input type="text" value="1, 2, 3"/>
+      </div>
+      <div class="matrix-row">
+    <input type="text" value="4, 5, 6"/>
+      </div>
+      <div class="matrix-row">
+    <input type="text" value="7, 8, 9"/>
+      </div>
+    </div>
+  </div>
+  <div class="clearfix"></div>
+  <div>
+    <ul class="list-inline">
+      <li> 
+        <input type="radio" name="method" id="multiply" value="multiply" checked="checked">
+        <label for="multiply">Multiply</label>
+      </li>
+      <li>
+        <input type="radio" name="method" id="transpose" value="transpose"/>
+        <label for="transpose">Transpose</label>
+      </li>
+      <li>
+        <input type="radio" name="method" id="add" value="add"/>
+        <label for="add">Addition</label>
+      </li>
+      <li>
+        <input type="radio" name="method" id="substract" value="subtract"/>
+        <label for="substract">Subtraction</label>
+      </li>
+    </ul>
+    <div id="compute">
+      <input class="btn btn-info" type="button" value="Compute"/>
+    </div>
+    <div id="answer"></div>
+  </div>
+  <script src="http://baopham.github.io/javascripts/custom/matrix.js" type="text/javascript"></script>
+</div>
+
+]]></content>
+  </entry>
+  
+</feed>

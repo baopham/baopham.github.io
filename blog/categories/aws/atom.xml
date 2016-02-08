@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: AWS | :baopham]]></title>
+  <link href="http://baopham.github.io/blog/categories/aws/atom.xml" rel="self"/>
+  <link href="http://baopham.github.io/"/>
+  <updated>2016-02-08T08:11:11-08:00</updated>
+  <id>http://baopham.github.io/</id>
+  <author>
+    <name><![CDATA[Bao Pham]]></name>
+    <email><![CDATA[gbaopham@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[AWS CloudFormation reusable variables]]></title>
+    <link href="http://baopham.github.io/blog/2016/02/08/aws-cloudformation-reusable-variables/"/>
+    <updated>2016-02-08T07:46:33-08:00</updated>
+    <id>http://baopham.github.io/blog/2016/02/08/aws-cloudformation-reusable-variables</id>
+    <content type="html"><![CDATA[<p>Here is a way to create reusable strings / numbers / etc. in CloudFormation.</p>
+
+<ol>
+<li>Create Lambda resource to build the values you need.</li>
+<li><p>Create a custom resource to store the value returned from the Lambda</p>
+
+<p> Example: Here we have a custom resource <code>DBInfo</code> to hold the DB information.</p>
+
+<p> <code>javascript
+ "Resources": {
+   "DBInfo": {
+     "Type": "Custom::DBInfo",
+     "Properties": {
+       "ServiceToken": { "Fn::GetAtt": ["GetDBInfo", "Arn"] },
+       "BuildVersion": { "Ref": "BuildVersion" }
+     }
+   },
+   "GetDBInfo": {
+     "Type": "AWS::Lambda::Function",
+     "Properties": {
+       "Handler": "index.handler",
+       "Role": { "Fn::GetAtt" : ["LambdaExecutionRole", "Arn"] },
+       "Code": {
+         "ZipFile":  { "Fn::Join": ["", [
+             "var response = require('cfn-response');",
+             "exports.handler = function(event, context) {",
+             "   var host = '",
+             { "Fn::GetAtt": [ "Database", "Endpoint.Address" ] },
+             "';",
+             "   var password = '",
+             { "Fn::GetAtt": [ "GeneratedDBPassword", "Value" ] },
+             "';",
+             "   var username = '",
+             {
+               "Fn::Join": [ "_", [ {"Ref": "AppName"}, {"Ref": "AppEnv"} ] ]
+             },
+             "   var database = '",
+             {
+               "Fn::Join": [ "_", [ {"Ref": "AppName"}, {"Ref": "AppEnv"} ] ]
+             },
+             "';",
+             "   var responseData = { Host: host, Password: password, Username: username, Database: database };",
+             "   response.send(event, context, response.SUCCESS, responseData);",
+             "};"
+           ]]
+         },
+         "Runtime": "nodejs"
+       }
+     }
+   },
+   "LambdaExecutionRole": {
+     "Type": "AWS::IAM::Role",
+     "Properties": {
+       "AssumeRolePolicyDocument": {
+         "Version": "2012-10-17",
+         "Statement": [{ "Effect": "Allow", "Principal": {"Service": ["lambda.amazonaws.com"]}, "Action": ["sts:AssumeRole"] }]
+       },
+       "Path": "/",
+       "Policies": [{
+         "PolicyName": "root",
+         "PolicyDocument": {
+           "Version": "2012-10-17",
+           "Statement": [{ "Effect": "Allow", "Action": ["logs:*"], "Resource": "arn:aws:logs:*:*:*" }]
+         }
+       }]
+     }
+   }
+ }
+</code></p></li>
+<li><p>Reference the custom resource with <code>Fn::GetAtt</code>:</p>
+
+<p> <code>javascript
+ { "Fn::GetAtt": [ "DBInfo", "Host" ] },
+ { "Fn::GetAtt": [ "DBInfo", "Password" ] }
+ ...
+</code></p></li>
+<li><p>Create a parameter <code>BuildVersion</code>. This is the key to make sure the custom resource <code>DBInfo</code> is updated when you update your CloudFormation</p>
+
+<p> <code>
+ "Parameters": {
+   "BuildVersion": {
+     "Description": "Build Version. Needs to be different everytime you make an update",
+     "Type": "String"
+   }
+ }
+</code></p></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+</feed>

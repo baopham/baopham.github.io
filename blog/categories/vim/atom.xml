@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Vim | :baopham]]></title>
+  <link href="http://baopham.github.io/blog/categories/vim/atom.xml" rel="self"/>
+  <link href="http://baopham.github.io/"/>
+  <updated>2016-02-08T08:11:11-08:00</updated>
+  <id>http://baopham.github.io/</id>
+  <author>
+    <name><![CDATA[Bao Pham]]></name>
+    <email><![CDATA[gbaopham@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[A Command Line Interface for Vundle]]></title>
+    <link href="http://baopham.github.io/blog/2014/05/29/a-command-line-interface-for-vundle/"/>
+    <updated>2014-05-29T21:30:24-07:00</updated>
+    <id>http://baopham.github.io/blog/2014/05/29/a-command-line-interface-for-vundle</id>
+    <content type="html"><![CDATA[<p>I&rsquo;m a die hard fan of Vim and sometimes can be obsessed with trying out new plugins. I really like <a href="https://github.com/gmarik/Vundle.vim">Vundle</a> &ndash; a Vim plugin manager that simplifies plugin installation. I recently reorganized my <a href="https://github.com/baopham/vim/blob/master/vimrc">.vimrc</a> so that it&rsquo;s easier to keep track of my plugin configurations. My <a href="https://github.com/baopham/vim">.vim</a> folder now has a sub directory <code>settings</code> that contains different files for each plugin configuration:</p>
+
+<!--more-->
+
+
+<p><img src="http://f.cl.ly/items/2p3c0E1q3f053K0L1N2M/Screen%20Shot%202014-05-29%20at%209.53.32%20PM.png" class="center"></p>
+
+<p>and <code>.vimrc</code> file will source these files one by one:</p>
+
+<p><code>vim
+for fpath in split(globpath('~/.vim/settings', '*.vim'), '\n')
+  exe 'source' fpath
+endfor
+</code></p>
+
+<p>The only problem is whenever I uninstall a plugin, I have to remember to remove the configuration file for that plugin in the <code>settings</code> directory. Of course I don&rsquo;t always remember, and so <a href="https://github.com/baopham/vundle-cli">Vundle CLI</a> is built for this.</p>
+
+<p>To quote from the <code>README.md</code>:</p>
+
+<blockquote><p>Available commands:</p>
+
+<ul>
+<li><code>rm</code> remove a plugin</li>
+<li><code>list</code> list all installed plugins</li>
+<li><code>find</code> find an installed plugin</li>
+<li><code>clean</code> clean up unused plugin related files</li>
+</ul>
+
+
+<p><code>rm</code> will remove the line <code>Bundle plugin_name</code> or <code>Plugin plugin_name</code> in your <code>.vimrc</code>,
+delete the configuration file for this plugin in the specified settings directory,
+and the plugin folder. Before anything is deleted, the command will prompt you
+for confirmation unless the <code>--force</code> switch is on.</p></blockquote>
+
+<p>Rather than explaining what each command does, I think a gif would do a much better job:</p>
+
+<p><img src="http://baopham.github.io/images/vundlecli.gif" alt="Vundle CLI gif" class="center"/></p>
+
+<p>The locations of <code>.vimrc</code> file, <code>.vim</code> and <code>settings</code> directories can be specified with options <code>--vimrc</code>, <code>--vimdir</code>, <code>--settings</code> respectively.  Otherwise, the default values are <code>~/.vimrc</code>, <code>~/.vim</code>, and <code>~/.vim/settings</code>. It should also be able to follow symlinks.</p>
+
+<p>I still need to write tests but I&rsquo;m leaving it for the future when I have more time and energy.</p>
+
+<p><a href="https://github.com/baopham/vundle-cli">Vundle CLI</a> is a Ruby gem so to install it, run this in your terminal:</p>
+
+<p><code>bash
+$ gem install vundle-cli
+</code></p>
+]]></content>
+  </entry>
+  
+</feed>

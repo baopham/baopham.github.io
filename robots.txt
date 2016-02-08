@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: 
+
+Sitemap: http://baopham.github.io/sitemap.xml 

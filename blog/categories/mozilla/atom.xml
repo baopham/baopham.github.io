@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Mozilla | :baopham]]></title>
+  <link href="http://baopham.github.io/blog/categories/mozilla/atom.xml" rel="self"/>
+  <link href="http://baopham.github.io/"/>
+  <updated>2016-02-08T08:11:11-08:00</updated>
+  <id>http://baopham.github.io/</id>
+  <author>
+    <name><![CDATA[Bao Pham]]></name>
+    <email><![CDATA[gbaopham@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Mozilla Jaw's Puzzle]]></title>
+    <link href="http://baopham.github.io/blog/2012/08/06/mozilla-jaws-puzzle/"/>
+    <updated>2012-08-06T00:00:00-07:00</updated>
+    <id>http://baopham.github.io/blog/2012/08/06/mozilla-jaws-puzzle</id>
+    <content type="html"><![CDATA[<p>I&rsquo;m actually a little late for this <a href="http://people.mozilla.org/~jwein/puzzle/">Jaw&rsquo;s programming puzzle</a>, which I only discovered yesterday from reading <a href="http://msujaws.wordpress.com/2012/05/02/wanna-join-the-firefox-team-at-mozilla-solve-the-puzzle/">a blog</a> written by a Mozilla employee. If I had seen this post a bit earlier, I might even have had a chance to work for them since I solved it! <em>yay</em>.</p>
+
+<p>(btw, if you love solving programming problems, please take a moment to go through the puzzle (it&rsquo;s really worth it) but note that this post contains <strong>SPOILERS</strong>.)</p>
+
+<!--more-->
+
+
+<p>At first, I was a bit unsure about the complicated-and-low-level-looking javascript in the source code:</p>
+
+<p><code>javascript
+var _0x9827=["\x67\x65\x74\x45\x6C\x65\x6D\x65\x6E\x74\x42\x79\x49\x64","\x66\x69\x6E\x61\x6C","\x63","\x32\x64","\x67\x65\x74\x43\x6F\x6E\x74\x65\x78\x74","\x77\x69\x64\x74\x68","\x34\x35\x30","\x68\x65\x69\x67\x68\x74","\x31\x35","\x66\x6F\x6E\x74","\x31\x35\x70\x78\x20\x43\x6F\x75\x72\x69\x65\x72\x20\x4E\x65\x77","\x66\x69\x6C\x6C\x53\x74\x79\x6C\x65","\x23\x30\x30\x30\x30\x30\x30","\x21\x62\x21\x21\x2C\x47\x21\x21\x21\x21\x21\x21\x21\x41\x21\x70\x7B\x21\x21\x21\x62\x21\x21\x21\x6E","\x6B\x21\x78\x74\x21\x21\x59\x51\x56\x5B\x5B\x4D\x46\x21\x6E\x21\x21\x6A\x6D\x6D\x21\x2F\x64\x70\x21","\x6B\x62\x78\x74\x2C\x58\x4A\x4F\x4F\x46\x53\x58\x4A\x4F\x4F\x46\x53\x41\x6E\x70\x7B\x6A\x6D\x6D\x62\x2F\x64\x70\x6E","","\x63\x68\x61\x72\x43\x6F\x64\x65\x41\x74","\x66\x72\x6F\x6D\x43\x68\x61\x72\x43\x6F\x64\x65","\x66\x69\x6C\x6C\x54\x65\x78\x74","\x70","\x63\x72\x65\x61\x74\x65\x45\x6C\x65\x6D\x65\x6E\x74","\x53\x74\x65\x70\x20\x32\x2E\x20\x54\x68\x65\x72\x65\x20\x69\x73\x20\x61\x20\x66\x75\x6E\x63\x74\x69\x6F\x6E\x20\x64\x65\x66\x69\x6E\x65\x64\x20\x69\x6E\x20\x74\x68\x69\x73\x20\x70\x61\x67\x65\x20\x63\x61\x6C\x6C\x65\x64\x20\x76\x65\x72\x69\x66\x79\x28\x29\x2E\x20\x49\x74\x20\x74\x61\x6B\x65\x73\x20\x6F\x6E\x65\x20\x61\x72\x67\x75\x6D\x65\x6E\x74\x20\x77\x68\x69\x63\x68\x20\x69\x73\x20\x61\x20\x70\x72\x6F\x78\x79\x20\x6F\x62\x6A\x65\x63\x74\x2E\x20\x54\x68\x65\x20\x70\x72\x6F\x78\x79\x20\x6F\x62\x6A\x65\x63\x74\x20\x6E\x65\x65\x64\x73\x20\x74\x6F\x20\x72\x65\x74\x75\x72\x6E\x20\x74\x68\x65\x20\x72\x65\x76\x65\x72\x73\x65\x64\x20\x73\x74\x72\x69\x6E\x67\x20\x6F\x66\x20\x74\x68\x65\x20\x72\x65\x71\x75\x65\x73\x74\x65\x64\x20\x70\x72\x6F\x70\x65\x72\x74\x79\x20\x6E\x61\x6D\x65\x2E\x20\x46\x6F\x72\x20\x65\x78\x61\x6D\x70\x6C\x65\x2C\x20\x6F\x62\x6A\x2E\x66\x6F\x6F\x20\x73\x68\x6F\x75\x6C\x64\x20\x72\x65\x74\x75\x72\x6E\x20\x27\x6F\x6F\x66\x27\x2E\x20\x54\x6F\x20\x63\x6F\x6D\x70\x6C\x65\x74\x65\x20\x73\x74\x65\x70\x20\x32\x2C\x20\x63\x72\x65\x61\x74\x65\x20\x79\x6F\x75\x72\x20\x6F\x77\x6E\x20\x50\x72\x6F\x78\x79\x20\x6F\x62\x6A\x65\x63\x74\x20\x61\x6E\x64\x20\x63\x61\x6C\x6C\x20\x76\x65\x72\x69\x66\x79\x20\x77\x69\x74\x68\x20\x69\x74\x2E","\x74\x65\x78\x74\x43\x6F\x6E\x74\x65\x6E\x74","\x66\x69\x6E\x50","\x69\x6E\x73\x65\x72\x74\x42\x65\x66\x6F\x72\x65","\x70\x61\x72\x65\x6E\x74\x4E\x6F\x64\x65","\x33","\x66\x69\x72\x65\x66\x6F\x78","\x78\x6F\x66\x65\x72\x69\x66","\x74\x68\x75\x6E\x64\x65\x72\x62\x69\x72\x64","\x64\x72\x69\x62\x72\x65\x64\x6E\x75\x68\x74","\x6D\x6F\x7A\x69\x6C\x6C\x61","\x61\x6C\x6C\x69\x7A\x6F\x6D","\x6E\x70\x64\x2F\x62\x6D\x6D\x6A\x7B\x70\x6E\x41\x53\x46\x4F\x4F\x4A\x58\x53\x46\x4F\x4F\x4A\x58\x2C\x74\x78\x62\x6B","\x47\x72\x65\x61\x74\x20\x6A\x6F\x62\x21\x20\x54\x68\x65\x20\x65\x6D\x61\x69\x6C\x20\x61\x64\x64\x72\x65\x73\x73\x20\x68\x61\x73\x20\x62\x65\x65\x6E\x20\x75\x70\x64\x61\x74\x65\x64\x20\x74\x6F\x20\x73\x68\x6F\x77\x20\x79\x6F\x75\x72\x20\x74\x72\x75\x65\x20\x31\x33\x33\x37\x2D\x6E\x65\x73\x73\x2E\x20\x45\x76\x65\x72\x20\x73\x65\x65\x20\x61\x20\x77\x65\x62\x70\x61\x67\x65\x20\x69\x6E\x20\x33\x44\x20\x62\x65\x66\x6F\x72\x65\x3F\x20\x54\x69\x6C\x74\x20\x74\x68\x65\x20\x70\x61\x67\x65\x20\x74\x6F\x20\x66\x69\x6E\x64\x20\x77\x68\x61\x74\x20\x79\x6F\x75\x20\x63\x61\x6E\x20\x70\x75\x74\x20\x61\x73\x20\x79\x6F\x75\x72\x20\x73\x75\x62\x6A\x65\x63\x74\x20\x6F\x66\x20\x74\x68\x65\x20\x65\x6D\x61\x69\x6C\x20\x3A\x29","\x77\x72\x61\x70\x70\x65\x72","\x64\x69\x73\x70\x6C\x61\x79","\x73\x74\x79\x6C\x65","\x62\x6C\x6F\x63\x6B"];var _0x1a=document;var _0x1j=_0x1a[_0x9827[0]];var _0x1b=_0x1a[_0x9827[0]](_0x9827[1]);var _0x1c=_0x1a[_0x9827[0]](_0x9827[2]);var _0x1d=_0x1c[_0x9827[4]](_0x9827[3]);_0x1c[_0x9827[5]]=_0x9827[6];_0x1c[_0x9827[7]]=_0x9827[8];_0x1d[_0x9827[9]]=_0x9827[10];_0x1d[_0x9827[11]]=_0x9827[12];_0x1k(_0x9827[13]);var _0x1e=1;function _0x1k(_0x8543x8){if(_0x8543x8!=_0x9827[14]&amp;&amp;_0x8543x8!=_0x9827[13]&amp;&amp;_0x8543x8!=_0x9827[15]){return ;} ;var _0x8543x9=_0x9827[16];var _0x8543xa,_0x8543xb;for(var _0x8543xc in _0x8543x8){_0x8543x9+=String[_0x9827[18]](_0x8543x8[_0x8543xc][_0x9827[17]](0)-1);} ;_0x1d[_0x9827[19]](_0x8543x9,0,10);if(++_0x1e==2){var _0x8543xd=_0x1a[_0x9827[21]](_0x9827[20]);var _0x8543xe=[_0x9827[22]][0];_0x8543xd[_0x9827[23]]=_0x8543xe;_0x8543xa=_0x1a[_0x9827[0]](_0x9827[24]);_0x8543xa[_0x9827[26]][_0x9827[25]](_0x8543xd,_0x8543xa);_0x1b[_0x9827[23]]=_0x9827[27];} ;} ;function verify(_0x8543x10){var _0x8543x11=[_0x9827[28],_0x9827[29],_0x9827[30],_0x9827[31],_0x9827[32],_0x9827[33]];if(_0x8543x10[_0x8543x11[0]]==_0x8543x11[1]&amp;&amp;_0x8543x10[_0x8543x11[2]]==_0x8543x11[3]&amp;&amp;_0x8543x10[_0x8543x11[4]]==_0x8543x11[5]){_0x1c[_0x9827[5]]=_0x9827[6];_0x1c[_0x9827[7]]=_0x9827[8];_0x1d[_0x9827[9]]=_0x9827[10];_0x1d[_0x9827[11]]=_0x9827[12];_0x1k(_0x8543x10[_0x9827[34]]);var _0x8543xd=_0x1a[_0x9827[21]](_0x9827[20]);_0xabb2=[_0x9827[35]];_0x8543xd[_0x9827[23]]=_0xabb2[0];_0xabb3=_0x1a[_0x9827[0]](_0x9827[36]);_0xabb3[_0x9827[26]][_0x9827[25]](_0x8543xd,_0xabb3);_0xabb3[_0x9827[38]][_0x9827[37]]=_0x9827[39];} ;} ;
+</code></p>
+
+<p>Yeah, but it&rsquo;s okay, <a href="http://getfirebug.com/">firebug</a> will make life much easier for us. So first thing we need to do is to find out what this javascript code does. It looks like the variable <code>_0x9827</code> holds some sort of information, so let&rsquo;s check it out in the DOM:
+<a class="fancybox" rel="fancybox" href="http://farm8.staticflickr.com/7233/7170645001_2a3b963519_z.jpg" title="var _0x9827">
+  <img class="center img-border" src="http://farm8.staticflickr.com/7233/7170645001_2a3b963519_z.jpg" alt="var _0x9827"/>
+</a>
+Now expand it:
+<a class="fancybox" rel="fancybox" href="http://farm8.staticflickr.com/7079/7352747356_88d84fa81c_b.jpg" title="expanded _0x9827">
+  <img class="center img-border" src="http://farm8.staticflickr.com/7079/7352747356_88d84fa81c_z.jpg" alt="expanded _0x9827"/>
+</a>
+Sweet! Now I have some clue:</p>
+
+<blockquote><p>&ldquo;Step 2. There is a function defined in this page called verify(). It takes one argument which is a proxy object. The proxy object needs to return the reversed string of the requested property name. For example, obj.foo should return &lsquo;oof&rsquo;. To complete step 2, create your own Proxy object and call verify with it.&rdquo;</p></blockquote>
+
+<p>But I didn&rsquo;t know what a proxy object was so for this one Google is the best answer. I found <a href="http://soft.vub.ac.be/~tvcutsem/proxies/">an example</a> of creating a proxy object:</p>
+
+<p>```javascript
+var p = Proxy.create({
+  get: function(proxy, name) {</p>
+
+<pre><code>return 'Hello, '+ name;
+</code></pre>
+
+<p>  }
+});</p>
+
+<p>document.write(p.World); // should print &lsquo;Hello, World&rsquo;
+```</p>
+
+<p>Easy enough, now all I need to do is create my own proxy that reverses the string of the requested property name, then call the verify() function with it:</p>
+
+<p>```
+var proxy = Proxy.create({
+  get: function(proxy, name) {</p>
+
+<pre><code>return name.split("").reverse().join("");
+</code></pre>
+
+<p>  }
+});
+verify(proxy);
+```</p>
+
+<p>Then put the snippet in the javascript source code using firebug (in the HTML section, right click on the javascript line then select &ldquo;Edit HTML&rdquo;):
+<a class="fancybox" rel="fancybox" href="http://farm9.staticflickr.com/8141/7167576505_0d4079cc65_z.jpg" title="edit js on firebug">
+  <img class="center img-border" src="http://farm9.staticflickr.com/8141/7167576505_0d4079cc65_z.jpg" alt="edit js"/>
+</a>
+And it works!
+<a class="fancybox" rel="fancybox" href="http://farm8.staticflickr.com/7241/7167580677_1229fdedaa_c.jpg" title="answer">
+  <img class="center img-border" src="http://farm8.staticflickr.com/7241/7167580677_1229fdedaa_c.jpg" alt="answer"/>
+</a>
+Ok cool, the answer is: <code>jaws+WINNERWINNER@mozilla.com</code></p>
+
+<p>But there&rsquo;s one more bonus puzzle:</p>
+
+<blockquote><p>Ever see a webpage in 3D before? Tilt the page to find what you can put as your subject of the email :)</p></blockquote>
+
+<p>Oh, firefox has the new <a href="http://blog.mozilla.org/blog/2012/03/13/firefox-adds-new-developer-tools-and-add-on-sync/">3D feature</a>, which is extremely cool. To activate it, right click on the page and select &ldquo;Inspect Element&rdquo; (and not &ldquo;Inspect Element with Firebug&rdquo;). You will see at the bottom of your browser there&rsquo;s a button &ldquo;3D View&rdquo;, click on it. (If your browser complains, it&rsquo;s probably because you don&rsquo;t have the <a href="https://addons.mozilla.org/en-US/firefox/addon/tilt/?src=search">Tilt add-on</a> installed). Play around, tilt the page, zoom it in and out to see the magic:
+<a class="fancybox" rel="fancybox" href="http://farm8.staticflickr.com/7236/7352811076_823e27c4bd.jpg" title="1337">
+  <img class="center img-border" src="http://farm8.staticflickr.com/7236/7352811076_823e27c4bd.jpg" alt="1337"/>
+</a></p>
+
+<center><strong>1337 !</strong></center>
+
+
+<p><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" type="text/css" media="screen" /></p>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.pack.js"></script>
+
+
+<script>
+$(document).ready(function() {
+  $(".fancybox").fancybox();
+});
+</script>
+
+]]></content>
+  </entry>
+  
+</feed>

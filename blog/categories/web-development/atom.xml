@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Web Development | :baopham]]></title>
+  <link href="http://baopham.github.io/blog/categories/web-development/atom.xml" rel="self"/>
+  <link href="http://baopham.github.io/"/>
+  <updated>2016-02-08T08:11:11-08:00</updated>
+  <id>http://baopham.github.io/</id>
+  <author>
+    <name><![CDATA[Bao Pham]]></name>
+    <email><![CDATA[gbaopham@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[TabRenderer - Quick preview for your tabular data]]></title>
+    <link href="http://baopham.github.io/blog/2014/05/14/tabrenderer-quick-preview-for-your-tabular-data/"/>
+    <updated>2014-05-14T20:05:26-07:00</updated>
+    <id>http://baopham.github.io/blog/2014/05/14/tabrenderer-quick-preview-for-your-tabular-data</id>
+    <content type="html"><![CDATA[<p>I recently learned from a friend that <a href="https://help.github.com/articles/rendering-csv-and-tsv-data">Github renders tabular data</a> (.csv and .tsv) as interactive table, which is really neat. However, it won&rsquo;t work if there&rsquo;s a mismatched column or illegal quoting so I quickly built a <a href="http://tabrenderer.herokuapp.com/">tabrenderer</a> to help people preview their data before pushing them to Github. At first, I was going to use JavaScript to parse the data but was afraid that it will not work the same way as Github&rsquo;s parser. After browsing their repos, I thought it&rsquo;s very likely that they use Ruby to do this given how often they use Ruby for their own projects. <!--more-->Besides, Ruby has its built-in class <a href="http://ruby-doc.org/stdlib-1.9.2/libdoc/csv/rdoc/CSV.html">CSV</a> that takes care of almost everything.</p>
+
+<p>So far, <a href="http://tabrenderer.herokuapp.com/">tabrenderer</a> notifies users of errors that prevent the parser to work such as illegal quoting. It will jump to the row that has such errors but will not scream if there&rsquo;s a mismatched column (it will be obvious to the users though to see some rows don&rsquo;t have columns). The users can either upload their file or simply type the data in the text box.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Thirsty? Google map for a drinking fountain]]></title>
+    <link href="http://baopham.github.io/blog/2014/01/02/thirsty-google-map-for-a-drinking-fountain/"/>
+    <updated>2014-01-02T08:05:30-08:00</updated>
+    <id>http://baopham.github.io/blog/2014/01/02/thirsty-google-map-for-a-drinking-fountain</id>
+    <content type="html"><![CDATA[<p>Or you can head over to <a href="http://vancouverfountains.herokuapp.com/" title="Vancouver Fountain Finder">Vancouver Fountain Finder</a> and search for the nearest drinking fountain in Vancouver, BC.</p>
+
+<p>This is a small project I built during the school break to learn <a href="http://nodejs.org/" title="Node.js">Node.js</a>. I have always wanted to learn <a href="http://nodejs.org/" title="Node.js">Node.js</a> and use <a href="gmap-v3">Google Maps API</a> so I tried to think of features that will let me learn new things as much as possible. Before this, I also built a simple <a href="http://bpmtimer.herokuapp.com/" title="Timer">timer</a> just to get started with <a href="http://nodejs.org/" title="Node.js">Node.js</a> and become familiar with <a href="http://knockoutjs.com/" title="Knockout.js">Knockout.js</a> and <a href="http://semantic-ui.com/" title="Semantic-UI">Semantic-UI</a>. <!--more-->I guess <a href="http://semantic-ui.com/" title="Semantic-UI">Semantic-UI</a> is still relatively new so I still prefer <a href="http://getbootstrap.com/" title="Bootstrap">Bootstrap</a> or maybe I am just biased&hellip; Anyway, a <a href="http://bpmtimer.herokuapp.com/" title="Timer">timer</a> because I saw my Math teacher struggling with the <a href="http://online-stopwatch.com/" title="Online Stopwatch">online stopwatch</a> before the exam&hellip; And the ads were quite distracting&hellip;</p>
+
+<p>Just a quick update since now I&rsquo;m back to school. Back to studying.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Tag Cloud for Toto]]></title>
+    <link href="http://baopham.github.io/blog/2012/05/05/tag-cloud-for-toto/"/>
+    <updated>2012-05-05T00:00:00-07:00</updated>
+    <id>http://baopham.github.io/blog/2012/05/05/tag-cloud-for-toto</id>
+    <content type="html"><![CDATA[<p>As I mentioned in the <a href="" title="/2012/03/21/abandoning-appengine/">previous post</a> about <a href="" title="http://cloudhead.io/toto">toto</a> blog engine, and how I have made some customizations, I still felt like something was missing.</p>
+
+<p>Okay, I have sitemap, pagination, mobile redirect, tags&hellip; what else could be missing that would appear in most blog websites?</p>
+
+<!--more-->
+
+
+<p><strong>tag cloud</strong> of course!! Duh&hellip;</p>
+
+<p><a href="http://www.flickr.com/photos/willrad/209637446/" title="DUH. by Willrad, on Flickr"><img class="img-border" src="http://farm1.staticflickr.com/66/209637446_ee265fbfa6.jpg" width="400" height="275" alt="DUH."></a><br/>
+<small><em>Just joking&hellip;</em></small></p>
+
+<p>Anyway, so I went back and fired an issue on the <a href="" title="https://github.com/5v3n/karakuri">karakuri</a> rack plugin github to see if this feature is possible to implement. Long story short, I made a pull request and with the support of the <a href="" title="https://github.com/5v3n">author</a>, now you can have the tag cloud feature. Isn&rsquo;t it sweet?</p>
+
+<blockquote><p>   <strong>Tag Cloud</strong><br/>
+   Example usage:</p>
+
+<pre><code>  &lt;h1&gt;Tags&lt;/h1&gt;
+  &lt;%  Karakuri::tag_cloud(@articles).each do |tag, freq| %&gt;
+      &lt;%= %|&lt;a href="http://baopham.github.io/tagged?tag=#{tag}" title="articles concerning #{tag}" style="font-size: #{10 * freq}px"&gt;#{tag}&lt;/a&gt;| %&gt;
+  &lt;% end %&gt;
+</code></pre></blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Abandoning AppEngine]]></title>
+    <link href="http://baopham.github.io/blog/2012/03/21/abandoning-appengine/"/>
+    <updated>2012-03-21T00:00:00-07:00</updated>
+    <id>http://baopham.github.io/blog/2012/03/21/abandoning-appengine</id>
+    <content type="html"><![CDATA[<p>These last 2 days have been insane!! You know why? Let me tell you the story:</p>
+
+<p>I was sick. It was a random cold that I caught from someone. But now I&rsquo;m glad I had it because if not because of it, I wouldn&rsquo;t have had the time to wander around <a href="https://github.com">github</a>, looking at people&rsquo;s repos, and then stumbled upon this project <a href="https://github.com/cloudhead/toto">toto</a>. And now, it&rsquo;s like a dream come true!.</p>
+
+<!--more-->
+
+
+<p><strong>toto</strong> is really the tiniest and coolest blogging engine yet! It has all that I love: git and ruby. It makes everything so easy to manage and configure, from archiving all the posts you wrote, to having a markdown converter by default, and articles embeded with metadata (which makes it easy to add tags/categories), etc.</p>
+
+<p>I&rsquo;m not going to explain all <strong>toto</strong>&rsquo;s features but as a future reference for myself, I&rsquo;d like to summarize all the steps that I took during the last 2 days to port my old website from <a href="http://code.google.com/appengine/">Google AppEngine</a> to <a href="https://github.com/cloudhead/toto">toto</a> and <a href="http://www.heroku.com/">Heroku</a>.</p>
+
+<h3>Installation</h3>
+
+<p><code>bash
+gem install toto
+git clone git://github.com/cloudhead/dorothy.git myblog
+</code></p>
+
+<p><strong>dorothy</strong> is <strong>toto</strong>&rsquo;s default template. This gives you the bone structure of your blog</p>
+
+<h3>config.ru</h3>
+
+<p>Add personal settings to <code>config.ru</code>:</p>
+
+<p>```ruby
+require &lsquo;toto&rsquo;
+require File.expand_path(&lsquo;../sitemap&rsquo;, <strong>FILE</strong>)
+require &lsquo;rack/mobile-detect&rsquo;</p>
+
+<h1>Rack config</h1>
+
+<p>use Rack::Static,</p>
+
+<pre><code>:urls =&gt; ['/css', '/js', '/images', '/favicon.ico', '/Resume.pdf', 'BingSiteAuth.xml', '/robots.txt'],
+:root =&gt; 'public'
+</code></pre>
+
+<p>use Rack::CommonLogger</p>
+
+<h1>Redirect to mobile site</h1>
+
+<p>use Rack::MobileDetect, :catchall => /[Bb]lack[Bb]erry|i[Pp]hone|[Aa]ndroid/,</p>
+
+<pre><code>                    :redirect_to =&gt; 'http://baopham-mobile.heroku.com/'
+</code></pre>
+
+<p>if ENV[&lsquo;RACK_ENV&rsquo;] == &lsquo;development&rsquo;</p>
+
+<pre><code>use Rack::ShowExceptions
+</code></pre>
+
+<p>end</p>
+
+<p>class Toto::Site</p>
+
+<pre><code>alias_method :old_go, :go
+
+def go route, env = {}, type = :html
+    if not route.first =~ /\d{4}/ and route.size == 2 and route.last =~ /(\d+)/
+        @config[:id] = route.last.to_i
+        route.pop
+    end
+    ret = old_go route, env, type
+    @config.delete :id
+    ret
+end
+</code></pre>
+
+<p>end</p>
+
+<p>toto = Toto::Server.new do</p>
+
+<pre><code>#
+# Add your settings here
+# set [:setting], [value]
+#
+set :author,    "Bao Pham"                                  # blog author
+set :title,     "Bao Pham"
+set :url,       "http://baopham.heroku.com"
+set :root,      "page"                                      # page to load on /
+set :articles_per_page,     6
+set :date,      lambda {|now| now.strftime("%d/%m/%Y") }    # date format for articles
+set :markdown,  :smart                                      # use markdown + smart-mode
+set :disqus,    "bpmsworld"                                 # disqus id, or false
+set :summary,   :max =&gt; 150, :delim =&gt; /~/                  # length of article summary and delimiter
+set :ext,       'txt'                                       # file extension for articles
+set :cache,     28800                                       # cache duration, in seconds
+
+set :date,      lambda {|now| now.strftime("%B #{now.day.ordinal} %Y") }
+
+set :error,     lambda {|code|
+    ERB.new(File.read("templates/pages/#{code}.rhtml")).result
+}
+</code></pre>
+
+<p>end</p>
+
+<p>run toto
+```</p>
+
+<p>Some changes I made:</p>
+
+<ul>
+<li><p>Add sitemap builder (line 2): <a href="#sitemap">sitemap</a></p></li>
+<li><p>Redirect for mobile view (line 11): <a href="#useragent">useragent</a></p></li>
+<li><p>Class <code>Toto::Site</code> (lines 19-31): <a href="#paginate">pagination</a></p></li>
+<li><p>Set <code>:root</code> to <code>"page"</code> (line 41): <a href="#paginate">pagination</a></p></li>
+<li><p>Changed the default number of articles per page to 6 (line 42)</p></li>
+<li><p>Added customed error pages in <code>templates/pages</code> (line 52)</p></li>
+</ul>
+
+
+<h3 id="sitemap">Sitemap</h3>
+
+
+<p>Just follow the instruction from <a href="http://artemk.name/2011/06/01/sitemap-in-toto/">this article</a>, you&rsquo;ll have a sitemap automatically</p>
+
+<h3 id="useragent">Mobile UserAgent Detect</h3>
+
+
+<p>This project is very neat. It detects mobile user-agents (iphone, ipad, android, blackberry,etc) and has options for you to redirect to other link. You can specifies specific link for different user-agents.</p>
+
+<p>Github repo: <a href="https://github.com/talison/rack-mobile-detect">talison/rack-mobile-detect</a></p>
+
+<h3 id="paginate">Pagination</h3>
+
+
+<p>It took me a while to get it to understand and make it work: <a href="http://vincentwoo.com/2011/02/23/cheap-toto-pagination/">cheap toto pagination</a></p>
+
+<ul>
+<li><p>So first add the class <code>Toto::Site</code> to your <code>config.ru</code> (now you see why i have it there)</p></li>
+<li><p>Remember to set your <code>:root</code> to <code>"page"</code> instead of <code>"index"</code></p></li>
+<li><p>Next, add <code>templates/pages/page.rhtml</code></p></li>
+<li><p>Replace the <code>...</code> with your <code>index.rhtml</code> content</p></li>
+</ul>
+
+
+<h3>Add Articles</h3>
+
+<p>Now adding articles are a piece of cake. Only a few things you need to watch out for:</p>
+
+<ul>
+<li><p>Name your article (text file) in folder <strong>articles</strong> exactly in this format: <strong>YYYY-MM-DD-article-title</strong>, which follows closely with the article&rsquo;s URL: <strong>YYYY/MM/DD/article-title</strong></p></li>
+<li><p>If you article title has characters like: <strong>:</strong> , <strong>.</strong> , <strong>&lsquo;</strong> , they are ignored in the URL, so that I noticed</p></li>
+<li><p>Before writing your article, add a few lines of metadata:</p></li>
+</ul>
+
+
+<p><code>
+title: My Post Title
+author: Bao Pham
+date: 2012/03/21
+</code></p>
+
+<ul>
+<li><p>If your title has non-alphabet characters, keep the title in double quote like <code>title: "Emmy's Post"</code> or <code>title: "I-Like-Dashes"</code> and of course, name the file as <strong>2012-03-21-emmys-post</strong> or <strong>2012-03-21-i&mdash;-like&mdash;-dashes</strong> respectively</p></li>
+<li><p>The article can be in markdown format or HTML<br/>
+<span class="label label-info">Tips</span> Alternately, you can make use of the provided <strong>Rakefile</strong> then you don&rsquo;t have to worry about how to name your article files: just type this in your terminal: <strong>rake Rakefile new</strong>, it will ask for your article&rsquo;s title and creates it for you:</p></li>
+</ul>
+
+
+<p>```bash
+$ rake Rakefile new
+Title: Emmy&rsquo;s Post</p>
+
+<p>  toto ~ an article was created for you at articles/2012-04-11-emmys-post.txt.
+```</p>
+
+<p>Those are the few things that I picked up from playing with <strong>toto</strong> for 2 days</p>
+
+<h3>Tags/Categories</h3>
+
+<p><strong>toto</strong> lacks support for tags unfortunately but no worries you have <a href="https://github.com/5v3n/karakuri">karakuri</a>. Follow the README and you&rsquo;re all set to go!</p>
+
+<h3>Deploy to Heroku</h3>
+
+<p>2 days to learn Rack, ERB templates, discover <a href="http://disqus.com/">disqus</a>, and many more interesting projects, finally&hellip; goodbye Google AppEngine and Django, I&rsquo;m joining the Ruby community!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Bootstrap Experiment]]></title>
+    <link href="http://baopham.github.io/blog/2012/03/07/bootstrap-experiment/"/>
+    <updated>2012-03-07T00:00:00-08:00</updated>
+    <id>http://baopham.github.io/blog/2012/03/07/bootstrap-experiment</id>
+    <content type="html"><![CDATA[<p>You&rsquo;ve probably heard of <a href="http://getbootstrap.com">Twitter Bootstrap</a>? If not, follow the link and you&rsquo;ll see what magics it does. I&rsquo;ve grown tired of my old website theme and decided to try out Bootstrap. Although Bootstrap gives people the opportunity to be lazy in putting more personal touch in their website&rsquo;s design, it&rsquo;s a great starting point for a newbie like me. Hopefully, from here onwards, I can create something more uniquely looking&hellip;</p>
+
+<!--more-->
+
+
+<p>Not only Bootstrap that makes a (major) change in the look of this website, from <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a>, I converted to <a href="http://code.google.com/p/google-code-prettify/">Google Code Prettify</a>, which is also pretty cool since it can guess what language the code snippet is. However, it doesn&rsquo;t support as many languages as SyntaxHighlighter.</p>
+
+<p>This could be a permanent change or just temporary, who knows if tomorrow I will see something even cooler than this?
+&nbsp;&#10047;</p>
+]]></content>
+  </entry>
+  
+</feed>

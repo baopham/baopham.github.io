@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: S3 | :baopham]]></title>
+  <link href="http://baopham.github.io/blog/categories/s3/atom.xml" rel="self"/>
+  <link href="http://baopham.github.io/"/>
+  <updated>2016-02-08T08:11:11-08:00</updated>
+  <id>http://baopham.github.io/</id>
+  <author>
+    <name><![CDATA[Bao Pham]]></name>
+    <email><![CDATA[gbaopham@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Laravel - Upload to a non-default S3 bucket]]></title>
+    <link href="http://baopham.github.io/blog/2015/09/22/laravel-upload-to-a-non-default-s3-bucket/"/>
+    <updated>2015-09-22T00:11:45-07:00</updated>
+    <id>http://baopham.github.io/blog/2015/09/22/laravel-upload-to-a-non-default-s3-bucket</id>
+    <content type="html"><![CDATA[<p>Very easy. Define a new &ldquo;disk&rdquo; in <code>config/filesystems.php</code>:</p>
+
+<p>```php</p>
+
+<pre><code>    's3-stage' =&gt; [
+        'driver' =&gt; 's3',
+        'key'    =&gt; env('S3_STAGE_KEY'),
+        'secret' =&gt; env('S3_STAGE_SECRET'),
+        'region' =&gt; env('S3_STAGE_REGION'),
+        'bucket' =&gt; env('S3_STAGE_BUCKET'),
+    ],
+</code></pre>
+
+<p>```</p>
+
+<p>But don&rsquo;t use <code>.</code> in your disk name as it will confuse with the array dot notation:</p>
+
+<p>```php</p>
+
+<h1>Illuminate\Filesystem\FilesystemManager</h1>
+
+<p>   /**</p>
+
+<pre><code> * Get the filesystem connection configuration.
+ *
+ * @param  string  $name
+ * @return array
+ */
+protected function getConfig($name)
+{
+    return $this-&gt;app['config']["filesystems.disks.{$name}"];
+}
+</code></pre>
+
+<p>```</p>
+
+<p>And then you can call: <code>Storage::disk('s3-stage')</code> like any other disk.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Laravel + Angularjs: file upload pattern]]></title>
+    <link href="http://baopham.github.io/blog/2015/03/22/laravel-plus-angularjs-file-upload-pattern/"/>
+    <updated>2015-03-22T22:36:38-07:00</updated>
+    <id>http://baopham.github.io/blog/2015/03/22/laravel-plus-angularjs-file-upload-pattern</id>
+    <content type="html"><![CDATA[<p>The thing with uploading files via AJAX is that users can just keep uploading files to the server without having to save the form. This leaves a lot of junk files around if you don&rsquo;t clean them up later. But we don&rsquo;t want to delete the files that are actually being used. This means we need to keep records of uploaded files.</p>
+
+<p>This pattern is working for me &ndash; assuming we want to keep files on S3:</p>
+
+<!--more-->
+
+
+<p><strong>1.</strong> A table to store records of uploaded files.</p>
+
+<p>```php
+// database/migrations/2015_03_05_004850_create_files_table.php</p>
+
+<p>public function up()
+{</p>
+
+<pre><code>Schema::create('files', function(Blueprint $table)
+{
+    $table-&gt;string('id', 36)-&gt;primary();
+    $table-&gt;string('mime', 255);
+    $table-&gt;string('filename', 255);
+    $table-&gt;bigInteger('size')-&gt;unsigned();
+    $table-&gt;string('storage_path')-&gt;unique();
+    $table-&gt;string('disk', 10);
+    $table-&gt;boolean('status');
+    $table-&gt;timestamps();
+});
+</code></pre>
+
+<p>}</p>
+
+<p>// app/Models/File.php</p>
+
+<p>use CRT\Models\BaseModel;
+use Illuminate\Support\Facades\Storage;</p>
+
+<p>class File extends BaseModel {</p>
+
+<pre><code>protected $fillable = ['mime', 'storage_path', 'status', 'filename', 'size', 'disk'];
+
+public static function boot()
+{
+    parent::boot();
+
+    static::deleting(function($model)
+    {
+        Storage::disk($model-&gt;disk)-&gt;delete($model-&gt;storage_path);
+    });
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p><strong>2.</strong> Use Javascript library to upload files thru AJAX (<a href="https://github.com/flowjs">Flowjs</a>, <a href="http://www.dropzonejs.com/">Dropzonejs</a>, etc.)</p>
+
+<p><strong>3.</strong> In the controller&rsquo;s upload method:</p>
+
+<p>```php
+// app/Http/Controllers/FileUploadController.php</p>
+
+<p>use CRT\Models\File as FileModel;</p>
+
+<p>use Flow\Config as FlowConfig;
+use Flow\Request as FlowRequest;
+use Flow\ConfigInterface;
+use Flow\RequestInterface;</p>
+
+<p>public function upload()
+{</p>
+
+<pre><code>$config = new FlowConfig();
+$config-&gt;setTempDir(storage_path() . '/tmp');
+$config-&gt;setDeleteChunksOnSave(false);
+
+$request = new FlowRequest();
+
+$totalSize = $request-&gt;getTotalSize();
+
+if ($totalSize &amp;&amp; $totalSize &gt; (1024 * 1024 * 4))
+{
+    return $this-&gt;responseWithError('File size exceeds 4MB');
+}
+
+$uploadFile = $request-&gt;getFile();
+
+list($path, $destination) = $this-&gt;getDestinationPathInfo($uploadFile);
+
+// @see: http://baopham.github.io/blog/2015/03/16/laravel-merge-flowjs-chunks-directly-to-s3
+if (\Bao\Flow\Basic::save($destination, $config, $request, $this-&gt;s3Client))
+{
+    $file = FileModel::create([
+        'mime' =&gt; $uploadFile['type'],
+        'size' =&gt; $request-&gt;getTotalSize(),
+        'storage_path' =&gt; $path,
+        'filename' =&gt; $uploadFile['name'],
+        'disk' =&gt; 's3',
+        'status' =&gt; false,
+    ]);
+
+    // Send JSON response.
+    return $this-&gt;responseWithData($file);
+}
+else
+{
+    // Indicate that we are not done with all the chunks.
+    return $this-&gt;responseWithData('', 204);
+}
+</code></pre>
+
+<p>}
+```
+This will save the <a href="http://baopham.github.io/blog/2015/03/16/laravel-merge-flowjs-chunks-directly-to-s3/">uploaded file to S3 directly</a>.</p>
+
+<p><strong>4.</strong> Angular side will store the response that has the file&rsquo;s info (id, size, filename, etc.) &ndash; mark this file as new, e.g:</p>
+
+<p>```javascript
+// public/assets/js/thing/controller.js</p>
+
+<p>var vm = this;
+vm.processFileSuccess = processFileSuccess;</p>
+
+<p>// &hellip;</p>
+
+<p>function processFileSuccess(file) {</p>
+
+<pre><code>file.isNew = true;
+vm.files.push(file);
+</code></pre>
+
+<p>}
+```</p>
+
+<p><strong>5.</strong> When user saves the form, we submit the form including the file&rsquo;s info.</p>
+
+<p><strong>6.</strong> Then in the backend, we process the file and mark the file&rsquo;s status as <code>true</code>:</p>
+
+<p>```php
+$store = Input::all();
+foreach ($store[&lsquo;files&rsquo;] as &amp;$fileInput)
+{</p>
+
+<pre><code>if (array_get($fileInput, 'isNew'))
+{
+    $file = FileModel::find($fileInput['id']);
+    if ($file-&gt;disk == 's3')
+    {
+        // move file to a different S3 folder
+        ...
+        // update file's storage path and status
+        $file-&gt;storage_path = ...;
+        $file-&gt;status = true;
+        $file-&gt;save();
+    }
+    else
+    {
+        // upload local file to S3 then update the file's record if needed or just delete it:
+        $file-&gt;delete();
+    }
+    // update the file input info before saving it to DB - store the S3 URL for example:
+    $fileInput['url'] = ...;
+}
+</code></pre>
+
+<p>}</p>
+
+<p>// then save $store in DB.
+```</p>
+
+<p><strong>7.</strong> Create a command to clean up tmp files that are older than x hours: <code>php artisan make:console CleanupFiles</code></p>
+
+<p>```php
+// app/Console/Commands/CleanupFiles.php</p>
+
+<p>/<em>*
+ * The console command name.
+ *
+ * @var string
+ </em>/
+protected $name = &lsquo;files:clean&rsquo;;</p>
+
+<p>/<em>*
+ * Execute the console command.
+ *
+ * @return mixed
+ </em>/
+public function fire()
+{</p>
+
+<pre><code>$date = new DateTime;
+$date-&gt;modify('-3 hours');
+$formatted = $date-&gt;format('Y-m-d H:i:s');
+FileModel::where('updated_at', '&lt;=', $formatted)
+    -&gt;where('status', '=', 0)
+    -&gt;get()-&gt;each(function($file)
+    {
+        $file-&gt;delete();
+    });
+
+\Flow\Uploader::pruneChunks(config('filesystems.disks.local.root') . '/tmp', 3*60*60);
+$this-&gt;info('Files older than 3 hours have been cleaned up.');
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Set a scheduler for it:</p>
+
+<p>```php
+// app/Console/Kernel.php</p>
+
+<p>protected $commands = [</p>
+
+<pre><code>'CRT\Console\Commands\CleanupFiles',
+</code></pre>
+
+<p>];</p>
+
+<p>protected function schedule(Schedule $schedule)
+{</p>
+
+<pre><code>$schedule-&gt;command('files:clean')
+        -&gt;hourly();
+</code></pre>
+
+<p>}
+```</p>
+
+<p>And then setup cronjob:</p>
+
+<p><code>
+* * * * * php /home/vagrant/projects/CRT/artisan schedule:run 1&gt;&gt; /dev/null 2&gt;&amp;1
+</code></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Laravel - Merge Flowjs chunks directly to S3]]></title>
+    <link href="http://baopham.github.io/blog/2015/03/16/laravel-merge-flowjs-chunks-directly-to-s3/"/>
+    <updated>2015-03-16T23:02:03-07:00</updated>
+    <id>http://baopham.github.io/blog/2015/03/16/laravel-merge-flowjs-chunks-directly-to-s3</id>
+    <content type="html"><![CDATA[<p><strong>Motivation</strong>: <a href="http://laravel.com/docs/5.0/filesystem">Laravel 5</a> now has support for Cloud storage.</p>
+
+<p><strong>Problem</strong>: <a href="https://github.com/flowjs/flow.js">Flowjs</a> library allows files to be uploaded in chunks making it possible to upload large files but by default it <a href="https://github.com/flowjs/flow-php-server/blob/84c928090c060238d15e89dd7e252acf8eff1140/src/Flow/File.php#L147">saves the final file to local storage</a>.</p>
+
+<p>We could extend this class so that it uses <a href="http://docs.aws.amazon.com/aws-sdk-php/guide/latest/feature-s3-stream-wrapper.html">S3 Stream Wrapper</a>:</p>
+
+<p>```php
+&lt;?php namespace Bao\Flow;</p>
+
+<p>use Flow\ConfigInterface;
+use Flow\RequestInterface;
+use Flow\FileOpenException;
+use Flow\FileLockException;</p>
+
+<p>use Illuminate\Support\Facades\Storage;
+use League\Flysystem\FilesystemInterface;</p>
+
+<p>use Aws\S3\S3Client;</p>
+
+<p>use Exception;</p>
+
+<p>class File extends \Flow\File {</p>
+
+<pre><code>/**
+ * @var \Flow\RequestInterface
+ */
+private $request;
+
+/**
+ * @var \Flow\ConfigInterface
+ */
+private $config;
+
+/**
+ * @var \Aws\S3\S3Client
+ */
+private $s3Client;
+
+public function __construct(ConfigInterface $config, RequestInterface $request = null, S3Client $s3Client = null)
+{
+    parent::__construct($config, $request);
+    $this-&gt;config = $config;
+    $this-&gt;request = $request;
+    $this-&gt;s3Client = $s3Client;
+}
+
+/**
+ * Merge all chunks to single file
+ *
+ * @param string $destination final file location
+ *
+ * @throws FileLockException
+ * @throws FileOpenException
+ * @throws \Exception
+ *
+ * @return bool indicates if file was saved
+ */
+public function save($destination)
+{
+    $toS3 = !empty($this-&gt;s3Client);
+    $local = !$toS3;
+
+    if ($toS3 &amp;&amp; !starts_with($destination, 's3://'))
+    {
+        // @see http://docs.aws.amazon.com/aws-sdk-php/guide/latest/feature-s3-stream-wrapper.html
+        throw new Exception('Not a valid S3 protocol');
+    }
+
+    if ($toS3)
+    {
+        $this-&gt;s3Client-&gt;registerStreamWrapper();
+    }
+
+    $fh = fopen($destination, 'w');
+    if (!$fh)
+    {
+        throw new FileOpenException('failed to open destination file: ' . $destination);
+    }
+
+    if ($local &amp;&amp; !flock($fh, LOCK_EX | LOCK_NB, $blocked)) {
+        // @codeCoverageIgnoreStart
+        if ($blocked)
+        {
+            // Concurrent request has requested a lock.
+            // File is being processed at the moment.
+            // Warning: lock is not checked in windows.
+            return false;
+        }
+        // @codeCoverageIgnoreEnd
+
+        throw new FileLockException('failed to lock file: ' . $destination);
+    }
+
+    $totalChunks = $this-&gt;request-&gt;getTotalChunks();
+
+    try
+    {
+        $preProcessChunk = $this-&gt;config-&gt;getPreprocessCallback();
+
+        for ($i = 1; $i &lt;= $totalChunks; $i++)
+        {
+            $file = $this-&gt;getChunkPath($i);
+            $chunk = fopen($file, "rb");
+
+            if (!$chunk)
+            {
+                throw new FileOpenException('failed to open chunk: ' . $file);
+            }
+
+            if ($preProcessChunk !== null)
+            {
+                call_user_func($preProcessChunk, $chunk);
+            }
+
+            stream_copy_to_stream($chunk, $fh);
+            fclose($chunk);
+        }
+    }
+    catch (\Exception $e)
+    {
+        if ($local) flock($fh, LOCK_UN);
+
+        fclose($fh);
+        throw $e;
+    }
+
+    if ($this-&gt;config-&gt;getDeleteChunksOnSave())
+    {
+        $this-&gt;deleteChunks();
+    }
+
+    if ($local) flock($fh, LOCK_UN);
+
+    fclose($fh);
+
+    return true;
+}
+</code></pre>
+
+<p>}
+```</p>
+]]></content>
+  </entry>
+  
+</feed>
