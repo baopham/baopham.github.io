@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "AWS CloudFormation reusable variables"
-date: 2016-02-08 07:46:33 -0800
+date: 2016-02-12 07:46:33 -0800
 comments: true
 categories: [AWS, CloudFormation]
 ---
@@ -12,18 +12,18 @@ Here is a way to create reusable strings / numbers / etc. in CloudFormation.
 
 2 - Create a custom resource to store the value returned from the Lambda
 
-Example: Here we have a custom resource `DBInfo` to hold the DB information.
+Example: Here we have a custom resource `AppInfo` to hold the App information.
 
 ```javascript
 "Resources": {
-  "DBInfo": {
-    "Type": "Custom::DBInfo",
+  "AppInfo": {
+    "Type": "Custom::AppInfo",
     "Properties": {
-      "ServiceToken": { "Fn::GetAtt": ["GetDBInfo", "Arn"] },
+      "ServiceToken": { "Fn::GetAtt": ["GetAppInfo", "Arn"] },
       "BuildVersion": { "Ref": "BuildVersion" }
     }
   },
-  "GetDBInfo": {
+  "GetAppInfo": {
     "Type": "AWS::Lambda::Function",
     "Properties": {
       "Handler": "index.handler",
@@ -32,20 +32,17 @@ Example: Here we have a custom resource `DBInfo` to hold the DB information.
         "ZipFile":  { "Fn::Join": ["", [
           "var response = require('cfn-response');",
           "exports.handler = function(event, context) {",
-          "   var password = '",
-          { "Fn::GetAtt": [ "GeneratedDBPassword", "Value" ] },
-          "';",
           "   var username = '",
           {
               "Fn::Join": [ "_", [ {"Ref": "AppName"}, {"Ref": "AppEnv"} ] ]
           },
           "';",
-          "   var database = '",
+          "   var email = '",
           {
-              "Fn::Join": [ "_", [ {"Ref": "AppName"}, {"Ref": "AppEnv"} ] ]
+              "Fn::Join": [ "", [ {"Ref": "AppName"}, "+", {"Ref": "AppEnv"}, "@gmail.com" ] ]
           },
           "';",
-          "   var responseData = { Password: password, Username: username, Database: database };",
+          "   var responseData = { Username: username, Email: email };",
           "   response.send(event, context, response.SUCCESS, responseData);",
           "};"
           ]]
@@ -76,11 +73,11 @@ Example: Here we have a custom resource `DBInfo` to hold the DB information.
 3 - Reference the custom resource with `Fn::GetAtt`:
 
 ```javascript
-{ "Fn::GetAtt": [ "DBInfo", "Username" ] },
-{ "Fn::GetAtt": [ "DBInfo", "Password" ] }
+{ "Fn::GetAtt": [ "AppInfo", "Username" ] },
+{ "Fn::GetAtt": [ "AppInfo", "Email" ] }
 ...
 ```
-4 - Create a parameter `BuildVersion`. This is the key to make sure the custom resource `DBInfo` is updated when you update your CloudFormation
+4 - Create a parameter `BuildVersion`. This is the key to make sure the custom resource `AppInfo` is updated when you update your parameters `AppName` or `AppEnv`. Without it, when you update these 2 parameters, CloudFormation will only update Lambda function and leave the resource `AppInfo` the same without sending another request to `GetAppInfo` for the latest value.
 
 ```
 "Parameters": {
