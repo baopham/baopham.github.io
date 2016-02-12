@@ -16,7 +16,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://baopham.github.io/blog/2016/02/08/aws-cloudformation-reusable-variables">
+  <link rel="canonical" href="http://baopham.github.io/blog/2016/02/12/aws-cloudformation-reusable-variables">
   <link href="/favicon.png" type="image/png" rel="icon">
   <link href="/atom.xml" rel="alternate" title=":baopham" type="application/atom+xml">
 
@@ -177,7 +177,7 @@
 
 
 
-<span class="glyphicon glyphicon-calendar"></span> <time datetime="2016-02-08T07:46:33-08:00" pubdate data-updated="true">Feb 8<span>th</span>, 2016</time>
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2016-02-12T07:46:33-08:00" pubdate data-updated="true">Feb 12<span>th</span>, 2016</time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://baopham.github.io">Comments</a>
@@ -199,7 +199,7 @@
 
 <p>2 &ndash; Create a custom resource to store the value returned from the Lambda</p>
 
-<p>Example: Here we have a custom resource <code>DBInfo</code> to hold the DB information.</p>
+<p>Example: Here we have a custom resource <code>AppInfo</code> to hold the App information.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -255,18 +255,15 @@
 <span class='line-number'>52</span>
 <span class='line-number'>53</span>
 <span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
 </pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="s2">&quot;Resources&quot;</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>  <span class="s2">&quot;DBInfo&quot;</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>    <span class="s2">&quot;Type&quot;</span><span class="o">:</span> <span class="s2">&quot;Custom::DBInfo&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;AppInfo&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s2">&quot;Type&quot;</span><span class="o">:</span> <span class="s2">&quot;Custom::AppInfo&quot;</span><span class="p">,</span>
 </span><span class='line'>    <span class="s2">&quot;Properties&quot;</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>      <span class="s2">&quot;ServiceToken&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;Fn::GetAtt&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;GetDBInfo&quot;</span><span class="p">,</span> <span class="s2">&quot;Arn&quot;</span><span class="p">]</span> <span class="p">},</span>
+</span><span class='line'>      <span class="s2">&quot;ServiceToken&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;Fn::GetAtt&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;GetAppInfo&quot;</span><span class="p">,</span> <span class="s2">&quot;Arn&quot;</span><span class="p">]</span> <span class="p">},</span>
 </span><span class='line'>      <span class="s2">&quot;BuildVersion&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;Ref&quot;</span><span class="o">:</span> <span class="s2">&quot;BuildVersion&quot;</span> <span class="p">}</span>
 </span><span class='line'>    <span class="p">}</span>
 </span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="s2">&quot;GetDBInfo&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>  <span class="s2">&quot;GetAppInfo&quot;</span><span class="o">:</span> <span class="p">{</span>
 </span><span class='line'>    <span class="s2">&quot;Type&quot;</span><span class="o">:</span> <span class="s2">&quot;AWS::Lambda::Function&quot;</span><span class="p">,</span>
 </span><span class='line'>    <span class="s2">&quot;Properties&quot;</span><span class="o">:</span> <span class="p">{</span>
 </span><span class='line'>      <span class="s2">&quot;Handler&quot;</span><span class="o">:</span> <span class="s2">&quot;index.handler&quot;</span><span class="p">,</span>
@@ -275,20 +272,17 @@
 </span><span class='line'>        <span class="s2">&quot;ZipFile&quot;</span><span class="o">:</span>  <span class="p">{</span> <span class="s2">&quot;Fn::Join&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="p">[</span>
 </span><span class='line'>          <span class="s2">&quot;var response = require(&#39;cfn-response&#39;);&quot;</span><span class="p">,</span>
 </span><span class='line'>          <span class="s2">&quot;exports.handler = function(event, context) {&quot;</span><span class="p">,</span>
-</span><span class='line'>          <span class="s2">&quot;   var password = &#39;&quot;</span><span class="p">,</span>
-</span><span class='line'>          <span class="p">{</span> <span class="s2">&quot;Fn::GetAtt&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;GeneratedDBPassword&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span> <span class="p">]</span> <span class="p">},</span>
-</span><span class='line'>          <span class="s2">&quot;&#39;;&quot;</span><span class="p">,</span>
 </span><span class='line'>          <span class="s2">&quot;   var username = &#39;&quot;</span><span class="p">,</span>
 </span><span class='line'>          <span class="p">{</span>
 </span><span class='line'>              <span class="s2">&quot;Fn::Join&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="p">[</span> <span class="p">{</span><span class="s2">&quot;Ref&quot;</span><span class="o">:</span> <span class="s2">&quot;AppName&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;Ref&quot;</span><span class="o">:</span> <span class="s2">&quot;AppEnv&quot;</span><span class="p">}</span> <span class="p">]</span> <span class="p">]</span>
 </span><span class='line'>          <span class="p">},</span>
 </span><span class='line'>          <span class="s2">&quot;&#39;;&quot;</span><span class="p">,</span>
-</span><span class='line'>          <span class="s2">&quot;   var database = &#39;&quot;</span><span class="p">,</span>
+</span><span class='line'>          <span class="s2">&quot;   var email = &#39;&quot;</span><span class="p">,</span>
 </span><span class='line'>          <span class="p">{</span>
-</span><span class='line'>              <span class="s2">&quot;Fn::Join&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="p">[</span> <span class="p">{</span><span class="s2">&quot;Ref&quot;</span><span class="o">:</span> <span class="s2">&quot;AppName&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;Ref&quot;</span><span class="o">:</span> <span class="s2">&quot;AppEnv&quot;</span><span class="p">}</span> <span class="p">]</span> <span class="p">]</span>
+</span><span class='line'>              <span class="s2">&quot;Fn::Join&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="p">[</span> <span class="p">{</span><span class="s2">&quot;Ref&quot;</span><span class="o">:</span> <span class="s2">&quot;AppName&quot;</span><span class="p">},</span> <span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;Ref&quot;</span><span class="o">:</span> <span class="s2">&quot;AppEnv&quot;</span><span class="p">},</span> <span class="s2">&quot;@gmail.com&quot;</span> <span class="p">]</span> <span class="p">]</span>
 </span><span class='line'>          <span class="p">},</span>
 </span><span class='line'>          <span class="s2">&quot;&#39;;&quot;</span><span class="p">,</span>
-</span><span class='line'>          <span class="s2">&quot;   var responseData = { Password: password, Username: username, Database: database };&quot;</span><span class="p">,</span>
+</span><span class='line'>          <span class="s2">&quot;   var responseData = { Username: username, Email: email };&quot;</span><span class="p">,</span>
 </span><span class='line'>          <span class="s2">&quot;   response.send(event, context, response.SUCCESS, responseData);&quot;</span><span class="p">,</span>
 </span><span class='line'>          <span class="s2">&quot;};&quot;</span>
 </span><span class='line'>          <span class="p">]]</span>
@@ -323,13 +317,13 @@
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">{</span> <span class="s2">&quot;Fn::GetAtt&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;DBInfo&quot;</span><span class="p">,</span> <span class="s2">&quot;Username&quot;</span> <span class="p">]</span> <span class="p">},</span>
-</span><span class='line'><span class="p">{</span> <span class="s2">&quot;Fn::GetAtt&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;DBInfo&quot;</span><span class="p">,</span> <span class="s2">&quot;Password&quot;</span> <span class="p">]</span> <span class="p">}</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">{</span> <span class="s2">&quot;Fn::GetAtt&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;AppInfo&quot;</span><span class="p">,</span> <span class="s2">&quot;Username&quot;</span> <span class="p">]</span> <span class="p">},</span>
+</span><span class='line'><span class="p">{</span> <span class="s2">&quot;Fn::GetAtt&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;AppInfo&quot;</span><span class="p">,</span> <span class="s2">&quot;Email&quot;</span> <span class="p">]</span> <span class="p">}</span>
 </span><span class='line'><span class="p">...</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>4 &ndash; Create a parameter <code>BuildVersion</code>. This is the key to make sure the custom resource <code>DBInfo</code> is updated when you update your CloudFormation</p>
+<p>4 &ndash; Create a parameter <code>BuildVersion</code>. This is the key to make sure the custom resource <code>AppInfo</code> is updated when you update your parameters <code>AppName</code> or <code>AppEnv</code>. Without it, when you update these 2 parameters, CloudFormation will only update Lambda function and leave the resource <code>AppInfo</code> the same without sending another request to <code>GetAppInfo</code> for the latest value.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -370,7 +364,7 @@
 
 
 
-<span class="glyphicon glyphicon-calendar"></span> <time datetime="2016-02-08T07:46:33-08:00" pubdate data-updated="true">Feb 8<span>th</span>, 2016</time>
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2016-02-12T07:46:33-08:00" pubdate data-updated="true">Feb 12<span>th</span>, 2016</time>
           
 
   <span class="glyphicon glyphicon-tags"></span>&nbsp;
@@ -435,8 +429,8 @@
   
     
     // var disqus_developer = 1;
-    var disqus_identifier = 'http://baopham.github.io/blog/2016/02/08/aws-cloudformation-reusable-variables/';
-    var disqus_url = 'http://baopham.github.io/blog/2016/02/08/aws-cloudformation-reusable-variables/';
+    var disqus_identifier = 'http://baopham.github.io/blog/2016/02/12/aws-cloudformation-reusable-variables/';
+    var disqus_url = 'http://baopham.github.io/blog/2016/02/12/aws-cloudformation-reusable-variables/';
     var disqus_script = 'embed.js';
   
   (function () {
