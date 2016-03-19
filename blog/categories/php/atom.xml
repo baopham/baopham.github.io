@@ -4,7 +4,7 @@
   <title><![CDATA[Category: PHP | :baopham]]></title>
   <link href="http://baopham.github.io/blog/categories/php/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-02-12T00:51:48-08:00</updated>
+  <updated>2016-03-19T02:08:43-07:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -489,31 +489,6 @@ public function save($destination)
 
 <p>}
 ```</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Facebook App Warm-up]]></title>
-    <link href="http://baopham.github.io/blog/2013/05/02/facebook-app-warm-up/"/>
-    <updated>2013-05-02T00:00:00-07:00</updated>
-    <id>http://baopham.github.io/blog/2013/05/02/facebook-app-warm-up</id>
-    <content type="html"><![CDATA[<p>This week I decided to try to build a Facebook app. It turns out to be not too bad. Facebook API and Heroku really make things easier. If you do a few googling around, I&rsquo;m sure you can find many good tutorials on how to build a Facebook app &ndash; if you&rsquo;re interested in making one yourself.</p>
-
-<p>There are a few challenges / nuisances I faced during the making though:</p>
-
-<!--more-->
-
-
-<ul>
-<li>First, of course, is the question: what kind of app? Ideally, I would like to build a game, but with the time constraint of only a few hours and my main focus was to get a taste of building a Facebook app, I decided to go with a simple app: Horoscope.</li>
-<li><p>After registering to be a Facebook developer, I selected Heroku to host my PHP app. Heroku then generated a dummy app so the next step is to download the sample code to local dev (Side note: remember to use <code>--recursive</code> with <code>git clone</code> if you also want to get the Facebook PHP SDK). But it doesn&rsquo;t work out of the box unless you have a proper Apache configuration. It took me a while to dig things out and set things up. Solution to this really depends on your OS and environtment so I&rsquo;m not going to go into details about it.</p></li>
-<li><p>Next, read the code, learn the api, write some class, add more stuff, edit the content, test it&hellip; That was easy&hellip; Until I bumped into an annoying <a href="https://developers.facebook.com/bugs/524245490930206?browse=search_50f87d9e8869a5e06191882#">FB&rsquo;s Javascript bug</a>. I did not find this post until much much later though so it was quite frustrating to see the page not reloaded after the user logged in. If you scroll down the post to see the comments, you can see some suggested fixes. I tried one of them and it works :)</p></li>
-</ul>
-
-
-<p><strong>UPDATE</strong>: Looks like the fix is ready as of now.</p>
-
-<p>In total, it took me about ~5 hours to finish this app. I think putting a time limit on how long I can work on a problem really helps. It pushes me to be more alert and work more efficiently. It is also to make sure that I have time to do my homework!</p>
 ]]></content>
   </entry>
   

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Math | :baopham]]></title>
   <link href="http://baopham.github.io/blog/categories/math/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-02-12T00:51:48-08:00</updated>
+  <updated>2016-03-19T02:08:43-07:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -18,16 +18,9 @@
     <link href="http://baopham.github.io/blog/2012/01/25/project-euler-practice-your-math-and-programming-skills/"/>
     <updated>2012-01-25T00:00:00-08:00</updated>
     <id>http://baopham.github.io/blog/2012/01/25/project-euler-practice-your-math-and-programming-skills</id>
-    <content type="html"><![CDATA[<p>I&rsquo;ve recently started to participate in this site <a href="http://projecteuler.net/">Project Euler</a>. It&rsquo;s a website with a series of mathematics/programming problems, ranging from easy to very hard. Some problems, if not solved using the right algorithm, can take more than 5 minutes to get the result (personal experience, I forgot that it was running&hellip;). So it only matters if you use correct and efficient algorithms. These problems are meant to be solved in only less than a minute.</p>
+    <content type="html"><![CDATA[<p>I&rsquo;ve recently started to participate in this site <a href="http://projecteuler.net/">Project Euler</a>. It&rsquo;s a website with a series of mathematics/programming problems, ranging from easy to very hard. Some problems, if not solved using the right algorithm, can take more than 5 minutes to get the result. So it only matters if you use correct and efficient algorithms. These problems are meant to be solved in only less than a minute.</p>
 
-<!--more-->
-
-
-<p>Now I&rsquo;m quite addicted to the thrilling feeling of getting the right answer. There are certainly numerous solutions out there on the web (and I admit, sometimes I have to resort to them when I&rsquo;m stuck), but it&rsquo;s always more exciting to try and learn new algorithms and apply them to the problems.</p>
-
-<p>Check out my Git repository of my solutions (mostly in Python because I find it faster and neater to code, no?) to some of the Euler questions: <a href="https://github.com/baopham/projectEuler">baopham/projectEuler</a></p>
-
-<p><img src="http://projecteuler.net/profile/baopham.png" alt="My Euler badge" /></p>
+<p>Check out my Git repository of my solutions (mostly in Python because I find it faster and neater to code) to some of the Euler questions: <a href="https://github.com/baopham/projectEuler">baopham/projectEuler</a></p>
 ]]></content>
   </entry>
   
