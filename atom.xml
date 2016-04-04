@@ -4,7 +4,7 @@
   <title><![CDATA[:baopham]]></title>
   <link href="http://baopham.github.io/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-04-04T00:07:18-07:00</updated>
+  <updated>2016-04-04T01:07:51-07:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -142,7 +142,7 @@
 </span><span class='line'>
 </span><span class='line'><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">expectsJobs</span><span class="p">(</span><span class="nx">SendInvitationEmail</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
 </span><span class='line'>
-</span><span class='line'><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">seeInDatabase</span><span class="p">(</span><span class="s1">&#39;users&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;email&#39;</span> <span class="o">=&gt;</span> <span class="nv">$payload</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]]);</span>
+</span><span class='line'><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">seeInDatabase</span><span class="p">(</span><span class="s1">&#39;users&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;email&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;foo@bar.com&#39;</span><span class="p">]);</span>
 </span></code></pre></td></tr></table></div></figure>
 
 ]]></content>
