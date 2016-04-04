@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Behat | :baopham]]></title>
+  <link href="http://baopham.github.io/blog/categories/behat/atom.xml" rel="self"/>
+  <link href="http://baopham.github.io/"/>
+  <updated>2016-04-03T23:15:43-07:00</updated>
+  <id>http://baopham.github.io/</id>
+  <author>
+    <name><![CDATA[Bao Pham]]></name>
+    <email><![CDATA[gbaopham@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Behat, Selenium and VirtualBox]]></title>
+    <link href="http://baopham.github.io/blog/2016/04/03/behat-selenium-and-virtualbox/"/>
+    <updated>2016-04-03T22:57:47-07:00</updated>
+    <id>http://baopham.github.io/blog/2016/04/03/behat-selenium-and-virtualbox</id>
+    <content type="html"><![CDATA[<p>If you want to run selenium server on the host machine and behat in VirtualBox, this setup could work for you:</p>
+
+<p>```yaml behat.yml
+default:
+extensions:</p>
+
+<pre><code>Behat\MinkExtension:
+base_url: https://foobar.dev
+default_session: laravel
+laravel: ~
+selenium2:
+    wd_host: "http://selenium-server.dev:4444/wd/hub"
+browser_name: chrome
+</code></pre>
+
+<p>```</p>
+
+<p>In your virtualbox, edit the <code>/etc/hosts</code> and add a line:</p>
+
+<p><code>text /etc/hosts
+10.0.2.2 selenium-server.dev
+</code></p>
+
+<p>Then run your selenium server on your host machine.</p>
+]]></content>
+  </entry>
+  
+</feed>

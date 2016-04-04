@@ -181,6 +181,76 @@
 
 
 
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2016-04-03T22:57:47-07:00" pubdate data-updated="true">Apr 3<span>rd</span>, 2016</time>
+        
+           | <a href="/blog/2016/04/03/behat-selenium-and-virtualbox/#disqus_thread"
+             data-disqus-identifier="http://baopham.github.io/blog/2016/04/03/behat-selenium-and-virtualbox/">Comments</a>
+        
+      </p>
+    
+    
+      <h1 class="entry-title"><a href="/blog/2016/04/03/behat-selenium-and-virtualbox/">Behat, Selenium and VirtualBox</a></h1>
+    
+  </header>
+
+
+  <div class="entry-content clearfix"><p>If you want to run selenium server on the host machine and behat in VirtualBox, this setup could work for you:</p>
+
+<figure class='code'><figcaption><span>behat.yml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">default</span><span class="p-Indicator">:</span>
+</span><span class='line'><span class="l-Scalar-Plain">extensions</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">Behat\MinkExtension</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">base_url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">https://foobar.dev</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">default_session</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">laravel</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">laravel</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">~</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">selenium2</span><span class="p-Indicator">:</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">wd_host</span><span class="p-Indicator">:</span> <span class="s">&quot;http://selenium-server.dev:4444/wd/hub&quot;</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">browser_name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">chrome</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In your virtualbox, edit the <code>/etc/hosts</code> and add a line:</p>
+
+<figure class='code'><figcaption><span>/etc/hosts</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>10.0.2.2 selenium-server.dev
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then run your selenium server on your host machine.</p>
+</div>
+  
+  
+
+
+        </article>
+      
+      
+        <article class="post">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
 <span class="glyphicon glyphicon-calendar"></span> <time datetime="2016-02-12T07:46:33-08:00" pubdate data-updated="true">Feb 12<span>th</span>, 2016</time>
         
            | <a href="/blog/2016/02/12/aws-cloudformation-reusable-variables/#disqus_thread"
@@ -1061,53 +1131,6 @@
 
         </article>
       
-      
-        <article class="post">
-          
-  <header class="page-header">
-    
-      <p class="meta text-muted text-uppercase">
-        
-
-
-
-
-
-
-
-
-
-
-
-
-<span class="glyphicon glyphicon-calendar"></span> <time datetime="2011-12-05T00:00:00-08:00" pubdate data-updated="true">Dec 5<span>th</span>, 2011</time>
-        
-           | <a href="/blog/2011/12/05/chess/#disqus_thread"
-             data-disqus-identifier="http://baopham.github.io/blog/2011/12/05/chess/">Comments</a>
-        
-      </p>
-    
-    
-      <h1 class="entry-title"><a href="/blog/2011/12/05/chess/">Chess</a></h1>
-    
-  </header>
-
-
-  <div class="entry-content clearfix"><p>Want to play some chess? Here is a chess board for you written in HTML5 using the drag and drop feature. Make sure your browser supports HTML5. Now drag away!</p>
-
-<p><strong>UPDATE:</strong> Now the chess rules are enforced. It won&rsquo;t move unless you follow the rules :)</p>
-
-</div>
-  
-  
-    <footer>
-      <a class="btn btn-default" rel="full-article" href="/blog/2011/12/05/chess/">Read on &rarr;</a>
-    </footer>
-  
-
-
-        </article>
-      
     </div>
 
     <ul class="pager">
@@ -1167,6 +1190,8 @@
   
   <div id="recent_posts" class="list-group">
     
+    <a class="list-group-item " href="/blog/2016/04/03/behat-selenium-and-virtualbox/">Behat, Selenium and VirtualBox</a>
+    
     <a class="list-group-item " href="/blog/2016/02/12/aws-cloudformation-reusable-variables/">AWS CloudFormation Reusable Variables</a>
     
     <a class="list-group-item " href="/blog/2015/09/22/a-dynamodb-wrapper-for-laravel-model/">A DynamoDb Wrapper for Laravel Model</a>
@@ -1175,8 +1200,6 @@
     
     <a class="list-group-item " href="/blog/2015/03/22/laravel-plus-angularjs-file-upload-pattern/">Laravel + Angularjs: File Upload Pattern</a>
     
-    <a class="list-group-item " href="/blog/2015/03/16/laravel-merge-flowjs-chunks-directly-to-s3/">Laravel - Merge Flowjs Chunks Directly to S3</a>
-    
   </div>
 </section>
 <section class="panel panel-default">
@@ -1184,7 +1207,7 @@
     <h3 class="panel-title">Tag Cloud</h3>
   </div>
   <div class="panel-body">
-    <span id="tag-cloud"><a class='text-primary' href='/blog/categories/angularjs' style='font-size: 112.0%;'>Angularjs</a> <a class='text-primary' href='/blog/categories/aws' style='font-size: 112.0%;'>AWS</a> <a class='text-primary' href='/blog/categories/cloudformation' style='font-size: 112.0%;'>CloudFormation</a> <a class='text-primary' href='/blog/categories/dynamodb' style='font-size: 112.0%;'>DynamoDb</a> <a class='text-primary' href='/blog/categories/flowjs' style='font-size: 112.0%;'>Flowjs</a> <a class='text-success' href='/blog/categories/github' style='font-size: 124.0%;'>Github</a> <a class='text-success' href='/blog/categories/html5' style='font-size: 124.0%;'>HTML5</a> <a class='text-danger' href='/blog/categories/javascript' style='font-size: 160.0%;'>JavaScript</a> <a class='text-primary' href='/blog/categories/knockout-js' style='font-size: 112.0%;'>Knockout.js</a> <a class='text-danger' href='/blog/categories/laravel' style='font-size: 148.0%;'>Laravel</a> <a class='text-success' href='/blog/categories/math' style='font-size: 124.0%;'>Math</a> <a class='text-primary' href='/blog/categories/node-js' style='font-size: 112.0%;'>Node.js</a> <a class='text-danger' href='/blog/categories/php' style='font-size: 148.0%;'>PHP</a> <a class='text-primary' href='/blog/categories/python' style='font-size: 112.0%;'>Python</a> <a class='text-success' href='/blog/categories/ruby' style='font-size: 124.0%;'>Ruby</a> <a class='text-danger' href='/blog/categories/s3' style='font-size: 136.0%;'>S3</a> <a class='text-primary' href='/blog/categories/semantic-ui' style='font-size: 112.0%;'>Semantic-UI</a> <a class='text-primary' href='/blog/categories/vim' style='font-size: 112.0%;'>Vim</a> <a class='text-success' href='/blog/categories/web-development' style='font-size: 124.0%;'>Web Development</a> </span>
+    <span id="tag-cloud"><a class='text-primary' href='/blog/categories/angularjs' style='font-size: 112.0%;'>Angularjs</a> <a class='text-primary' href='/blog/categories/aws' style='font-size: 112.0%;'>AWS</a> <a class='text-primary' href='/blog/categories/behat' style='font-size: 112.0%;'>Behat</a> <a class='text-primary' href='/blog/categories/cloudformation' style='font-size: 112.0%;'>CloudFormation</a> <a class='text-primary' href='/blog/categories/dynamodb' style='font-size: 112.0%;'>DynamoDb</a> <a class='text-primary' href='/blog/categories/flowjs' style='font-size: 112.0%;'>Flowjs</a> <a class='text-success' href='/blog/categories/github' style='font-size: 124.0%;'>Github</a> <a class='text-success' href='/blog/categories/html5' style='font-size: 124.0%;'>HTML5</a> <a class='text-danger' href='/blog/categories/javascript' style='font-size: 160.0%;'>JavaScript</a> <a class='text-primary' href='/blog/categories/knockout-js' style='font-size: 112.0%;'>Knockout.js</a> <a class='text-danger' href='/blog/categories/laravel' style='font-size: 148.0%;'>Laravel</a> <a class='text-success' href='/blog/categories/math' style='font-size: 124.0%;'>Math</a> <a class='text-primary' href='/blog/categories/node-js' style='font-size: 112.0%;'>Node.js</a> <a class='text-danger' href='/blog/categories/php' style='font-size: 148.0%;'>PHP</a> <a class='text-primary' href='/blog/categories/python' style='font-size: 112.0%;'>Python</a> <a class='text-success' href='/blog/categories/ruby' style='font-size: 124.0%;'>Ruby</a> <a class='text-danger' href='/blog/categories/s3' style='font-size: 136.0%;'>S3</a> <a class='text-primary' href='/blog/categories/selenium' style='font-size: 112.0%;'>Selenium</a> <a class='text-primary' href='/blog/categories/semantic-ui' style='font-size: 112.0%;'>Semantic-UI</a> <a class='text-primary' href='/blog/categories/vim' style='font-size: 112.0%;'>Vim</a> <a class='text-primary' href='/blog/categories/virtualbox' style='font-size: 112.0%;'>VirtualBox</a> <a class='text-success' href='/blog/categories/web-development' style='font-size: 124.0%;'>Web Development</a> </span>
   </div>
 </section>
 

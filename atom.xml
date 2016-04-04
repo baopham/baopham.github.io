@@ -4,7 +4,7 @@
   <title><![CDATA[:baopham]]></title>
   <link href="http://baopham.github.io/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-03-19T02:11:43-07:00</updated>
+  <updated>2016-04-03T23:15:43-07:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -12,6 +12,45 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Behat, Selenium and VirtualBox]]></title>
+    <link href="http://baopham.github.io/blog/2016/04/03/behat-selenium-and-virtualbox/"/>
+    <updated>2016-04-03T22:57:47-07:00</updated>
+    <id>http://baopham.github.io/blog/2016/04/03/behat-selenium-and-virtualbox</id>
+    <content type="html"><![CDATA[<p>If you want to run selenium server on the host machine and behat in VirtualBox, this setup could work for you:</p>
+
+<figure class='code'><figcaption><span>behat.yml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">default</span><span class="p-Indicator">:</span>
+</span><span class='line'><span class="l-Scalar-Plain">extensions</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">Behat\MinkExtension</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">base_url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">https://foobar.dev</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">default_session</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">laravel</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">laravel</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">~</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">selenium2</span><span class="p-Indicator">:</span>
+</span><span class='line'>        <span class="l-Scalar-Plain">wd_host</span><span class="p-Indicator">:</span> <span class="s">&quot;http://selenium-server.dev:4444/wd/hub&quot;</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">browser_name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">chrome</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In your virtualbox, edit the <code>/etc/hosts</code> and add a line:</p>
+
+<figure class='code'><figcaption><span>/etc/hosts</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>10.0.2.2 selenium-server.dev
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then run your selenium server on your host machine.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[AWS CloudFormation Reusable Variables]]></title>
