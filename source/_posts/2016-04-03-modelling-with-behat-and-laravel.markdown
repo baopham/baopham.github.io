@@ -70,5 +70,5 @@ $this->post('users', ['_token' =>  csrf_token(), 'email' => 'foo@bar.com']);
 
 $this->expectsJobs(SendInvitationEmail::class);
 
-$this->seeInDatabase('users', ['email' => $payload['email']]);
+$this->seeInDatabase('users', ['email' => 'foo@bar.com']);
 ```
