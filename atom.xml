@@ -4,7 +4,7 @@
   <title><![CDATA[:baopham]]></title>
   <link href="http://baopham.github.io/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-04-04T01:07:51-07:00</updated>
+  <updated>2016-04-04T01:36:11-07:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -23,6 +23,7 @@
 <p>If you like the author&rsquo;s idea and want to apply this to your Laravel projects, here is something you can do to get most (if not all) Laravel PHPUnit helper methods in your Behat Domain Context class:</p>
 
 <ul>
+<li>Install <a href="https://github.com/laracasts/Behat-Laravel-Extension">Behat-Laravel-Extension</a></li>
 <li>Have a base Context class. I call it <code>DomainContext</code> but you could do something similar for the default <code>FeatureContext</code>. Having a separate abstract parent class lets me divide my context classes into 2 categories: UI and Domain.</li>
 </ul>
 
