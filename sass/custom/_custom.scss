@@ -1,0 +1,9 @@
+figure.code:not(.panel) figcaption span {
+  font-size: 13px;
+  line-height: inherit;
+  color: #666;
+}
+
+figure.code:not(.panel) figcaption {
+  padding: 0 8px;
+}
