@@ -10,6 +10,7 @@ Here is an interesting read talking about how to "do a Domain-Driven Design whil
 
 If you like the author's idea and want to apply this to your Laravel projects, here is something you can do to get most (if not all) Laravel PHPUnit helper methods in your Behat Domain Context class:
 
+* Install [Behat-Laravel-Extension](https://github.com/laracasts/Behat-Laravel-Extension)
 * Have a base Context class. I call it `DomainContext` but you could do something similar for the default `FeatureContext`. Having a separate abstract parent class lets me divide my context classes into 2 categories: UI and Domain.
 
 ```php
