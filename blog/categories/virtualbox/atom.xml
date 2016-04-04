@@ -4,7 +4,7 @@
   <title><![CDATA[Category: VirtualBox | :baopham]]></title>
   <link href="http://baopham.github.io/blog/categories/virtualbox/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-04-04T01:36:11-07:00</updated>
+  <updated>2016-04-04T02:20:11-07:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -20,17 +20,15 @@
     <id>http://baopham.github.io/blog/2016/04/03/behat-selenium-and-virtualbox</id>
     <content type="html"><![CDATA[<p>If you want to run selenium server on the host machine and behat in VirtualBox, this setup could work for you:</p>
 
-<p>```yaml behat.yml
-default:
-extensions:</p>
+<p>```yml behat.yml
+default:</p>
 
-<pre><code>Behat\MinkExtension:
-base_url: https://foobar.dev
-default_session: laravel
-laravel: ~
-selenium2:
-    wd_host: "http://selenium-server.dev:4444/wd/hub"
-browser_name: chrome
+<pre><code>extensions:
+    Behat\MinkExtension:
+        base_url: https://foobar.dev
+        selenium2:
+            wd_host: "http://selenium-server.dev:4444/wd/hub"
+        browser_name: chrome
 </code></pre>
 
 <p>```</p>
