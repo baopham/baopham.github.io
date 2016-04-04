@@ -8,16 +8,14 @@ categories: [Behat, Selenium, VirtualBox]
 
 If you want to run selenium server on the host machine and behat in VirtualBox, this setup could work for you:
 
-```yaml behat.yml
+```yml behat.yml
 default:
-extensions:
-    Behat\MinkExtension:
-    base_url: https://foobar.dev
-    default_session: laravel
-    laravel: ~
-    selenium2:
-        wd_host: "http://selenium-server.dev:4444/wd/hub"
-    browser_name: chrome
+    extensions:
+        Behat\MinkExtension:
+            base_url: https://foobar.dev
+            selenium2:
+                wd_host: "http://selenium-server.dev:4444/wd/hub"
+            browser_name: chrome
 ```
 
 In your virtualbox, edit the `/etc/hosts` and add a line:
