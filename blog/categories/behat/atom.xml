@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Behat | :baopham]]></title>
   <link href="http://baopham.github.io/blog/categories/behat/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-04-03T23:15:43-07:00</updated>
+  <updated>2016-04-04T00:07:18-07:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -12,6 +12,85 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Modelling with Behat and Laravel]]></title>
+    <link href="http://baopham.github.io/blog/2016/04/03/modelling-with-behat-and-laravel/"/>
+    <updated>2016-04-03T23:17:34-07:00</updated>
+    <id>http://baopham.github.io/blog/2016/04/03/modelling-with-behat-and-laravel</id>
+    <content type="html"><![CDATA[<p>Here is an interesting read talking about how to &ldquo;do a Domain-Driven Design while doing Behaviour-Driven Development&rsquo;s red-green-refactor cycle&rdquo;: <a href="http://stakeholderwhisperer.com/posts/2014/10/introducing-modelling-by-example">Introducing Modelling by Example</a></p>
+
+<p>If you like the author&rsquo;s idea and want to apply this to your Laravel projects, here is something you can do to get most (if not all) Laravel PHPUnit helper methods in your Behat Domain Context class:</p>
+
+<ul>
+<li>Have a base Context class. I call it <code>DomainContext</code> but you could do something similar for the default <code>FeatureContext</code>. Having a separate abstract parent class lets me divide my context classes into 2 categories: UI and Domain.</li>
+</ul>
+
+
+<p>```php
+&lt;?php</p>
+
+<p>use App\User;
+use Behat\Behat\Context\SnippetAcceptingContext;
+use Behat\MinkExtension\Context\MinkContext;
+use Illuminate\Foundation\Testing\ApplicationTrait;
+use Illuminate\Foundation\Testing\CrawlerTrait;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
+use Laracasts\Behat\Context\KernelAwareContext;
+use PHPUnit_Framework_Assert as PHPUnit;
+use Symfony\Component\HttpKernel\HttpKernelInterface;</p>
+
+<p>abstract class DomainContext extends MinkContext implements KernelAwareContext, SnippetAcceptingContext
+{</p>
+
+<pre><code>use ApplicationTrait;
+use CrawlerTrait;
+
+protected $baseUrl = 'http://localhost';
+
+/**
+ * @var User
+ */
+protected $currentUser;
+
+public function setApp(HttpKernelInterface $app)
+{
+    $this-&gt;app = $app;
+}
+
+public function be(User $user)
+{
+    Session::start();
+
+    Auth::loginUsingId($user-&gt;id);
+
+    $this-&gt;currentUser = $user;
+}
+
+public function __call($name, array $arguments)
+{
+    forward_static_call_array([PHPUnit::class, $name], $arguments);
+}
+</code></pre>
+
+<p>}
+```
+* Extend this base class for all your Domain Context classes then you will have access to methods such as:</p>
+
+<p>```php
+$this->be($user);</p>
+
+<p>$this->get(&lsquo;users&rsquo;);</p>
+
+<p>$this->post(&lsquo;users&rsquo;, [&lsquo;_token&rsquo; =>  csrf_token(), &lsquo;email&rsquo; => &lsquo;<a href="&#109;&#x61;&#x69;&#x6c;&#x74;&#x6f;&#x3a;&#x66;&#111;&#111;&#64;&#x62;&#x61;&#x72;&#x2e;&#99;&#111;&#x6d;">&#102;&#x6f;&#111;&#x40;&#x62;&#97;&#x72;&#46;&#99;&#111;&#109;</a>&rsquo;]);</p>
+
+<p>$this->expectsJobs(SendInvitationEmail::class);</p>
+
+<p>$this->seeInDatabase(&lsquo;users&rsquo;, [&lsquo;email&rsquo; => $payload[&lsquo;email&rsquo;]]);
+```</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Behat, Selenium and VirtualBox]]></title>

@@ -181,6 +181,172 @@
 
 
 
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2016-04-03T23:17:34-07:00" pubdate data-updated="true">Apr 3<span>rd</span>, 2016</time>
+        
+           | <a href="/blog/2016/04/03/modelling-with-behat-and-laravel/#disqus_thread"
+             data-disqus-identifier="http://baopham.github.io/blog/2016/04/03/modelling-with-behat-and-laravel/">Comments</a>
+        
+      </p>
+    
+    
+      <h1 class="entry-title"><a href="/blog/2016/04/03/modelling-with-behat-and-laravel/">Modelling With Behat and Laravel</a></h1>
+    
+  </header>
+
+
+  <div class="entry-content clearfix"><p>Here is an interesting read talking about how to &ldquo;do a Domain-Driven Design while doing Behaviour-Driven Development&rsquo;s red-green-refactor cycle&rdquo;: <a href="http://stakeholderwhisperer.com/posts/2014/10/introducing-modelling-by-example">Introducing Modelling by Example</a></p>
+
+<p>If you like the author&rsquo;s idea and want to apply this to your Laravel projects, here is something you can do to get most (if not all) Laravel PHPUnit helper methods in your Behat Domain Context class:</p>
+
+<ul>
+<li>Have a base Context class. I call it <code>DomainContext</code> but you could do something similar for the default <code>FeatureContext</code>. Having a separate abstract parent class lets me divide my context classes into 2 categories: UI and Domain.</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">use</span> <span class="nx">App\User</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nx">Behat\Behat\Context\SnippetAcceptingContext</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nx">Behat\MinkExtension\Context\MinkContext</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nx">Illuminate\Foundation\Testing\ApplicationTrait</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nx">Illuminate\Foundation\Testing\CrawlerTrait</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nx">Illuminate\Support\Facades\Auth</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nx">Illuminate\Support\Facades\Session</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nx">Laracasts\Behat\Context\KernelAwareContext</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nx">PHPUnit_Framework_Assert</span> <span class="k">as</span> <span class="nx">PHPUnit</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nx">Symfony\Component\HttpKernel\HttpKernelInterface</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">abstract</span> <span class="k">class</span> <span class="nc">DomainContext</span> <span class="k">extends</span> <span class="nx">MinkContext</span> <span class="k">implements</span> <span class="nx">KernelAwareContext</span><span class="p">,</span> <span class="nx">SnippetAcceptingContext</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">use</span> <span class="nx">ApplicationTrait</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">use</span> <span class="nx">CrawlerTrait</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">protected</span> <span class="nv">$baseUrl</span> <span class="o">=</span> <span class="s1">&#39;http://localhost&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="sd">/**</span>
+</span><span class='line'><span class="sd">     * @var User</span>
+</span><span class='line'><span class="sd">     */</span>
+</span><span class='line'>    <span class="k">protected</span> <span class="nv">$currentUser</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">setApp</span><span class="p">(</span><span class="nx">HttpKernelInterface</span> <span class="nv">$app</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">app</span> <span class="o">=</span> <span class="nv">$app</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">be</span><span class="p">(</span><span class="nx">User</span> <span class="nv">$user</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="nx">Session</span><span class="o">::</span><span class="na">start</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nx">Auth</span><span class="o">::</span><span class="na">loginUsingId</span><span class="p">(</span><span class="nv">$user</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">currentUser</span> <span class="o">=</span> <span class="nv">$user</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">__call</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="k">array</span> <span class="nv">$arguments</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="nb">forward_static_call_array</span><span class="p">([</span><span class="nx">PHPUnit</span><span class="o">::</span><span class="na">class</span><span class="p">,</span> <span class="nv">$name</span><span class="p">],</span> <span class="nv">$arguments</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Extend this base class for all your Domain Context classes then you will have access to methods such as:</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">be</span><span class="p">(</span><span class="nv">$user</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;users&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">post</span><span class="p">(</span><span class="s1">&#39;users&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;_token&#39;</span> <span class="o">=&gt;</span>  <span class="nx">csrf_token</span><span class="p">(),</span> <span class="s1">&#39;email&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;foo@bar.com&#39;</span><span class="p">]);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">expectsJobs</span><span class="p">(</span><span class="nx">SendInvitationEmail</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">seeInDatabase</span><span class="p">(</span><span class="s1">&#39;users&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;email&#39;</span> <span class="o">=&gt;</span> <span class="nv">$payload</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+        </article>
+      
+      
+        <article class="post">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
 <span class="glyphicon glyphicon-calendar"></span> <time datetime="2016-04-03T22:57:47-07:00" pubdate data-updated="true">Apr 3<span>rd</span>, 2016</time>
         
            | <a href="/blog/2016/04/03/behat-selenium-and-virtualbox/#disqus_thread"
@@ -1089,48 +1255,6 @@
 
         </article>
       
-      
-        <article class="post">
-          
-  <header class="page-header">
-    
-      <p class="meta text-muted text-uppercase">
-        
-
-
-
-
-
-
-
-
-
-
-
-
-<span class="glyphicon glyphicon-calendar"></span> <time datetime="2012-01-25T00:00:00-08:00" pubdate data-updated="true">Jan 25<span>th</span>, 2012</time>
-        
-           | <a href="/blog/2012/01/25/project-euler-practice-your-math-and-programming-skills/#disqus_thread"
-             data-disqus-identifier="http://baopham.github.io/blog/2012/01/25/project-euler-practice-your-math-and-programming-skills/">Comments</a>
-        
-      </p>
-    
-    
-      <h1 class="entry-title"><a href="/blog/2012/01/25/project-euler-practice-your-math-and-programming-skills/">Project Euler: Practice Your Math and Programming Skills</a></h1>
-    
-  </header>
-
-
-  <div class="entry-content clearfix"><p>I&rsquo;ve recently started to participate in this site <a href="http://projecteuler.net/">Project Euler</a>. It&rsquo;s a website with a series of mathematics/programming problems, ranging from easy to very hard. Some problems, if not solved using the right algorithm, can take more than 5 minutes to get the result. So it only matters if you use correct and efficient algorithms. These problems are meant to be solved in only less than a minute.</p>
-
-<p>Check out my Git repository of my solutions (mostly in Python because I find it faster and neater to code) to some of the Euler questions: <a href="https://github.com/baopham/projectEuler">baopham/projectEuler</a></p>
-</div>
-  
-  
-
-
-        </article>
-      
     </div>
 
     <ul class="pager">
@@ -1190,6 +1314,8 @@
   
   <div id="recent_posts" class="list-group">
     
+    <a class="list-group-item " href="/blog/2016/04/03/modelling-with-behat-and-laravel/">Modelling With Behat and Laravel</a>
+    
     <a class="list-group-item " href="/blog/2016/04/03/behat-selenium-and-virtualbox/">Behat, Selenium and VirtualBox</a>
     
     <a class="list-group-item " href="/blog/2016/02/12/aws-cloudformation-reusable-variables/">AWS CloudFormation Reusable Variables</a>
@@ -1198,8 +1324,6 @@
     
     <a class="list-group-item " href="/blog/2015/09/22/laravel-upload-to-a-non-default-s3-bucket/">Laravel - Upload to a Non-default S3 Bucket</a>
     
-    <a class="list-group-item " href="/blog/2015/03/22/laravel-plus-angularjs-file-upload-pattern/">Laravel + Angularjs: File Upload Pattern</a>
-    
   </div>
 </section>
 <section class="panel panel-default">
@@ -1207,7 +1331,7 @@
     <h3 class="panel-title">Tag Cloud</h3>
   </div>
   <div class="panel-body">
-    <span id="tag-cloud"><a class='text-primary' href='/blog/categories/angularjs' style='font-size: 112.0%;'>Angularjs</a> <a class='text-primary' href='/blog/categories/aws' style='font-size: 112.0%;'>AWS</a> <a class='text-primary' href='/blog/categories/behat' style='font-size: 112.0%;'>Behat</a> <a class='text-primary' href='/blog/categories/cloudformation' style='font-size: 112.0%;'>CloudFormation</a> <a class='text-primary' href='/blog/categories/dynamodb' style='font-size: 112.0%;'>DynamoDb</a> <a class='text-primary' href='/blog/categories/flowjs' style='font-size: 112.0%;'>Flowjs</a> <a class='text-success' href='/blog/categories/github' style='font-size: 124.0%;'>Github</a> <a class='text-success' href='/blog/categories/html5' style='font-size: 124.0%;'>HTML5</a> <a class='text-danger' href='/blog/categories/javascript' style='font-size: 160.0%;'>JavaScript</a> <a class='text-primary' href='/blog/categories/knockout-js' style='font-size: 112.0%;'>Knockout.js</a> <a class='text-danger' href='/blog/categories/laravel' style='font-size: 148.0%;'>Laravel</a> <a class='text-success' href='/blog/categories/math' style='font-size: 124.0%;'>Math</a> <a class='text-primary' href='/blog/categories/node-js' style='font-size: 112.0%;'>Node.js</a> <a class='text-danger' href='/blog/categories/php' style='font-size: 148.0%;'>PHP</a> <a class='text-primary' href='/blog/categories/python' style='font-size: 112.0%;'>Python</a> <a class='text-success' href='/blog/categories/ruby' style='font-size: 124.0%;'>Ruby</a> <a class='text-danger' href='/blog/categories/s3' style='font-size: 136.0%;'>S3</a> <a class='text-primary' href='/blog/categories/selenium' style='font-size: 112.0%;'>Selenium</a> <a class='text-primary' href='/blog/categories/semantic-ui' style='font-size: 112.0%;'>Semantic-UI</a> <a class='text-primary' href='/blog/categories/vim' style='font-size: 112.0%;'>Vim</a> <a class='text-primary' href='/blog/categories/virtualbox' style='font-size: 112.0%;'>VirtualBox</a> <a class='text-success' href='/blog/categories/web-development' style='font-size: 124.0%;'>Web Development</a> </span>
+    <span id="tag-cloud"><a class='text-primary' href='/blog/categories/angularjs' style='font-size: 112.0%;'>Angularjs</a> <a class='text-primary' href='/blog/categories/aws' style='font-size: 112.0%;'>AWS</a> <a class='text-success' href='/blog/categories/behat' style='font-size: 124.0%;'>Behat</a> <a class='text-primary' href='/blog/categories/cloudformation' style='font-size: 112.0%;'>CloudFormation</a> <a class='text-primary' href='/blog/categories/dynamodb' style='font-size: 112.0%;'>DynamoDb</a> <a class='text-primary' href='/blog/categories/flowjs' style='font-size: 112.0%;'>Flowjs</a> <a class='text-success' href='/blog/categories/github' style='font-size: 124.0%;'>Github</a> <a class='text-success' href='/blog/categories/html5' style='font-size: 124.0%;'>HTML5</a> <a class='text-danger' href='/blog/categories/javascript' style='font-size: 160.0%;'>JavaScript</a> <a class='text-primary' href='/blog/categories/knockout-js' style='font-size: 112.0%;'>Knockout.js</a> <a class='text-danger' href='/blog/categories/laravel' style='font-size: 160.0%;'>Laravel</a> <a class='text-success' href='/blog/categories/math' style='font-size: 124.0%;'>Math</a> <a class='text-primary' href='/blog/categories/node-js' style='font-size: 112.0%;'>Node.js</a> <a class='text-danger' href='/blog/categories/php' style='font-size: 148.0%;'>PHP</a> <a class='text-primary' href='/blog/categories/python' style='font-size: 112.0%;'>Python</a> <a class='text-success' href='/blog/categories/ruby' style='font-size: 124.0%;'>Ruby</a> <a class='text-danger' href='/blog/categories/s3' style='font-size: 136.0%;'>S3</a> <a class='text-primary' href='/blog/categories/selenium' style='font-size: 112.0%;'>Selenium</a> <a class='text-primary' href='/blog/categories/semantic-ui' style='font-size: 112.0%;'>Semantic-UI</a> <a class='text-primary' href='/blog/categories/vim' style='font-size: 112.0%;'>Vim</a> <a class='text-primary' href='/blog/categories/virtualbox' style='font-size: 112.0%;'>VirtualBox</a> <a class='text-success' href='/blog/categories/web-development' style='font-size: 124.0%;'>Web Development</a> </span>
   </div>
 </section>
 
