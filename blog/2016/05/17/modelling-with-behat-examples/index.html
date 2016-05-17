@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Modelling with Behat and Laravel Examples - :baopham</title>
+  <meta name="author" content="Bao Pham">
+
+  
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://baopham.github.io/blog/2016/05/17/modelling-with-behat-examples">
+  <link href="/favicon.png" type="image/png" rel="icon">
+  <link href="/atom.xml" rel="alternate" title=":baopham" type="application/atom+xml">
+
+  <link href="/assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=Open+Sans:300italic,300,400italic,400,600italic,600,700italic,700,800italic,800" rel="stylesheet" type="text/css">
+
+
+  <script src="/javascripts/libs/jquery/jquery-2.0.3.min.js"></script>
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-27192907-6']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+  <body   class="no-sidebar"  >
+    <div id="wrap">
+      <header role="banner">
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+
+  <div class="nav-vim vim-normal hidden-xs hidden-sm">
+  <div class="text-center nav-vim vim-cmd">NORMAL</div>
+
+  <div class="text-center nav-vim vim-vcs">
+    <i class="fa fa-code-fork"></i>
+    source <span class="pull-right">|</span>
+  </div>
+
+  <div class="text-center nav-vim vim-name">blog.html</div>
+
+  <div class="text-center nav-vim vim-middle">&nbsp;</div>
+
+  <div class="text-center nav-vim vim-ff">unix <span class="pull-right">|</span></div>
+
+  <div class="text-center nav-vim vim-ft">html</div>
+
+  <div class="text-center nav-vim vim-line-percent">0%</div>
+
+  <div class="text-center nav-vim vim-line-current">
+    <i class="fa fa-bars"></i>
+    <span class="vim-line-row">0</span>:1
+  </div>
+</div>
+
+
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">:baopham</a>
+    </div>
+
+    <div class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="active">
+          <a href="/">Blog</a>
+        </li>
+        <li >
+          <a href="/blog/archives">Archives</a>
+        </li>
+        <li class="visible-xs">
+          <a href="/blog/tags">Tags</a>
+        </li>
+        <li >
+          <a href="/about/resume">Resume</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <a class="subscribe-rss" href="/atom.xml" title="subscribe via RSS">
+            <span class="visible-xs">RSS</span>
+            <img class="hidden-xs" src="/images/rss.png" alt="RSS">
+          </a>
+        </li>
+        
+      </ul>
+      
+        <form class="search navbar-form navbar-right" action="http://google.com/search" method="GET">
+          <input type="hidden" name="q" value="site:baopham.github.io">
+          <div class="form-group">
+            <input class="form-control" type="text" name="q" placeholder="/search">
+          </div>
+        </form>
+      
+    </div>
+  </div>
+</nav>
+
+
+      </header>
+      <div id="top-header" class="header noise-bg text-center visible-sm visible-xs hidden-print">
+  <div class="row">
+    
+  <section>
+    <div>
+      <img class="img-circle gravatar-img" src="http://www.gravatar.com/avatar/d1747ec1e8e0325b54071a4f1dab5744?s=400" alt="Gravatar of Bao Pham " title="Gravatar of Bao Pham" />
+    </div>
+  </section>
+
+    
+  <section>
+    <ul class="media-list list-inline">
+      
+        <li class="media">
+          <a href="http://github.com/baopham">
+            <img class="media-object" src="/images/GitHub-Mark-32px.png" alt="My Github"/>
+          </a>
+        </li>
+      
+      
+        <li class="media">
+          <a href="mailto:gbaopham@gmail.com">
+            <img class="media-object" src="/images/email.png" alt="Email me"/>
+          </a>
+        </li>
+      
+    </ul>
+  </section>
+
+
+    
+  </div>
+</div>
+
+
+      <div id="main" class="container">
+        <div id="content">
+          <div class="row">
+  <div class="page-content col-md-12">
+    <article class="hentry" role="article">
+      
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2016-05-17T00:52:27-07:00" pubdate data-updated="true">May 17<span>th</span>, 2016</time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://baopham.github.io">Comments</a>
+        
+      </p>
+    
+    
+    <h1 class="entry-title">
+      Modelling With Behat and Laravel Examples
+      
+    </h1>
+    
+  </header>
+
+
+  <div class="entry-content clearfix"><p>Follow up from my previous <a href="http://baopham.github.io/blog/2016/04/03/modelling-with-behat-and-laravel/">post</a>, here is a example feature (similar to the feature from the <a href="http://stakeholderwhisperer.com/posts/2014/10/introducing-modelling-by-example">original post</a>)</p>
+
+<h3>behat.yml</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>default:
+</span><span class='line'>    suites:
+</span><span class='line'>      product_payment_domain:
+</span><span class='line'>        contexts: [ ProductPaymentDomainContext ]
+</span><span class='line'>        filters:  { tags: '@product_payment' }
+</span><span class='line'>      product_payment_ui:
+</span><span class='line'>        contexts: [ ProductPaymentUIContext ]
+</span><span class='line'>        filters:  { tags: '@product_payment&&@critical' }
+</span><span class='line'>    gherkin:
+</span><span class='line'>      filters:
+</span><span class='line'>        tags: ~@wip
+</span><span class='line'>    extensions:
+</span><span class='line'>        Laracasts\Behat:
+</span><span class='line'>            #env_path: .env.behat
+</span><span class='line'>        Behat\MinkExtension:
+</span><span class='line'>            base_url: https://e-commerce.dev
+</span><span class='line'>            default_session: laravel
+</span><span class='line'>            laravel: ~
+</span><span class='line'>            selenium2:
+</span><span class='line'>              wd_host: "http://selenium-server.dev:4444/wd/hub"
+</span><span class='line'>            browser_name: chrome</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Feature and Scenarios</h3>
+
+<blockquote><p>How To Write Scenarios</p>
+
+<p>Focus on describing the problem you&rsquo;re trying to solve, rather than focusing on the &ldquo;how&rdquo; and the &ldquo;look&rdquo;. For example, don&rsquo;t mention anything about &ldquo;I click button x&rdquo; or &ldquo;I go page /path/to/page&rdquo; or &ldquo;I should see ABC on sidebar&rdquo; or &ldquo;I wait&rdquo; in your scenarios.</p>
+
+<p>Read more here: <a href="http://stakeholderwhisperer.com/posts/2014/10/introducing-modelling-by-example">Introducing Modelling by Example</a></p></blockquote>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Feature: Product payment
+</span><span class='line'>  In order to receive products
+</span><span class='line'>  As a customer
+</span><span class='line'>  I need to be able to pay for the products that I have selected
+</span><span class='line'>
+</span><span class='line'>  Scenario: Buying a product that is out of stock
+</span><span class='line'>    Given I have put the product "Windows ME" in my basket a few days before
+</span><span class='line'>    And product "Window ME" is now out of stock
+</span><span class='line'>    Then I should not be able to checkout because "Window ME" is out of stock
+</span><span class='line'>
+</span><span class='line'>  Scenario: Cannot buy if product is restricted in the account's country
+</span><span class='line'>    Given I am located in a country that does not allow product "FooBar"
+</span><span class='line'>    Then I cannot purchase this product</span></code></pre></td></tr></table></div></figure>
+
+
+<p>How I would implement the steps in the Domain Context class:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="sd">/**</span>
+</span><span class='line'><span class="sd"> * @Given I have put the product :product in my basket a few days before</span>
+</span><span class='line'><span class="sd"> */</span>
+</span><span class='line'><span class="k">public</span> <span class="k">function</span> <span class="nf">iHavePutTheProductInMyBasket</span><span class="p">(</span><span class="nv">$product</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">product</span> <span class="o">=</span> <span class="nx">factory</span><span class="p">(</span><span class="nx">Product</span><span class="o">::</span><span class="na">class</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">([</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="nv">$product</span><span class="p">]);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">basket</span><span class="o">-&gt;</span><span class="na">put</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">product</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">/**</span>
+</span><span class='line'><span class="sd"> * @Given product :product is now out of stock</span>
+</span><span class='line'><span class="sd"> */</span>
+</span><span class='line'><span class="k">public</span> <span class="k">function</span> <span class="nf">ProductIsOutOfStock</span><span class="p">(</span><span class="nv">$product</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">product</span><span class="o">-&gt;</span><span class="na">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">product</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">();</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">/**</span>
+</span><span class='line'><span class="sd"> * @Then I should not be able to checkout because :product is out of stock</span>
+</span><span class='line'><span class="sd"> */</span>
+</span><span class='line'><span class="k">public</span> <span class="k">function</span> <span class="nf">iShouldNotBeAbleToCheckoutBecauseProductIsOutOfStock</span><span class="p">(</span><span class="nv">$product</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertException</span><span class="p">(</span><span class="k">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">basket</span><span class="o">-&gt;</span><span class="na">checkout</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">},</span> <span class="nx">ProductIsOutOfStock</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">/**</span>
+</span><span class='line'><span class="sd"> * @Given I am located in a country that does not allow product :product</span>
+</span><span class='line'><span class="sd"> */</span>
+</span><span class='line'><span class="k">public</span> <span class="k">function</span> <span class="nf">iAmLocatedInACountryThatDoesNotAllowProduct</span><span class="p">(</span><span class="nv">$product</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">currentUser</span> <span class="o">=</span> <span class="nx">factory</span><span class="p">(</span><span class="nx">User</span><span class="o">::</span><span class="na">class</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">product</span> <span class="o">=</span> <span class="nx">factory</span><span class="p">(</span><span class="nx">Product</span><span class="o">::</span><span class="na">class</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">([</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="nv">$product</span><span class="p">]);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">currentUser</span><span class="o">-&gt;</span><span class="na">country</span><span class="o">-&gt;</span><span class="na">restricted_products</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">sync</span><span class="p">([</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">product</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">]);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">/**</span>
+</span><span class='line'><span class="sd"> * @Then I cannot purchase this product</span>
+</span><span class='line'><span class="sd"> */</span>
+</span><span class='line'><span class="k">public</span> <span class="k">function</span> <span class="nf">iCannotPurchaseThisProduct</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">currentUser</span><span class="o">-&gt;</span><span class="na">cannot</span><span class="p">(</span><span class="s1">&#39;purchase&#39;</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">product</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>where the method <code>assertException</code> is a custom method:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="sd">/**</span>
+</span><span class='line'><span class="sd"> * @param Closure $closure</span>
+</span><span class='line'><span class="sd"> * @param string $exception</span>
+</span><span class='line'><span class="sd"> */</span>
+</span><span class='line'><span class="k">protected</span> <span class="k">function</span> <span class="nf">assertException</span><span class="p">(</span><span class="nx">\Closure</span> <span class="nv">$closure</span><span class="p">,</span> <span class="nv">$exception</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nv">$fail</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">try</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$closure</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nv">$fail</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">\Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="nv">$e</span> <span class="nx">instanceof</span> <span class="nv">$exception</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nv">$fail</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$fail</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">fail</span><span class="p">(</span><span class="s2">&quot;Expected </span><span class="si">$exception</span><span class="s2"> to be thrown&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>and if you follow my <a href="http://baopham.github.io/blog/2016/04/03/modelling-with-behat-and-laravel/">previous post</a>, the <code>assertEquals</code> is forwarded to the <code>PHPUnit_Framework_Assert</code> class.</p>
+</div>
+
+
+      <footer>
+        <p class="meta text-muted">
+          
+  
+
+<span class="glyphicon glyphicon-user"></span> <span class="byline author vcard">Posted by <span class="fn">Bao Pham</span></span>
+
+          
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2016-05-17T00:52:27-07:00" pubdate data-updated="true">May 17<span>th</span>, 2016</time>
+          
+
+  <span class="glyphicon glyphicon-tags"></span>&nbsp;
+  <span class="categories">
+    
+      <a class='category' href='/blog/categories/behat/'>Behat</a>, <a class='category' href='/blog/categories/laravel/'>Laravel</a>, <a class='category' href='/blog/categories/php/'>PHP</a>
+    
+  </span>
+
+
+        </p>
+        
+          <div class="sharing">
+  
+  
+  
+</div>
+
+        
+        
+          <ul class="meta text-muted pager">
+            
+            <li class="previous"><a href="/blog/2016/04/03/modelling-with-behat-and-laravel/" title="Previous Post: Modelling with Behat and Laravel">&laquo; Modelling with Behat and Laravel</a></li>
+            
+            
+          </ul>
+        
+      </footer>
+    </article>
+    
+      <section>
+        <h1>Comments</h1>
+        <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+      </section>
+    
+  </div>
+
+  
+</div>
+
+        </div>
+      </div>
+    </div>
+    <footer role="contentinfo"><div class="container">
+  <p class="text-muted credits">
+  Copyright &copy; 2016 - Bao Pham - <a href="/privacy">Privacy Policy</a><br>
+  <small>
+    <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>,
+    <span class="credit">customized with <a href="https://github.com/kAworu/octostrap3">octostrap3</a></span>.
+  </small>
+</p>
+
+</div>
+</footer>
+    <script src="/assets/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/javascripts/modernizr-2.0.js"></script>
+
+
+<script type="text/javascript">
+  var disqus_shortname = 'baopham-github-io';
+  
+    
+    // var disqus_developer = 1;
+    var disqus_identifier = 'http://baopham.github.io/blog/2016/05/17/modelling-with-behat-examples/';
+    var disqus_url = 'http://baopham.github.io/blog/2016/05/17/modelling-with-behat-examples/';
+    var disqus_script = 'embed.js';
+  
+  (function () {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + disqus_shortname + '.disqus.com/' + disqus_script;
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  }());
+</script>
+
+
+
+
+
+
+
+
+
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+<script src="/javascripts/custom/theme.js"></script>
+
+
+  </body>
+</html>

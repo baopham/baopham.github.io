@@ -4,7 +4,7 @@
   <title><![CDATA[Category: PHP | :baopham]]></title>
   <link href="http://baopham.github.io/blog/categories/php/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-04-04T02:20:11-07:00</updated>
+  <updated>2016-05-17T01:52:48-07:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -12,6 +12,162 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Modelling with Behat and Laravel Examples]]></title>
+    <link href="http://baopham.github.io/blog/2016/05/17/modelling-with-behat-examples/"/>
+    <updated>2016-05-17T00:52:27-07:00</updated>
+    <id>http://baopham.github.io/blog/2016/05/17/modelling-with-behat-examples</id>
+    <content type="html"><![CDATA[<p>Follow up from my previous <a href="http://baopham.github.io/blog/2016/04/03/modelling-with-behat-and-laravel/">post</a>, here is a example feature (similar to the feature from the <a href="http://stakeholderwhisperer.com/posts/2014/10/introducing-modelling-by-example">original post</a>)</p>
+
+<h3>behat.yml</h3>
+
+<p>```
+default:</p>
+
+<pre><code>suites:
+  product_payment_domain:
+    contexts: [ ProductPaymentDomainContext ]
+    filters:  { tags: '@product_payment' }
+  product_payment_ui:
+    contexts: [ ProductPaymentUIContext ]
+    filters:  { tags: '@product_payment&amp;&amp;@critical' }
+gherkin:
+  filters:
+    tags: ~@wip
+extensions:
+    Laracasts\Behat:
+        #env_path: .env.behat
+    Behat\MinkExtension:
+        base_url: https://e-commerce.dev
+        default_session: laravel
+        laravel: ~
+        selenium2:
+          wd_host: "http://selenium-server.dev:4444/wd/hub"
+        browser_name: chrome
+</code></pre>
+
+<p>```</p>
+
+<h3>Feature and Scenarios</h3>
+
+<blockquote><p>How To Write Scenarios</p>
+
+<p>Focus on describing the problem you&rsquo;re trying to solve, rather than focusing on the &ldquo;how&rdquo; and the &ldquo;look&rdquo;. For example, don&rsquo;t mention anything about &ldquo;I click button x&rdquo; or &ldquo;I go page /path/to/page&rdquo; or &ldquo;I should see ABC on sidebar&rdquo; or &ldquo;I wait&rdquo; in your scenarios.</p>
+
+<p>Read more here: <a href="http://stakeholderwhisperer.com/posts/2014/10/introducing-modelling-by-example">Introducing Modelling by Example</a></p></blockquote>
+
+<p>```
+Feature: Product payment
+  In order to receive products
+  As a customer
+  I need to be able to pay for the products that I have selected</p>
+
+<p>  Scenario: Buying a product that is out of stock</p>
+
+<pre><code>Given I have put the product "Windows ME" in my basket a few days before
+And product "Window ME" is now out of stock
+Then I should not be able to checkout because "Window ME" is out of stock
+</code></pre>
+
+<p>  Scenario: Cannot buy if product is restricted in the account&rsquo;s country</p>
+
+<pre><code>Given I am located in a country that does not allow product "FooBar"
+Then I cannot purchase this product
+</code></pre>
+
+<p>```</p>
+
+<p>How I would implement the steps in the Domain Context class:</p>
+
+<p>```php</p>
+
+<pre><code>/**
+ * @Given I have put the product :product in my basket a few days before
+ */
+public function iHavePutTheProductInMyBasket($product)
+{
+    $this-&gt;product = factory(Product::class)-&gt;create(['name' =&gt; $product]);
+
+    $this-&gt;basket-&gt;put($this-&gt;product);
+}
+
+/**
+ * @Given product :product is now out of stock
+ */
+public function ProductIsOutOfStock($product)
+{
+    $this-&gt;product-&gt;count = 0;
+
+    $this-&gt;product-&gt;save();
+}
+
+/**
+ * @Then I should not be able to checkout because :product is out of stock
+ */
+public function iShouldNotBeAbleToCheckoutBecauseProductIsOutOfStock($product)
+{
+    $this-&gt;assertException(function () {
+        $this-&gt;basket-&gt;checkout();
+    }, ProductIsOutOfStock::class);
+}
+
+/**
+ * @Given I am located in a country that does not allow product :product
+ */
+public function iAmLocatedInACountryThatDoesNotAllowProduct($product)
+{
+    $this-&gt;currentUser = factory(User::class)-&gt;create();
+
+    $this-&gt;product = factory(Product::class)-&gt;create(['name' =&gt; $product]);
+
+    $this-&gt;currentUser-&gt;country-&gt;restricted_products()-&gt;sync([$this-&gt;product-&gt;id]);
+}
+
+/**
+ * @Then I cannot purchase this product
+ */
+public function iCannotPurchaseThisProduct()
+{
+    $this-&gt;currentUser-&gt;cannot('purchase', $this-&gt;product);
+}
+</code></pre>
+
+<p>```</p>
+
+<p>where the method <code>assertException</code> is a custom method:</p>
+
+<p>```php</p>
+
+<pre><code>/**
+ * @param Closure $closure
+ * @param string $exception
+ */
+protected function assertException(\Closure $closure, $exception)
+{
+    $fail = false;
+
+    try {
+        $closure();
+
+        $fail = true;
+    } catch (\Exception $e) {
+        if (!($e instanceof $exception)) {
+            $fail = true;
+        }
+    }
+
+    if ($fail) {
+        $this-&gt;fail("Expected $exception to be thrown");
+    }
+}
+</code></pre>
+
+<p>```</p>
+
+<p>and if you follow my <a href="http://baopham.github.io/blog/2016/04/03/modelling-with-behat-and-laravel/">previous post</a>, the <code>assertEquals</code> is forwarded to the <code>PHPUnit_Framework_Assert</code> class.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[A DynamoDb wrapper for Laravel model]]></title>

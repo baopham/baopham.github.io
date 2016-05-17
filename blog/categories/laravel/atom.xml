@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Laravel | :baopham]]></title>
   <link href="http://baopham.github.io/blog/categories/laravel/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-04-04T02:20:11-07:00</updated>
+  <updated>2016-05-17T01:52:48-07:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -12,6 +12,162 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Modelling with Behat and Laravel Examples]]></title>
+    <link href="http://baopham.github.io/blog/2016/05/17/modelling-with-behat-examples/"/>
+    <updated>2016-05-17T00:52:27-07:00</updated>
+    <id>http://baopham.github.io/blog/2016/05/17/modelling-with-behat-examples</id>
+    <content type="html"><![CDATA[<p>Follow up from my previous <a href="http://baopham.github.io/blog/2016/04/03/modelling-with-behat-and-laravel/">post</a>, here is a example feature (similar to the feature from the <a href="http://stakeholderwhisperer.com/posts/2014/10/introducing-modelling-by-example">original post</a>)</p>
+
+<h3>behat.yml</h3>
+
+<p>```
+default:</p>
+
+<pre><code>suites:
+  product_payment_domain:
+    contexts: [ ProductPaymentDomainContext ]
+    filters:  { tags: '@product_payment' }
+  product_payment_ui:
+    contexts: [ ProductPaymentUIContext ]
+    filters:  { tags: '@product_payment&amp;&amp;@critical' }
+gherkin:
+  filters:
+    tags: ~@wip
+extensions:
+    Laracasts\Behat:
+        #env_path: .env.behat
+    Behat\MinkExtension:
+        base_url: https://e-commerce.dev
+        default_session: laravel
+        laravel: ~
+        selenium2:
+          wd_host: "http://selenium-server.dev:4444/wd/hub"
+        browser_name: chrome
+</code></pre>
+
+<p>```</p>
+
+<h3>Feature and Scenarios</h3>
+
+<blockquote><p>How To Write Scenarios</p>
+
+<p>Focus on describing the problem you&rsquo;re trying to solve, rather than focusing on the &ldquo;how&rdquo; and the &ldquo;look&rdquo;. For example, don&rsquo;t mention anything about &ldquo;I click button x&rdquo; or &ldquo;I go page /path/to/page&rdquo; or &ldquo;I should see ABC on sidebar&rdquo; or &ldquo;I wait&rdquo; in your scenarios.</p>
+
+<p>Read more here: <a href="http://stakeholderwhisperer.com/posts/2014/10/introducing-modelling-by-example">Introducing Modelling by Example</a></p></blockquote>
+
+<p>```
+Feature: Product payment
+  In order to receive products
+  As a customer
+  I need to be able to pay for the products that I have selected</p>
+
+<p>  Scenario: Buying a product that is out of stock</p>
+
+<pre><code>Given I have put the product "Windows ME" in my basket a few days before
+And product "Window ME" is now out of stock
+Then I should not be able to checkout because "Window ME" is out of stock
+</code></pre>
+
+<p>  Scenario: Cannot buy if product is restricted in the account&rsquo;s country</p>
+
+<pre><code>Given I am located in a country that does not allow product "FooBar"
+Then I cannot purchase this product
+</code></pre>
+
+<p>```</p>
+
+<p>How I would implement the steps in the Domain Context class:</p>
+
+<p>```php</p>
+
+<pre><code>/**
+ * @Given I have put the product :product in my basket a few days before
+ */
+public function iHavePutTheProductInMyBasket($product)
+{
+    $this-&gt;product = factory(Product::class)-&gt;create(['name' =&gt; $product]);
+
+    $this-&gt;basket-&gt;put($this-&gt;product);
+}
+
+/**
+ * @Given product :product is now out of stock
+ */
+public function ProductIsOutOfStock($product)
+{
+    $this-&gt;product-&gt;count = 0;
+
+    $this-&gt;product-&gt;save();
+}
+
+/**
+ * @Then I should not be able to checkout because :product is out of stock
+ */
+public function iShouldNotBeAbleToCheckoutBecauseProductIsOutOfStock($product)
+{
+    $this-&gt;assertException(function () {
+        $this-&gt;basket-&gt;checkout();
+    }, ProductIsOutOfStock::class);
+}
+
+/**
+ * @Given I am located in a country that does not allow product :product
+ */
+public function iAmLocatedInACountryThatDoesNotAllowProduct($product)
+{
+    $this-&gt;currentUser = factory(User::class)-&gt;create();
+
+    $this-&gt;product = factory(Product::class)-&gt;create(['name' =&gt; $product]);
+
+    $this-&gt;currentUser-&gt;country-&gt;restricted_products()-&gt;sync([$this-&gt;product-&gt;id]);
+}
+
+/**
+ * @Then I cannot purchase this product
+ */
+public function iCannotPurchaseThisProduct()
+{
+    $this-&gt;currentUser-&gt;cannot('purchase', $this-&gt;product);
+}
+</code></pre>
+
+<p>```</p>
+
+<p>where the method <code>assertException</code> is a custom method:</p>
+
+<p>```php</p>
+
+<pre><code>/**
+ * @param Closure $closure
+ * @param string $exception
+ */
+protected function assertException(\Closure $closure, $exception)
+{
+    $fail = false;
+
+    try {
+        $closure();
+
+        $fail = true;
+    } catch (\Exception $e) {
+        if (!($e instanceof $exception)) {
+            $fail = true;
+        }
+    }
+
+    if ($fail) {
+        $this-&gt;fail("Expected $exception to be thrown");
+    }
+}
+</code></pre>
+
+<p>```</p>
+
+<p>and if you follow my <a href="http://baopham.github.io/blog/2016/04/03/modelling-with-behat-and-laravel/">previous post</a>, the <code>assertEquals</code> is forwarded to the <code>PHPUnit_Framework_Assert</code> class.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Modelling with Behat and Laravel]]></title>
@@ -84,11 +240,11 @@ $this->be($user);</p>
 
 <p>$this->get(&lsquo;users&rsquo;);</p>
 
-<p>$this->post(&lsquo;users&rsquo;, [&lsquo;_token&rsquo; =>  csrf_token(), &lsquo;email&rsquo; => &lsquo;<a href="&#x6d;&#x61;&#105;&#x6c;&#116;&#111;&#x3a;&#102;&#111;&#x6f;&#x40;&#98;&#x61;&#114;&#46;&#99;&#x6f;&#109;">&#102;&#x6f;&#111;&#x40;&#98;&#x61;&#114;&#x2e;&#99;&#111;&#x6d;</a>&rsquo;]);</p>
+<p>$this->post(&lsquo;users&rsquo;, [&lsquo;_token&rsquo; =>  csrf_token(), &lsquo;email&rsquo; => &lsquo;<a href="&#x6d;&#97;&#x69;&#108;&#x74;&#x6f;&#58;&#x66;&#111;&#111;&#x40;&#98;&#97;&#x72;&#46;&#x63;&#111;&#x6d;">&#x66;&#x6f;&#x6f;&#x40;&#98;&#x61;&#114;&#46;&#99;&#x6f;&#x6d;</a>&rsquo;]);</p>
 
 <p>$this->expectsJobs(SendInvitationEmail::class);</p>
 
-<p>$this->seeInDatabase(&lsquo;users&rsquo;, [&lsquo;email&rsquo; => &lsquo;<a href="&#x6d;&#97;&#105;&#108;&#x74;&#111;&#58;&#x66;&#x6f;&#111;&#x40;&#98;&#x61;&#114;&#x2e;&#99;&#111;&#109;">&#x66;&#111;&#111;&#64;&#x62;&#x61;&#114;&#46;&#x63;&#x6f;&#109;</a>&rsquo;]);
+<p>$this->seeInDatabase(&lsquo;users&rsquo;, [&lsquo;email&rsquo; => &lsquo;<a href="&#109;&#97;&#105;&#108;&#x74;&#111;&#58;&#102;&#111;&#x6f;&#64;&#x62;&#97;&#x72;&#x2e;&#99;&#x6f;&#109;">&#102;&#111;&#x6f;&#x40;&#x62;&#97;&#x72;&#46;&#99;&#111;&#109;</a>&rsquo;]);
 ```</p>
 ]]></content>
   </entry>
@@ -420,155 +576,6 @@ $this-&gt;info('Files older than 3 hours have been cleaned up.');
 <p><code>
 * * * * * php /home/vagrant/projects/CRT/artisan schedule:run 1&gt;&gt; /dev/null 2&gt;&amp;1
 </code></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Laravel - Merge Flowjs chunks directly to S3]]></title>
-    <link href="http://baopham.github.io/blog/2015/03/16/laravel-merge-flowjs-chunks-directly-to-s3/"/>
-    <updated>2015-03-16T23:02:03-07:00</updated>
-    <id>http://baopham.github.io/blog/2015/03/16/laravel-merge-flowjs-chunks-directly-to-s3</id>
-    <content type="html"><![CDATA[<p><strong>Motivation</strong>: <a href="http://laravel.com/docs/5.0/filesystem">Laravel 5</a> now has support for Cloud storage.</p>
-
-<p><strong>Problem</strong>: <a href="https://github.com/flowjs/flow.js">Flowjs</a> library allows files to be uploaded in chunks making it possible to upload large files but by default it <a href="https://github.com/flowjs/flow-php-server/blob/84c928090c060238d15e89dd7e252acf8eff1140/src/Flow/File.php#L147">saves the final file to local storage</a>.</p>
-
-<p>We could extend this class so that it uses <a href="http://docs.aws.amazon.com/aws-sdk-php/guide/latest/feature-s3-stream-wrapper.html">S3 Stream Wrapper</a>:</p>
-
-<p>```php
-&lt;?php namespace Bao\Flow;</p>
-
-<p>use Flow\ConfigInterface;
-use Flow\RequestInterface;
-use Flow\FileOpenException;
-use Flow\FileLockException;</p>
-
-<p>use Illuminate\Support\Facades\Storage;
-use League\Flysystem\FilesystemInterface;</p>
-
-<p>use Aws\S3\S3Client;</p>
-
-<p>use Exception;</p>
-
-<p>class File extends \Flow\File {</p>
-
-<pre><code>/**
- * @var \Flow\RequestInterface
- */
-private $request;
-
-/**
- * @var \Flow\ConfigInterface
- */
-private $config;
-
-/**
- * @var \Aws\S3\S3Client
- */
-private $s3Client;
-
-public function __construct(ConfigInterface $config, RequestInterface $request = null, S3Client $s3Client = null)
-{
-    parent::__construct($config, $request);
-    $this-&gt;config = $config;
-    $this-&gt;request = $request;
-    $this-&gt;s3Client = $s3Client;
-}
-
-/**
- * Merge all chunks to single file
- *
- * @param string $destination final file location
- *
- * @throws FileLockException
- * @throws FileOpenException
- * @throws \Exception
- *
- * @return bool indicates if file was saved
- */
-public function save($destination)
-{
-    $toS3 = !empty($this-&gt;s3Client);
-    $local = !$toS3;
-
-    if ($toS3 &amp;&amp; !starts_with($destination, 's3://'))
-    {
-        // @see http://docs.aws.amazon.com/aws-sdk-php/guide/latest/feature-s3-stream-wrapper.html
-        throw new Exception('Not a valid S3 protocol');
-    }
-
-    if ($toS3)
-    {
-        $this-&gt;s3Client-&gt;registerStreamWrapper();
-    }
-
-    $fh = fopen($destination, 'w');
-    if (!$fh)
-    {
-        throw new FileOpenException('failed to open destination file: ' . $destination);
-    }
-
-    if ($local &amp;&amp; !flock($fh, LOCK_EX | LOCK_NB, $blocked)) {
-        // @codeCoverageIgnoreStart
-        if ($blocked)
-        {
-            // Concurrent request has requested a lock.
-            // File is being processed at the moment.
-            // Warning: lock is not checked in windows.
-            return false;
-        }
-        // @codeCoverageIgnoreEnd
-
-        throw new FileLockException('failed to lock file: ' . $destination);
-    }
-
-    $totalChunks = $this-&gt;request-&gt;getTotalChunks();
-
-    try
-    {
-        $preProcessChunk = $this-&gt;config-&gt;getPreprocessCallback();
-
-        for ($i = 1; $i &lt;= $totalChunks; $i++)
-        {
-            $file = $this-&gt;getChunkPath($i);
-            $chunk = fopen($file, "rb");
-
-            if (!$chunk)
-            {
-                throw new FileOpenException('failed to open chunk: ' . $file);
-            }
-
-            if ($preProcessChunk !== null)
-            {
-                call_user_func($preProcessChunk, $chunk);
-            }
-
-            stream_copy_to_stream($chunk, $fh);
-            fclose($chunk);
-        }
-    }
-    catch (\Exception $e)
-    {
-        if ($local) flock($fh, LOCK_UN);
-
-        fclose($fh);
-        throw $e;
-    }
-
-    if ($this-&gt;config-&gt;getDeleteChunksOnSave())
-    {
-        $this-&gt;deleteChunks();
-    }
-
-    if ($local) flock($fh, LOCK_UN);
-
-    fclose($fh);
-
-    return true;
-}
-</code></pre>
-
-<p>}
-```</p>
 ]]></content>
   </entry>
   
