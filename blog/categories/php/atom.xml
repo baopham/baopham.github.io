@@ -4,7 +4,7 @@
   <title><![CDATA[Category: PHP | :baopham]]></title>
   <link href="http://baopham.github.io/blog/categories/php/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-05-17T01:52:48-07:00</updated>
+  <updated>2016-07-03T18:38:41-07:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -12,6 +12,95 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Tree Parser]]></title>
+    <link href="http://baopham.github.io/blog/2016/07/03/tree-parser/"/>
+    <updated>2016-07-03T18:30:34-07:00</updated>
+    <id>http://baopham.github.io/blog/2016/07/03/tree-parser</id>
+    <content type="html"><![CDATA[<p>I just wrote a PHP library <a href="https://github.com/baopham/php-tree-parser">baopham/tree-parser</a> to parse a specific tree content to PHP objects.</p>
+
+<p>This library can parse this tree content:</p>
+
+<p>```
+   Root</p>
+
+<pre><code>|- Level 1 - Order 1
+  |- Level 2 - Order 2
+    |- Level 3 - Order 3
+    |- Level 3 - Order 4
+  |- Level 2 - Order 5
+|- Level 1 - Order 6
+  |- Level 2 - Order 7
+    |- Level 3 - Order 8
+      |- Level 4 - Order 9
+</code></pre>
+
+<p>```</p>
+
+<p>into this:</p>
+
+<p>```php</p>
+
+<p>foreach ($root->children as $child) {</p>
+
+<pre><code>print $child-&gt;name;
+
+print $child-&gt;order;
+
+print $child-&gt;level;
+
+print_r($child-&gt;children);
+
+print_r($child-&gt;children[0]-&gt;children);
+
+print $child-&gt;children[0]-&gt;parent === $child;
+</code></pre>
+
+<p>}</p>
+
+<p>print $root->isRoot</p>
+
+<p>// assuming we got the $lastLeaf after done traversing down.
+print $lastLeaf->parent->parent->parent->parent === $root
+```</p>
+
+<h3>Advanced</h3>
+
+<p>```php
+$tree = &lt;&lt;&lt;TREE
+  Root</p>
+
+<pre><code>|- Level 1 - Order 1
+  |- Level 2 - Order 2
+    |- Level 3 - Order 3
+    |- Level 3 - Order 4
+  |- Level 2 - Order 5
+|- Level 1 - Order 6
+  |- Level 2 - Order 7
+    |- Level 3 - Order 8
+      |- Level 4 - Order 9
+</code></pre>
+
+<p>TREE;</p>
+
+<p>$parser = new BaoPham\TreeParser($tree);</p>
+
+<p>$parser->parse();</p>
+
+<p>$structure = $parser->getStructure();</p>
+
+<p>// Get nodes at level 3
+$level3Nodes = $structure[3];
+// Get node at level 3, order 4
+$node = $structure[3][4];</p>
+
+<p>// Get last leaf
+$orderedNodes = $parser->getOrderedNodes();
+$lastLeaf = $orderedNodes[count($orderedNodes) &ndash; 1];
+```</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Modelling with Behat and Laravel Examples]]></title>
@@ -496,155 +585,6 @@ $this-&gt;info('Files older than 3 hours have been cleaned up.');
 <p><code>
 * * * * * php /home/vagrant/projects/CRT/artisan schedule:run 1&gt;&gt; /dev/null 2&gt;&amp;1
 </code></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Laravel - Merge Flowjs chunks directly to S3]]></title>
-    <link href="http://baopham.github.io/blog/2015/03/16/laravel-merge-flowjs-chunks-directly-to-s3/"/>
-    <updated>2015-03-16T23:02:03-07:00</updated>
-    <id>http://baopham.github.io/blog/2015/03/16/laravel-merge-flowjs-chunks-directly-to-s3</id>
-    <content type="html"><![CDATA[<p><strong>Motivation</strong>: <a href="http://laravel.com/docs/5.0/filesystem">Laravel 5</a> now has support for Cloud storage.</p>
-
-<p><strong>Problem</strong>: <a href="https://github.com/flowjs/flow.js">Flowjs</a> library allows files to be uploaded in chunks making it possible to upload large files but by default it <a href="https://github.com/flowjs/flow-php-server/blob/84c928090c060238d15e89dd7e252acf8eff1140/src/Flow/File.php#L147">saves the final file to local storage</a>.</p>
-
-<p>We could extend this class so that it uses <a href="http://docs.aws.amazon.com/aws-sdk-php/guide/latest/feature-s3-stream-wrapper.html">S3 Stream Wrapper</a>:</p>
-
-<p>```php
-&lt;?php namespace Bao\Flow;</p>
-
-<p>use Flow\ConfigInterface;
-use Flow\RequestInterface;
-use Flow\FileOpenException;
-use Flow\FileLockException;</p>
-
-<p>use Illuminate\Support\Facades\Storage;
-use League\Flysystem\FilesystemInterface;</p>
-
-<p>use Aws\S3\S3Client;</p>
-
-<p>use Exception;</p>
-
-<p>class File extends \Flow\File {</p>
-
-<pre><code>/**
- * @var \Flow\RequestInterface
- */
-private $request;
-
-/**
- * @var \Flow\ConfigInterface
- */
-private $config;
-
-/**
- * @var \Aws\S3\S3Client
- */
-private $s3Client;
-
-public function __construct(ConfigInterface $config, RequestInterface $request = null, S3Client $s3Client = null)
-{
-    parent::__construct($config, $request);
-    $this-&gt;config = $config;
-    $this-&gt;request = $request;
-    $this-&gt;s3Client = $s3Client;
-}
-
-/**
- * Merge all chunks to single file
- *
- * @param string $destination final file location
- *
- * @throws FileLockException
- * @throws FileOpenException
- * @throws \Exception
- *
- * @return bool indicates if file was saved
- */
-public function save($destination)
-{
-    $toS3 = !empty($this-&gt;s3Client);
-    $local = !$toS3;
-
-    if ($toS3 &amp;&amp; !starts_with($destination, 's3://'))
-    {
-        // @see http://docs.aws.amazon.com/aws-sdk-php/guide/latest/feature-s3-stream-wrapper.html
-        throw new Exception('Not a valid S3 protocol');
-    }
-
-    if ($toS3)
-    {
-        $this-&gt;s3Client-&gt;registerStreamWrapper();
-    }
-
-    $fh = fopen($destination, 'w');
-    if (!$fh)
-    {
-        throw new FileOpenException('failed to open destination file: ' . $destination);
-    }
-
-    if ($local &amp;&amp; !flock($fh, LOCK_EX | LOCK_NB, $blocked)) {
-        // @codeCoverageIgnoreStart
-        if ($blocked)
-        {
-            // Concurrent request has requested a lock.
-            // File is being processed at the moment.
-            // Warning: lock is not checked in windows.
-            return false;
-        }
-        // @codeCoverageIgnoreEnd
-
-        throw new FileLockException('failed to lock file: ' . $destination);
-    }
-
-    $totalChunks = $this-&gt;request-&gt;getTotalChunks();
-
-    try
-    {
-        $preProcessChunk = $this-&gt;config-&gt;getPreprocessCallback();
-
-        for ($i = 1; $i &lt;= $totalChunks; $i++)
-        {
-            $file = $this-&gt;getChunkPath($i);
-            $chunk = fopen($file, "rb");
-
-            if (!$chunk)
-            {
-                throw new FileOpenException('failed to open chunk: ' . $file);
-            }
-
-            if ($preProcessChunk !== null)
-            {
-                call_user_func($preProcessChunk, $chunk);
-            }
-
-            stream_copy_to_stream($chunk, $fh);
-            fclose($chunk);
-        }
-    }
-    catch (\Exception $e)
-    {
-        if ($local) flock($fh, LOCK_UN);
-
-        fclose($fh);
-        throw $e;
-    }
-
-    if ($this-&gt;config-&gt;getDeleteChunksOnSave())
-    {
-        $this-&gt;deleteChunks();
-    }
-
-    if ($local) flock($fh, LOCK_UN);
-
-    fclose($fh);
-
-    return true;
-}
-</code></pre>
-
-<p>}
-```</p>
 ]]></content>
   </entry>
   

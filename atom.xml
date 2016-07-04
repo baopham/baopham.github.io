@@ -4,7 +4,7 @@
   <title><![CDATA[:baopham]]></title>
   <link href="http://baopham.github.io/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-05-17T01:52:48-07:00</updated>
+  <updated>2016-07-03T18:38:41-07:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -12,6 +12,139 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Tree Parser]]></title>
+    <link href="http://baopham.github.io/blog/2016/07/03/tree-parser/"/>
+    <updated>2016-07-03T18:30:34-07:00</updated>
+    <id>http://baopham.github.io/blog/2016/07/03/tree-parser</id>
+    <content type="html"><![CDATA[<p>I just wrote a PHP library <a href="https://github.com/baopham/php-tree-parser">baopham/tree-parser</a> to parse a specific tree content to PHP objects.</p>
+
+<p>This library can parse this tree content:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>   Root
+</span><span class='line'>    |- Level 1 - Order 1
+</span><span class='line'>      |- Level 2 - Order 2
+</span><span class='line'>        |- Level 3 - Order 3
+</span><span class='line'>        |- Level 3 - Order 4
+</span><span class='line'>      |- Level 2 - Order 5
+</span><span class='line'>    |- Level 1 - Order 6
+</span><span class='line'>      |- Level 2 - Order 7
+</span><span class='line'>        |- Level 3 - Order 8
+</span><span class='line'>          |- Level 4 - Order 9</span></code></pre></td></tr></table></div></figure>
+
+
+<p>into this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">foreach</span> <span class="p">(</span><span class="nv">$root</span><span class="o">-&gt;</span><span class="na">children</span> <span class="k">as</span> <span class="nv">$child</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">print</span> <span class="nv">$child</span><span class="o">-&gt;</span><span class="na">name</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">print</span> <span class="nv">$child</span><span class="o">-&gt;</span><span class="na">order</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">print</span> <span class="nv">$child</span><span class="o">-&gt;</span><span class="na">level</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nb">print_r</span><span class="p">(</span><span class="nv">$child</span><span class="o">-&gt;</span><span class="na">children</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nb">print_r</span><span class="p">(</span><span class="nv">$child</span><span class="o">-&gt;</span><span class="na">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-&gt;</span><span class="na">children</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">print</span> <span class="nv">$child</span><span class="o">-&gt;</span><span class="na">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-&gt;</span><span class="na">parent</span> <span class="o">===</span> <span class="nv">$child</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">print</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="na">isRoot</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// assuming we got the $lastLeaf after done traversing down.</span>
+</span><span class='line'><span class="k">print</span> <span class="nv">$lastLeaf</span><span class="o">-&gt;</span><span class="na">parent</span><span class="o">-&gt;</span><span class="na">parent</span><span class="o">-&gt;</span><span class="na">parent</span><span class="o">-&gt;</span><span class="na">parent</span> <span class="o">===</span> <span class="nv">$root</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Advanced</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$tree</span> <span class="o">=</span> <span class="s">&lt;&lt;&lt;TREE</span>
+</span><span class='line'><span class="s">  Root</span>
+</span><span class='line'><span class="s">    |- Level 1 - Order 1</span>
+</span><span class='line'><span class="s">      |- Level 2 - Order 2</span>
+</span><span class='line'><span class="s">        |- Level 3 - Order 3</span>
+</span><span class='line'><span class="s">        |- Level 3 - Order 4</span>
+</span><span class='line'><span class="s">      |- Level 2 - Order 5</span>
+</span><span class='line'><span class="s">    |- Level 1 - Order 6</span>
+</span><span class='line'><span class="s">      |- Level 2 - Order 7</span>
+</span><span class='line'><span class="s">        |- Level 3 - Order 8</span>
+</span><span class='line'><span class="s">          |- Level 4 - Order 9</span>
+</span><span class='line'><span class="s">TREE;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$parser</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">BaoPham\TreeParser</span><span class="p">(</span><span class="nv">$tree</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$parser</span><span class="o">-&gt;</span><span class="na">parse</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$structure</span> <span class="o">=</span> <span class="nv">$parser</span><span class="o">-&gt;</span><span class="na">getStructure</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Get nodes at level 3</span>
+</span><span class='line'><span class="nv">$level3Nodes</span> <span class="o">=</span> <span class="nv">$structure</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+</span><span class='line'><span class="c1">// Get node at level 3, order 4</span>
+</span><span class='line'><span class="nv">$node</span> <span class="o">=</span> <span class="nv">$structure</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">4</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Get last leaf</span>
+</span><span class='line'><span class="nv">$orderedNodes</span> <span class="o">=</span> <span class="nv">$parser</span><span class="o">-&gt;</span><span class="na">getOrderedNodes</span><span class="p">();</span>
+</span><span class='line'><span class="nv">$lastLeaf</span> <span class="o">=</span> <span class="nv">$orderedNodes</span><span class="p">[</span><span class="nb">count</span><span class="p">(</span><span class="nv">$orderedNodes</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Modelling With Behat and Laravel Examples]]></title>
