@@ -4,7 +4,7 @@
   <title><![CDATA[:baopham]]></title>
   <link href="http://baopham.github.io/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-07-03T18:38:41-07:00</updated>
+  <updated>2016-07-15T20:11:49-07:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -12,6 +12,79 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[204 No Content]]></title>
+    <link href="http://baopham.github.io/blog/2016/07/15/204-no-content/"/>
+    <updated>2016-07-15T19:56:11-07:00</updated>
+    <id>http://baopham.github.io/blog/2016/07/15/204-no-content</id>
+    <content type="html"><![CDATA[<p>Response codes such ass 200, 404, 500 are very common response codes. Each code has their own meanings and so of course make sure you use them correctly.</p>
+
+<p>I just discovered a case where our API wasn&rsquo;t returning a JSON and the Mule app started to throw exception when it called the API.</p>
+
+<p>What happens is:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">return</span> <span class="nx">Response</span><span class="o">::</span><span class="na">json</span><span class="p">([</span><span class="s1">&#39;data&#39;</span> <span class="o">=&gt;</span> <span class="p">[],</span> <span class="s1">&#39;message&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Uh oh&#39;</span><span class="p">],</span> <span class="mi">204</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>is considered as an empty response due to <a href="https://github.com/symfony/symfony/blob/c53cb57b9ddb0e97c3596772d4b4a66c0db14091/src/Symfony/Component/HttpFoundation/Response.php#L267-L270">Symfony\Component\HttpFoundation\Response</a> treating code 204 as empty</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">public</span> <span class="k">function</span> <span class="nf">prepare</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nv">$headers</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">headers</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">isInformational</span><span class="p">()</span> <span class="o">||</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">isEmpty</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setContent</span><span class="p">(</span><span class="k">null</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$headers</span><span class="o">-&gt;</span><span class="na">remove</span><span class="p">(</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$headers</span><span class="o">-&gt;</span><span class="na">remove</span><span class="p">(</span><span class="s1">&#39;Content-Length&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="c1">//....</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//....</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//...</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">/**</span>
+</span><span class='line'><span class="sd"> * Is the response empty?</span>
+</span><span class='line'><span class="sd"> *</span>
+</span><span class='line'><span class="sd"> * @return bool</span>
+</span><span class='line'><span class="sd"> */</span>
+</span><span class='line'><span class="k">public</span> <span class="k">function</span> <span class="nf">isEmpty</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nb">in_array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">statusCode</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="mi">204</span><span class="p">,</span> <span class="mi">304</span><span class="p">));</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Tree Parser]]></title>

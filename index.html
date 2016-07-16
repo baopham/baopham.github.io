@@ -181,6 +181,110 @@
 
 
 
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2016-07-15T19:56:11-07:00" pubdate data-updated="true">Jul 15<span>th</span>, 2016</time>
+        
+           | <a href="/blog/2016/07/15/204-no-content/#disqus_thread"
+             data-disqus-identifier="http://baopham.github.io/blog/2016/07/15/204-no-content/">Comments</a>
+        
+      </p>
+    
+    
+      <h1 class="entry-title"><a href="/blog/2016/07/15/204-no-content/">204 No Content</a></h1>
+    
+  </header>
+
+
+  <div class="entry-content clearfix"><p>Response codes such ass 200, 404, 500 are very common response codes. Each code has their own meanings and so of course make sure you use them correctly.</p>
+
+<p>I just discovered a case where our API wasn&rsquo;t returning a JSON and the Mule app started to throw exception when it called the API.</p>
+
+<p>What happens is:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">return</span> <span class="nx">Response</span><span class="o">::</span><span class="na">json</span><span class="p">([</span><span class="s1">&#39;data&#39;</span> <span class="o">=&gt;</span> <span class="p">[],</span> <span class="s1">&#39;message&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Uh oh&#39;</span><span class="p">],</span> <span class="mi">204</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>is considered as an empty response due to <a href="https://github.com/symfony/symfony/blob/c53cb57b9ddb0e97c3596772d4b4a66c0db14091/src/Symfony/Component/HttpFoundation/Response.php#L267-L270">Symfony\Component\HttpFoundation\Response</a> treating code 204 as empty</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">public</span> <span class="k">function</span> <span class="nf">prepare</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nv">$headers</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">headers</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">isInformational</span><span class="p">()</span> <span class="o">||</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">isEmpty</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setContent</span><span class="p">(</span><span class="k">null</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$headers</span><span class="o">-&gt;</span><span class="na">remove</span><span class="p">(</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$headers</span><span class="o">-&gt;</span><span class="na">remove</span><span class="p">(</span><span class="s1">&#39;Content-Length&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="c1">//....</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//....</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//...</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">/**</span>
+</span><span class='line'><span class="sd"> * Is the response empty?</span>
+</span><span class='line'><span class="sd"> *</span>
+</span><span class='line'><span class="sd"> * @return bool</span>
+</span><span class='line'><span class="sd"> */</span>
+</span><span class='line'><span class="k">public</span> <span class="k">function</span> <span class="nf">isEmpty</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nb">in_array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">statusCode</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="mi">204</span><span class="p">,</span> <span class="mi">304</span><span class="p">));</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+        </article>
+      
+      
+        <article class="post">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
 <span class="glyphicon glyphicon-calendar"></span> <time datetime="2016-07-03T18:30:34-07:00" pubdate data-updated="true">Jul 3<span>rd</span>, 2016</time>
         
            | <a href="/blog/2016/07/03/tree-parser/#disqus_thread"
@@ -1559,51 +1663,6 @@
 
         </article>
       
-      
-        <article class="post">
-          
-  <header class="page-header">
-    
-      <p class="meta text-muted text-uppercase">
-        
-
-
-
-
-
-
-
-
-
-
-
-
-<span class="glyphicon glyphicon-calendar"></span> <time datetime="2014-05-29T21:30:24-07:00" pubdate data-updated="true">May 29<span>th</span>, 2014</time>
-        
-           | <a href="/blog/2014/05/29/a-command-line-interface-for-vundle/#disqus_thread"
-             data-disqus-identifier="http://baopham.github.io/blog/2014/05/29/a-command-line-interface-for-vundle/">Comments</a>
-        
-      </p>
-    
-    
-      <h1 class="entry-title"><a href="/blog/2014/05/29/a-command-line-interface-for-vundle/">A Command Line Interface for Vundle</a></h1>
-    
-  </header>
-
-
-  <div class="entry-content clearfix"><p>I&rsquo;m a die hard fan of Vim and sometimes can be obsessed with trying out new plugins. I really like <a href="https://github.com/gmarik/Vundle.vim">Vundle</a> &ndash; a Vim plugin manager that simplifies plugin installation. I recently reorganized my <a href="https://github.com/baopham/vim/blob/master/vimrc">.vimrc</a> so that it&rsquo;s easier to keep track of my plugin configurations. My <a href="https://github.com/baopham/vim">.vim</a> folder now has a sub directory <code>settings</code> that contains different files for each plugin configuration:</p>
-
-</div>
-  
-  
-    <footer>
-      <a class="btn btn-default" rel="full-article" href="/blog/2014/05/29/a-command-line-interface-for-vundle/">Read on &rarr;</a>
-    </footer>
-  
-
-
-        </article>
-      
     </div>
 
     <ul class="pager">
@@ -1663,6 +1722,8 @@
   
   <div id="recent_posts" class="list-group">
     
+    <a class="list-group-item " href="/blog/2016/07/15/204-no-content/">204 No Content</a>
+    
     <a class="list-group-item " href="/blog/2016/07/03/tree-parser/">Tree Parser</a>
     
     <a class="list-group-item " href="/blog/2016/05/17/modelling-with-behat-examples/">Modelling With Behat and Laravel Examples</a>
@@ -1671,8 +1732,6 @@
     
     <a class="list-group-item " href="/blog/2016/04/03/behat-selenium-and-virtualbox/">Behat, Selenium and VirtualBox</a>
     
-    <a class="list-group-item " href="/blog/2016/02/12/aws-cloudformation-reusable-variables/">AWS CloudFormation Reusable Variables</a>
-    
   </div>
 </section>
 <section class="panel panel-default">
@@ -1680,7 +1739,7 @@
     <h3 class="panel-title">Tag Cloud</h3>
   </div>
   <div class="panel-body">
-    <span id="tag-cloud"><a class='text-primary' href='/blog/categories/angularjs' style='font-size: 110.0%;'>Angularjs</a> <a class='text-primary' href='/blog/categories/aws' style='font-size: 110.0%;'>AWS</a> <a class='text-danger' href='/blog/categories/behat' style='font-size: 130.0%;'>Behat</a> <a class='text-primary' href='/blog/categories/cloudformation' style='font-size: 110.0%;'>CloudFormation</a> <a class='text-primary' href='/blog/categories/dynamodb' style='font-size: 110.0%;'>DynamoDb</a> <a class='text-primary' href='/blog/categories/flowjs' style='font-size: 110.0%;'>Flowjs</a> <a class='text-success' href='/blog/categories/github' style='font-size: 120.0%;'>Github</a> <a class='text-success' href='/blog/categories/html5' style='font-size: 120.0%;'>HTML5</a> <a class='text-danger' href='/blog/categories/javascript' style='font-size: 150.0%;'>JavaScript</a> <a class='text-primary' href='/blog/categories/knockout-js' style='font-size: 110.0%;'>Knockout.js</a> <a class='text-danger' href='/blog/categories/laravel' style='font-size: 160.0%;'>Laravel</a> <a class='text-success' href='/blog/categories/math' style='font-size: 120.0%;'>Math</a> <a class='text-primary' href='/blog/categories/node-js' style='font-size: 110.0%;'>Node.js</a> <a class='text-danger' href='/blog/categories/php' style='font-size: 160.0%;'>PHP</a> <a class='text-primary' href='/blog/categories/python' style='font-size: 110.0%;'>Python</a> <a class='text-success' href='/blog/categories/ruby' style='font-size: 120.0%;'>Ruby</a> <a class='text-danger' href='/blog/categories/s3' style='font-size: 130.0%;'>S3</a> <a class='text-primary' href='/blog/categories/selenium' style='font-size: 110.0%;'>Selenium</a> <a class='text-primary' href='/blog/categories/semantic-ui' style='font-size: 110.0%;'>Semantic-UI</a> <a class='text-primary' href='/blog/categories/vim' style='font-size: 110.0%;'>Vim</a> <a class='text-primary' href='/blog/categories/virtualbox' style='font-size: 110.0%;'>VirtualBox</a> <a class='text-success' href='/blog/categories/web-development' style='font-size: 120.0%;'>Web Development</a> </span>
+    <span id="tag-cloud"><a class='text-primary' href='/blog/categories/angularjs' style='font-size: 110.0%;'>Angularjs</a> <a class='text-primary' href='/blog/categories/aws' style='font-size: 110.0%;'>AWS</a> <a class='text-danger' href='/blog/categories/behat' style='font-size: 130.0%;'>Behat</a> <a class='text-primary' href='/blog/categories/cloudformation' style='font-size: 110.0%;'>CloudFormation</a> <a class='text-primary' href='/blog/categories/dynamodb' style='font-size: 110.0%;'>DynamoDb</a> <a class='text-primary' href='/blog/categories/flowjs' style='font-size: 110.0%;'>Flowjs</a> <a class='text-success' href='/blog/categories/github' style='font-size: 120.0%;'>Github</a> <a class='text-success' href='/blog/categories/html5' style='font-size: 120.0%;'>HTML5</a> <a class='text-danger' href='/blog/categories/javascript' style='font-size: 150.0%;'>JavaScript</a> <a class='text-primary' href='/blog/categories/knockout-js' style='font-size: 110.0%;'>Knockout.js</a> <a class='text-danger' href='/blog/categories/laravel' style='font-size: 160.0%;'>Laravel</a> <a class='text-primary' href='/blog/categories/laravel-' style='font-size: 110.0%;'>Laravel,</a> <a class='text-success' href='/blog/categories/math' style='font-size: 120.0%;'>Math</a> <a class='text-primary' href='/blog/categories/node-js' style='font-size: 110.0%;'>Node.js</a> <a class='text-danger' href='/blog/categories/php' style='font-size: 160.0%;'>PHP</a> <a class='text-primary' href='/blog/categories/php-' style='font-size: 110.0%;'>PHP,</a> <a class='text-primary' href='/blog/categories/python' style='font-size: 110.0%;'>Python</a> <a class='text-success' href='/blog/categories/ruby' style='font-size: 120.0%;'>Ruby</a> <a class='text-danger' href='/blog/categories/s3' style='font-size: 130.0%;'>S3</a> <a class='text-primary' href='/blog/categories/selenium' style='font-size: 110.0%;'>Selenium</a> <a class='text-primary' href='/blog/categories/semantic-ui' style='font-size: 110.0%;'>Semantic-UI</a> <a class='text-primary' href='/blog/categories/symfony' style='font-size: 110.0%;'>Symfony</a> <a class='text-primary' href='/blog/categories/vim' style='font-size: 110.0%;'>Vim</a> <a class='text-primary' href='/blog/categories/virtualbox' style='font-size: 110.0%;'>VirtualBox</a> <a class='text-success' href='/blog/categories/web-development' style='font-size: 120.0%;'>Web Development</a> </span>
   </div>
 </section>
 

@@ -4,7 +4,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Tree Parser - :baopham</title>
+  <title>204 No Content - :baopham</title>
   <meta name="author" content="Bao Pham">
 
   
@@ -16,7 +16,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://baopham.github.io/blog/2016/07/03/tree-parser">
+  <link rel="canonical" href="http://baopham.github.io/blog/2016/07/15/204-no-content">
   <link href="/favicon.png" type="image/png" rel="icon">
   <link href="/atom.xml" rel="alternate" title=":baopham" type="application/atom+xml">
 
@@ -177,7 +177,7 @@
 
 
 
-<span class="glyphicon glyphicon-calendar"></span> <time datetime="2016-07-03T18:30:34-07:00" pubdate data-updated="true">Jul 3<span>rd</span>, 2016</time>
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2016-07-15T19:56:11-07:00" pubdate data-updated="true">Jul 15<span>th</span>, 2016</time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://baopham.github.io">Comments</a>
@@ -186,81 +186,25 @@
     
     
     <h1 class="entry-title">
-      Tree Parser
+      204 No Content
       
     </h1>
     
   </header>
 
 
-  <div class="entry-content clearfix"><p>I just wrote a PHP library <a href="https://github.com/baopham/php-tree-parser">baopham/tree-parser</a> to parse a specific tree content to PHP objects.</p>
+  <div class="entry-content clearfix"><p>Response codes such ass 200, 404, 500 are very common response codes. Each code has their own meanings and so of course make sure you use them correctly.</p>
 
-<p>This library can parse this tree content:</p>
+<p>I just discovered a case where our API wasn&rsquo;t returning a JSON and the Mule app started to throw exception when it called the API.</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>   Root
-</span><span class='line'>    |- Level 1 - Order 1
-</span><span class='line'>      |- Level 2 - Order 2
-</span><span class='line'>        |- Level 3 - Order 3
-</span><span class='line'>        |- Level 3 - Order 4
-</span><span class='line'>      |- Level 2 - Order 5
-</span><span class='line'>    |- Level 1 - Order 6
-</span><span class='line'>      |- Level 2 - Order 7
-</span><span class='line'>        |- Level 3 - Order 8
-</span><span class='line'>          |- Level 4 - Order 9</span></code></pre></td></tr></table></div></figure>
-
-
-<p>into this:</p>
+<p>What happens is:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">foreach</span> <span class="p">(</span><span class="nv">$root</span><span class="o">-&gt;</span><span class="na">children</span> <span class="k">as</span> <span class="nv">$child</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">print</span> <span class="nv">$child</span><span class="o">-&gt;</span><span class="na">name</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">print</span> <span class="nv">$child</span><span class="o">-&gt;</span><span class="na">order</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">print</span> <span class="nv">$child</span><span class="o">-&gt;</span><span class="na">level</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nb">print_r</span><span class="p">(</span><span class="nv">$child</span><span class="o">-&gt;</span><span class="na">children</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nb">print_r</span><span class="p">(</span><span class="nv">$child</span><span class="o">-&gt;</span><span class="na">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-&gt;</span><span class="na">children</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">print</span> <span class="nv">$child</span><span class="o">-&gt;</span><span class="na">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-&gt;</span><span class="na">parent</span> <span class="o">===</span> <span class="nv">$child</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">print</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="na">isRoot</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// assuming we got the $lastLeaf after done traversing down.</span>
-</span><span class='line'><span class="k">print</span> <span class="nv">$lastLeaf</span><span class="o">-&gt;</span><span class="na">parent</span><span class="o">-&gt;</span><span class="na">parent</span><span class="o">-&gt;</span><span class="na">parent</span><span class="o">-&gt;</span><span class="na">parent</span> <span class="o">===</span> <span class="nv">$root</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">return</span> <span class="nx">Response</span><span class="o">::</span><span class="na">json</span><span class="p">([</span><span class="s1">&#39;data&#39;</span> <span class="o">=&gt;</span> <span class="p">[],</span> <span class="s1">&#39;message&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Uh oh&#39;</span><span class="p">],</span> <span class="mi">204</span><span class="p">);</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h3>Advanced</h3>
+<p>is considered as an empty response due to <a href="https://github.com/symfony/symfony/blob/c53cb57b9ddb0e97c3596772d4b4a66c0db14091/src/Symfony/Component/HttpFoundation/Response.php#L267-L270">Symfony\Component\HttpFoundation\Response</a> treating code 204 as empty</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -287,35 +231,31 @@
 <span class='line-number'>23</span>
 <span class='line-number'>24</span>
 <span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$tree</span> <span class="o">=</span> <span class="s">&lt;&lt;&lt;TREE</span>
-</span><span class='line'><span class="s">  Root</span>
-</span><span class='line'><span class="s">    |- Level 1 - Order 1</span>
-</span><span class='line'><span class="s">      |- Level 2 - Order 2</span>
-</span><span class='line'><span class="s">        |- Level 3 - Order 3</span>
-</span><span class='line'><span class="s">        |- Level 3 - Order 4</span>
-</span><span class='line'><span class="s">      |- Level 2 - Order 5</span>
-</span><span class='line'><span class="s">    |- Level 1 - Order 6</span>
-</span><span class='line'><span class="s">      |- Level 2 - Order 7</span>
-</span><span class='line'><span class="s">        |- Level 3 - Order 8</span>
-</span><span class='line'><span class="s">          |- Level 4 - Order 9</span>
-</span><span class='line'><span class="s">TREE;</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">public</span> <span class="k">function</span> <span class="nf">prepare</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nv">$headers</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">headers</span><span class="p">;</span>
 </span><span class='line'>
-</span><span class='line'><span class="nv">$parser</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">BaoPham\TreeParser</span><span class="p">(</span><span class="nv">$tree</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">isInformational</span><span class="p">()</span> <span class="o">||</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">isEmpty</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setContent</span><span class="p">(</span><span class="k">null</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$headers</span><span class="o">-&gt;</span><span class="na">remove</span><span class="p">(</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$headers</span><span class="o">-&gt;</span><span class="na">remove</span><span class="p">(</span><span class="s1">&#39;Content-Length&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="c1">//....</span>
 </span><span class='line'>
-</span><span class='line'><span class="nv">$parser</span><span class="o">-&gt;</span><span class="na">parse</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//....</span>
+</span><span class='line'><span class="p">}</span>
 </span><span class='line'>
-</span><span class='line'><span class="nv">$structure</span> <span class="o">=</span> <span class="nv">$parser</span><span class="o">-&gt;</span><span class="na">getStructure</span><span class="p">();</span>
+</span><span class='line'><span class="c1">//...</span>
 </span><span class='line'>
-</span><span class='line'><span class="c1">// Get nodes at level 3</span>
-</span><span class='line'><span class="nv">$level3Nodes</span> <span class="o">=</span> <span class="nv">$structure</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
-</span><span class='line'><span class="c1">// Get node at level 3, order 4</span>
-</span><span class='line'><span class="nv">$node</span> <span class="o">=</span> <span class="nv">$structure</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">4</span><span class="p">];</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// Get last leaf</span>
-</span><span class='line'><span class="nv">$orderedNodes</span> <span class="o">=</span> <span class="nv">$parser</span><span class="o">-&gt;</span><span class="na">getOrderedNodes</span><span class="p">();</span>
-</span><span class='line'><span class="nv">$lastLeaf</span> <span class="o">=</span> <span class="nv">$orderedNodes</span><span class="p">[</span><span class="nb">count</span><span class="p">(</span><span class="nv">$orderedNodes</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+</span><span class='line'><span class="sd">/**</span>
+</span><span class='line'><span class="sd"> * Is the response empty?</span>
+</span><span class='line'><span class="sd"> *</span>
+</span><span class='line'><span class="sd"> * @return bool</span>
+</span><span class='line'><span class="sd"> */</span>
+</span><span class='line'><span class="k">public</span> <span class="k">function</span> <span class="nf">isEmpty</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nb">in_array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">statusCode</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="mi">204</span><span class="p">,</span> <span class="mi">304</span><span class="p">));</span>
+</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 </div>
@@ -341,13 +281,13 @@
 
 
 
-<span class="glyphicon glyphicon-calendar"></span> <time datetime="2016-07-03T18:30:34-07:00" pubdate data-updated="true">Jul 3<span>rd</span>, 2016</time>
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2016-07-15T19:56:11-07:00" pubdate data-updated="true">Jul 15<span>th</span>, 2016</time>
           
 
   <span class="glyphicon glyphicon-tags"></span>&nbsp;
   <span class="categories">
     
-      <a class='category' href='/blog/categories/php/'>PHP</a>
+      <a class='category' href='/blog/categories/laravel/'>Laravel,</a>, <a class='category' href='/blog/categories/php/'>PHP,</a>, <a class='category' href='/blog/categories/symfony/'>Symfony</a>
     
   </span>
 
@@ -364,10 +304,8 @@
         
           <ul class="meta text-muted pager">
             
-            <li class="previous"><a href="/blog/2016/05/17/modelling-with-behat-examples/" title="Previous Post: Modelling with Behat and Laravel Examples">&laquo; Modelling with Behat and Laravel Examples</a></li>
+            <li class="previous"><a href="/blog/2016/07/03/tree-parser/" title="Previous Post: Tree Parser">&laquo; Tree Parser</a></li>
             
-            
-            <li class="next"><a href="/blog/2016/07/15/204-no-content/" title="Next Post: 204 No Content">204 No Content &raquo;</a></li>
             
           </ul>
         
@@ -408,8 +346,8 @@
   
     
     // var disqus_developer = 1;
-    var disqus_identifier = 'http://baopham.github.io/blog/2016/07/03/tree-parser/';
-    var disqus_url = 'http://baopham.github.io/blog/2016/07/03/tree-parser/';
+    var disqus_identifier = 'http://baopham.github.io/blog/2016/07/15/204-no-content/';
+    var disqus_url = 'http://baopham.github.io/blog/2016/07/15/204-no-content/';
     var disqus_script = 'embed.js';
   
   (function () {

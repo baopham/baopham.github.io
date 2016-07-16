@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: PHP | :baopham]]></title>
+  <title><![CDATA[Category: PHP, | :baopham]]></title>
   <link href="http://baopham.github.io/blog/categories/php/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-07-03T18:38:41-07:00</updated>
+  <updated>2016-07-15T20:11:49-07:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -14,577 +14,52 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Tree Parser]]></title>
-    <link href="http://baopham.github.io/blog/2016/07/03/tree-parser/"/>
-    <updated>2016-07-03T18:30:34-07:00</updated>
-    <id>http://baopham.github.io/blog/2016/07/03/tree-parser</id>
-    <content type="html"><![CDATA[<p>I just wrote a PHP library <a href="https://github.com/baopham/php-tree-parser">baopham/tree-parser</a> to parse a specific tree content to PHP objects.</p>
+    <title type="html"><![CDATA[204 No Content]]></title>
+    <link href="http://baopham.github.io/blog/2016/07/15/204-no-content/"/>
+    <updated>2016-07-15T19:56:11-07:00</updated>
+    <id>http://baopham.github.io/blog/2016/07/15/204-no-content</id>
+    <content type="html"><![CDATA[<p>Response codes such ass 200, 404, 500 are very common response codes. Each code has their own meanings and so of course make sure you use them correctly.</p>
 
-<p>This library can parse this tree content:</p>
+<p>I just discovered a case where our API wasn&rsquo;t returning a JSON and the Mule app started to throw exception when it called the API.</p>
 
-<p>```
-   Root</p>
+<p>What happens is:</p>
 
-<pre><code>|- Level 1 - Order 1
-  |- Level 2 - Order 2
-    |- Level 3 - Order 3
-    |- Level 3 - Order 4
-  |- Level 2 - Order 5
-|- Level 1 - Order 6
-  |- Level 2 - Order 7
-    |- Level 3 - Order 8
-      |- Level 4 - Order 9
-</code></pre>
-
-<p>```</p>
-
-<p>into this:</p>
-
-<p>```php</p>
-
-<p>foreach ($root->children as $child) {</p>
-
-<pre><code>print $child-&gt;name;
-
-print $child-&gt;order;
-
-print $child-&gt;level;
-
-print_r($child-&gt;children);
-
-print_r($child-&gt;children[0]-&gt;children);
-
-print $child-&gt;children[0]-&gt;parent === $child;
-</code></pre>
-
-<p>}</p>
-
-<p>print $root->isRoot</p>
-
-<p>// assuming we got the $lastLeaf after done traversing down.
-print $lastLeaf->parent->parent->parent->parent === $root
-```</p>
-
-<h3>Advanced</h3>
-
-<p>```php
-$tree = &lt;&lt;&lt;TREE
-  Root</p>
-
-<pre><code>|- Level 1 - Order 1
-  |- Level 2 - Order 2
-    |- Level 3 - Order 3
-    |- Level 3 - Order 4
-  |- Level 2 - Order 5
-|- Level 1 - Order 6
-  |- Level 2 - Order 7
-    |- Level 3 - Order 8
-      |- Level 4 - Order 9
-</code></pre>
-
-<p>TREE;</p>
-
-<p>$parser = new BaoPham\TreeParser($tree);</p>
-
-<p>$parser->parse();</p>
-
-<p>$structure = $parser->getStructure();</p>
-
-<p>// Get nodes at level 3
-$level3Nodes = $structure[3];
-// Get node at level 3, order 4
-$node = $structure[3][4];</p>
-
-<p>// Get last leaf
-$orderedNodes = $parser->getOrderedNodes();
-$lastLeaf = $orderedNodes[count($orderedNodes) &ndash; 1];
-```</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Modelling with Behat and Laravel Examples]]></title>
-    <link href="http://baopham.github.io/blog/2016/05/17/modelling-with-behat-examples/"/>
-    <updated>2016-05-17T00:52:27-07:00</updated>
-    <id>http://baopham.github.io/blog/2016/05/17/modelling-with-behat-examples</id>
-    <content type="html"><![CDATA[<p>Follow up from my previous <a href="http://baopham.github.io/blog/2016/04/03/modelling-with-behat-and-laravel/">post</a>, here is a example feature (similar to the feature from the <a href="http://stakeholderwhisperer.com/posts/2014/10/introducing-modelling-by-example">original post</a>)</p>
-
-<h3>behat.yml</h3>
-
-<p>```
-default:</p>
-
-<pre><code>suites:
-  product_payment_domain:
-    contexts: [ ProductPaymentDomainContext ]
-    filters:  { tags: '@product_payment' }
-  product_payment_ui:
-    contexts: [ ProductPaymentUIContext ]
-    filters:  { tags: '@product_payment&amp;&amp;@critical' }
-gherkin:
-  filters:
-    tags: ~@wip
-extensions:
-    Laracasts\Behat:
-        #env_path: .env.behat
-    Behat\MinkExtension:
-        base_url: https://e-commerce.dev
-        default_session: laravel
-        laravel: ~
-        selenium2:
-          wd_host: "http://selenium-server.dev:4444/wd/hub"
-        browser_name: chrome
-</code></pre>
-
-<p>```</p>
-
-<h3>Feature and Scenarios</h3>
-
-<blockquote><p>How To Write Scenarios</p>
-
-<p>Focus on describing the problem you&rsquo;re trying to solve, rather than focusing on the &ldquo;how&rdquo; and the &ldquo;look&rdquo;. For example, don&rsquo;t mention anything about &ldquo;I click button x&rdquo; or &ldquo;I go page /path/to/page&rdquo; or &ldquo;I should see ABC on sidebar&rdquo; or &ldquo;I wait&rdquo; in your scenarios.</p>
-
-<p>Read more here: <a href="http://stakeholderwhisperer.com/posts/2014/10/introducing-modelling-by-example">Introducing Modelling by Example</a></p></blockquote>
-
-<p>```
-Feature: Product payment
-  In order to receive products
-  As a customer
-  I need to be able to pay for the products that I have selected</p>
-
-<p>  Scenario: Buying a product that is out of stock</p>
-
-<pre><code>Given I have put the product "Windows ME" in my basket a few days before
-And product "Window ME" is now out of stock
-Then I should not be able to checkout because "Window ME" is out of stock
-</code></pre>
-
-<p>  Scenario: Cannot buy if product is restricted in the account&rsquo;s country</p>
-
-<pre><code>Given I am located in a country that does not allow product "FooBar"
-Then I cannot purchase this product
-</code></pre>
-
-<p>```</p>
-
-<p>How I would implement the steps in the Domain Context class:</p>
-
-<p>```php</p>
-
-<pre><code>/**
- * @Given I have put the product :product in my basket a few days before
- */
-public function iHavePutTheProductInMyBasket($product)
-{
-    $this-&gt;product = factory(Product::class)-&gt;create(['name' =&gt; $product]);
-
-    $this-&gt;basket-&gt;put($this-&gt;product);
-}
-
-/**
- * @Given product :product is now out of stock
- */
-public function ProductIsOutOfStock($product)
-{
-    $this-&gt;product-&gt;count = 0;
-
-    $this-&gt;product-&gt;save();
-}
-
-/**
- * @Then I should not be able to checkout because :product is out of stock
- */
-public function iShouldNotBeAbleToCheckoutBecauseProductIsOutOfStock($product)
-{
-    $this-&gt;assertException(function () {
-        $this-&gt;basket-&gt;checkout();
-    }, ProductIsOutOfStock::class);
-}
-
-/**
- * @Given I am located in a country that does not allow product :product
- */
-public function iAmLocatedInACountryThatDoesNotAllowProduct($product)
-{
-    $this-&gt;currentUser = factory(User::class)-&gt;create();
-
-    $this-&gt;product = factory(Product::class)-&gt;create(['name' =&gt; $product]);
-
-    $this-&gt;currentUser-&gt;country-&gt;restricted_products()-&gt;sync([$this-&gt;product-&gt;id]);
-}
-
-/**
- * @Then I cannot purchase this product
- */
-public function iCannotPurchaseThisProduct()
-{
-    $this-&gt;currentUser-&gt;cannot('purchase', $this-&gt;product);
-}
-</code></pre>
-
-<p>```</p>
-
-<p>where the method <code>assertException</code> is a custom method:</p>
-
-<p>```php</p>
-
-<pre><code>/**
- * @param Closure $closure
- * @param string $exception
- */
-protected function assertException(\Closure $closure, $exception)
-{
-    $fail = false;
-
-    try {
-        $closure();
-
-        $fail = true;
-    } catch (\Exception $e) {
-        if (!($e instanceof $exception)) {
-            $fail = true;
-        }
-    }
-
-    if ($fail) {
-        $this-&gt;fail("Expected $exception to be thrown");
-    }
-}
-</code></pre>
-
-<p>```</p>
-
-<p>and if you follow my <a href="http://baopham.github.io/blog/2016/04/03/modelling-with-behat-and-laravel/">previous post</a>, the <code>assertEquals</code> is forwarded to the <code>PHPUnit_Framework_Assert</code> class.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[A DynamoDb wrapper for Laravel model]]></title>
-    <link href="http://baopham.github.io/blog/2015/09/22/a-dynamodb-wrapper-for-laravel-model/"/>
-    <updated>2015-09-22T00:21:39-07:00</updated>
-    <id>http://baopham.github.io/blog/2015/09/22/a-dynamodb-wrapper-for-laravel-model</id>
-    <content type="html"><![CDATA[<p>With this package <a href="https://packagist.org/packages/baopham/dynamodb">baopham/dynamodb</a>, you can do:</p>
-
-<p>```php</p>
-
-<p>class Campaign extends BaoPham\DynamoDb\DynamoDbModel
-{</p>
-
-<pre><code>protected $table = 'dynamodb_table_for_campaign';
-
-protected $fillable = ['name', 'description', 'status'];
-</code></pre>
-
-<p>}</p>
-
-<p>$campaign = new Campaign();</p>
-
-<p>$campaign->find(&lsquo;campaign-id&rsquo;); // it&rsquo;s best to use UUID instead of incremented id &ndash; less work since you have to set the id attribute yourself.</p>
-
-<p>// or
-$campaign->where(&lsquo;name&rsquo;, &lsquo;foo&rsquo;)</p>
-
-<pre><code>    -&gt;where('status', true)
-    -&gt;get();
-</code></pre>
-
-<p>// or
-$campaign->first();</p>
-
-<p>// or
-$campaign->update([&lsquo;name&rsquo; => &lsquo;foo2&rsquo;, &lsquo;description&rsquo; => &lsquo;bar2&rsquo;, &lsquo;status&rsquo; => false]);</p>
-
-<p>// or
-$campaign->find(&lsquo;campaign-id&rsquo;)&ndash;>delete();</p>
-
-<p>```</p>
-
-<p>For more, <code>README</code>, tests and code are available here: <a href="https://github.com/baopham/laravel-dynamodb">https://github.com/baopham/laravel-dynamodb</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Laravel - Upload to a non-default S3 bucket]]></title>
-    <link href="http://baopham.github.io/blog/2015/09/22/laravel-upload-to-a-non-default-s3-bucket/"/>
-    <updated>2015-09-22T00:11:45-07:00</updated>
-    <id>http://baopham.github.io/blog/2015/09/22/laravel-upload-to-a-non-default-s3-bucket</id>
-    <content type="html"><![CDATA[<p>Very easy. Define a new &ldquo;disk&rdquo; in <code>config/filesystems.php</code>:</p>
-
-<p>```php</p>
-
-<pre><code>    's3-stage' =&gt; [
-        'driver' =&gt; 's3',
-        'key'    =&gt; env('S3_STAGE_KEY'),
-        'secret' =&gt; env('S3_STAGE_SECRET'),
-        'region' =&gt; env('S3_STAGE_REGION'),
-        'bucket' =&gt; env('S3_STAGE_BUCKET'),
-    ],
-</code></pre>
-
-<p>```</p>
-
-<p>But don&rsquo;t use <code>.</code> in your disk name as it will confuse with the array dot notation:</p>
-
-<p>```php</p>
-
-<h1>Illuminate\Filesystem\FilesystemManager</h1>
-
-<p>   /**</p>
-
-<pre><code> * Get the filesystem connection configuration.
- *
- * @param  string  $name
- * @return array
- */
-protected function getConfig($name)
-{
-    return $this-&gt;app['config']["filesystems.disks.{$name}"];
-}
-</code></pre>
-
-<p>```</p>
-
-<p>And then you can call: <code>Storage::disk('s3-stage')</code> like any other disk.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Laravel + Angularjs: file upload pattern]]></title>
-    <link href="http://baopham.github.io/blog/2015/03/22/laravel-plus-angularjs-file-upload-pattern/"/>
-    <updated>2015-03-22T22:36:38-07:00</updated>
-    <id>http://baopham.github.io/blog/2015/03/22/laravel-plus-angularjs-file-upload-pattern</id>
-    <content type="html"><![CDATA[<p>The thing with uploading files via AJAX is that users can just keep uploading files to the server without having to save the form. This leaves a lot of junk files around if you don&rsquo;t clean them up later. But we don&rsquo;t want to delete the files that are actually being used. This means we need to keep records of uploaded files.</p>
-
-<p>This pattern is working for me &ndash; assuming we want to keep files on S3:</p>
-
-<!--more-->
-
-
-<p><strong>1.</strong> A table to store records of uploaded files.</p>
-
-<p>```php
-// database/migrations/2015_03_05_004850_create_files_table.php</p>
-
-<p>public function up()
-{</p>
-
-<pre><code>Schema::create('files', function(Blueprint $table)
-{
-    $table-&gt;string('id', 36)-&gt;primary();
-    $table-&gt;string('mime', 255);
-    $table-&gt;string('filename', 255);
-    $table-&gt;bigInteger('size')-&gt;unsigned();
-    $table-&gt;string('storage_path')-&gt;unique();
-    $table-&gt;string('disk', 10);
-    $table-&gt;boolean('status');
-    $table-&gt;timestamps();
-});
-</code></pre>
-
-<p>}</p>
-
-<p>// app/Models/File.php</p>
-
-<p>use CRT\Models\BaseModel;
-use Illuminate\Support\Facades\Storage;</p>
-
-<p>class File extends BaseModel {</p>
-
-<pre><code>protected $fillable = ['mime', 'storage_path', 'status', 'filename', 'size', 'disk'];
-
-public static function boot()
-{
-    parent::boot();
-
-    static::deleting(function($model)
-    {
-        Storage::disk($model-&gt;disk)-&gt;delete($model-&gt;storage_path);
-    });
-}
-</code></pre>
-
-<p>}
-```</p>
-
-<p><strong>2.</strong> Use Javascript library to upload files thru AJAX (<a href="https://github.com/flowjs">Flowjs</a>, <a href="http://www.dropzonejs.com/">Dropzonejs</a>, etc.)</p>
-
-<p><strong>3.</strong> In the controller&rsquo;s upload method:</p>
-
-<p>```php
-// app/Http/Controllers/FileUploadController.php</p>
-
-<p>use CRT\Models\File as FileModel;</p>
-
-<p>use Flow\Config as FlowConfig;
-use Flow\Request as FlowRequest;
-use Flow\ConfigInterface;
-use Flow\RequestInterface;</p>
-
-<p>public function upload()
-{</p>
-
-<pre><code>$config = new FlowConfig();
-$config-&gt;setTempDir(storage_path() . '/tmp');
-$config-&gt;setDeleteChunksOnSave(false);
-
-$request = new FlowRequest();
-
-$totalSize = $request-&gt;getTotalSize();
-
-if ($totalSize &amp;&amp; $totalSize &gt; (1024 * 1024 * 4))
-{
-    return $this-&gt;responseWithError('File size exceeds 4MB');
-}
-
-$uploadFile = $request-&gt;getFile();
-
-list($path, $destination) = $this-&gt;getDestinationPathInfo($uploadFile);
-
-// @see: http://baopham.github.io/blog/2015/03/16/laravel-merge-flowjs-chunks-directly-to-s3
-if (\Bao\Flow\Basic::save($destination, $config, $request, $this-&gt;s3Client))
-{
-    $file = FileModel::create([
-        'mime' =&gt; $uploadFile['type'],
-        'size' =&gt; $request-&gt;getTotalSize(),
-        'storage_path' =&gt; $path,
-        'filename' =&gt; $uploadFile['name'],
-        'disk' =&gt; 's3',
-        'status' =&gt; false,
-    ]);
-
-    // Send JSON response.
-    return $this-&gt;responseWithData($file);
-}
-else
-{
-    // Indicate that we are not done with all the chunks.
-    return $this-&gt;responseWithData('', 204);
-}
-</code></pre>
-
-<p>}
-```
-This will save the <a href="http://baopham.github.io/blog/2015/03/16/laravel-merge-flowjs-chunks-directly-to-s3/">uploaded file to S3 directly</a>.</p>
-
-<p><strong>4.</strong> Angular side will store the response that has the file&rsquo;s info (id, size, filename, etc.) &ndash; mark this file as new, e.g:</p>
-
-<p>```javascript
-// public/assets/js/thing/controller.js</p>
-
-<p>var vm = this;
-vm.processFileSuccess = processFileSuccess;</p>
-
-<p>// &hellip;</p>
-
-<p>function processFileSuccess(file) {</p>
-
-<pre><code>file.isNew = true;
-vm.files.push(file);
-</code></pre>
-
-<p>}
-```</p>
-
-<p><strong>5.</strong> When user saves the form, we submit the form including the file&rsquo;s info.</p>
-
-<p><strong>6.</strong> Then in the backend, we process the file and mark the file&rsquo;s status as <code>true</code>:</p>
-
-<p>```php
-$store = Input::all();
-foreach ($store[&lsquo;files&rsquo;] as &amp;$fileInput)
-{</p>
-
-<pre><code>if (array_get($fileInput, 'isNew'))
-{
-    $file = FileModel::find($fileInput['id']);
-    if ($file-&gt;disk == 's3')
-    {
-        // move file to a different S3 folder
-        ...
-        // update file's storage path and status
-        $file-&gt;storage_path = ...;
-        $file-&gt;status = true;
-        $file-&gt;save();
-    }
-    else
-    {
-        // upload local file to S3 then update the file's record if needed or just delete it:
-        $file-&gt;delete();
-    }
-    // update the file input info before saving it to DB - store the S3 URL for example:
-    $fileInput['url'] = ...;
-}
-</code></pre>
-
-<p>}</p>
-
-<p>// then save $store in DB.
-```</p>
-
-<p><strong>7.</strong> Create a command to clean up tmp files that are older than x hours: <code>php artisan make:console CleanupFiles</code></p>
-
-<p>```php
-// app/Console/Commands/CleanupFiles.php</p>
-
-<p>/<em>*
- * The console command name.
- *
- * @var string
- </em>/
-protected $name = &lsquo;files:clean&rsquo;;</p>
-
-<p>/<em>*
- * Execute the console command.
- *
- * @return mixed
- </em>/
-public function fire()
-{</p>
-
-<pre><code>$date = new DateTime;
-$date-&gt;modify('-3 hours');
-$formatted = $date-&gt;format('Y-m-d H:i:s');
-FileModel::where('updated_at', '&lt;=', $formatted)
-    -&gt;where('status', '=', 0)
-    -&gt;get()-&gt;each(function($file)
-    {
-        $file-&gt;delete();
-    });
-
-\Flow\Uploader::pruneChunks(config('filesystems.disks.local.root') . '/tmp', 3*60*60);
-$this-&gt;info('Files older than 3 hours have been cleaned up.');
-</code></pre>
-
-<p>}
-```</p>
-
-<p>Set a scheduler for it:</p>
-
-<p>```php
-// app/Console/Kernel.php</p>
-
-<p>protected $commands = [</p>
-
-<pre><code>'CRT\Console\Commands\CleanupFiles',
-</code></pre>
-
-<p>];</p>
-
-<p>protected function schedule(Schedule $schedule)
-{</p>
-
-<pre><code>$schedule-&gt;command('files:clean')
-        -&gt;hourly();
-</code></pre>
-
-<p>}
-```</p>
-
-<p>And then setup cronjob:</p>
-
-<p><code>
-* * * * * php /home/vagrant/projects/CRT/artisan schedule:run 1&gt;&gt; /dev/null 2&gt;&amp;1
+<p><code>php
+return Response::json(['data' =&gt; [], 'message' =&gt; 'Uh oh'], 204);
 </code></p>
+
+<p>is considered as an empty response due to <a href="https://github.com/symfony/symfony/blob/c53cb57b9ddb0e97c3596772d4b4a66c0db14091/src/Symfony/Component/HttpFoundation/Response.php#L267-L270">Symfony\Component\HttpFoundation\Response</a> treating code 204 as empty</p>
+
+<p>```php</p>
+
+<pre><code>public function prepare(Request $request)
+{
+    $headers = $this-&gt;headers;
+
+    if ($this-&gt;isInformational() || $this-&gt;isEmpty()) {
+        $this-&gt;setContent(null);
+        $headers-&gt;remove('Content-Type');
+        $headers-&gt;remove('Content-Length');
+        //....
+
+    }
+    //....
+}
+
+//...
+
+/**
+ * Is the response empty?
+ *
+ * @return bool
+ */
+public function isEmpty()
+{
+    return in_array($this-&gt;statusCode, array(204, 304));
+}
+</code></pre>
+
+<p>```</p>
 ]]></content>
   </entry>
   
