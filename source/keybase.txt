@@ -1,0 +1,51 @@
+https://keybase.io/baopham
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://baopham.github.io
+  * I am baopham (https://keybase.io/baopham) on keybase.
+  * I have a public key ASBXOla_jS3Mf5D6YrisnAS7M5uJPwhC4lzQhAC4-PY6sgo
+
+To do so, I am signing this object:
+
+{
+    "body": {
+        "key": {
+            "eldest_kid": "0120573a56bf8d2dcc7f90fa62b8ac9c04bb339b893f0842e25cd08400b8f8f63ab20a",
+            "host": "keybase.io",
+            "kid": "0120573a56bf8d2dcc7f90fa62b8ac9c04bb339b893f0842e25cd08400b8f8f63ab20a",
+            "uid": "4a923b9a8765e623d69719f217f2da19",
+            "username": "baopham"
+        },
+        "service": {
+            "hostname": "baopham.github.io",
+            "protocol": "https:"
+        },
+        "type": "web_service_binding",
+        "version": 1
+    },
+    "client": {
+        "name": "keybase.io go client",
+        "version": "1.0.16"
+    },
+    "ctime": 1468760443,
+    "expire_in": 504576000,
+    "merkle_root": {
+        "ctime": 1468760407,
+        "hash": "4ef0caa8de05f863d2137abbc7f063b53ee69a18e257c94874d2be7debaf5bdd7f42b9a2227511a4bfff9d1da212f96a2a9053a18b8ff3e153724263cf53c404",
+        "seqno": 528119
+    },
+    "prev": "c583285c5d3edd15435e06e60192e2ec9e969be64d6d7a3e15957f10b2e80c4d",
+    "seqno": 18,
+    "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEgVzpWv40tzH+Q+mK4rJwEuzObiT8IQuJc0IQAuPj2OrIKp3BheWxvYWTFAvl7ImJvZHkiOnsia2V5Ijp7ImVsZGVzdF9raWQiOiIwMTIwNTczYTU2YmY4ZDJkY2M3ZjkwZmE2MmI4YWM5YzA0YmIzMzliODkzZjA4NDJlMjVjZDA4NDAwYjhmOGY2M2FiMjBhIiwiaG9zdCI6ImtleWJhc2UuaW8iLCJraWQiOiIwMTIwNTczYTU2YmY4ZDJkY2M3ZjkwZmE2MmI4YWM5YzA0YmIzMzliODkzZjA4NDJlMjVjZDA4NDAwYjhmOGY2M2FiMjBhIiwidWlkIjoiNGE5MjNiOWE4NzY1ZTYyM2Q2OTcxOWYyMTdmMmRhMTkiLCJ1c2VybmFtZSI6ImJhb3BoYW0ifSwic2VydmljZSI6eyJob3N0bmFtZSI6ImJhb3BoYW0uZ2l0aHViLmlvIiwicHJvdG9jb2wiOiJodHRwczoifSwidHlwZSI6IndlYl9zZXJ2aWNlX2JpbmRpbmciLCJ2ZXJzaW9uIjoxfSwiY2xpZW50Ijp7Im5hbWUiOiJrZXliYXNlLmlvIGdvIGNsaWVudCIsInZlcnNpb24iOiIxLjAuMTYifSwiY3RpbWUiOjE0Njg3NjA0NDMsImV4cGlyZV9pbiI6NTA0NTc2MDAwLCJtZXJrbGVfcm9vdCI6eyJjdGltZSI6MTQ2ODc2MDQwNywiaGFzaCI6IjRlZjBjYWE4ZGUwNWY4NjNkMjEzN2FiYmM3ZjA2M2I1M2VlNjlhMThlMjU3Yzk0ODc0ZDJiZTdkZWJhZjViZGQ3ZjQyYjlhMjIyNzUxMWE0YmZmZjlkMWRhMjEyZjk2YTJhOTA1M2ExOGI4ZmYzZTE1MzcyNDI2M2NmNTNjNDA0Iiwic2Vxbm8iOjUyODExOX0sInByZXYiOiJjNTgzMjg1YzVkM2VkZDE1NDM1ZTA2ZTYwMTkyZTJlYzllOTY5YmU2NGQ2ZDdhM2UxNTk1N2YxMGIyZTgwYzRkIiwic2Vxbm8iOjE4LCJ0YWciOiJzaWduYXR1cmUifaNzaWfEQLfhrGghLAncRjDZxUxncvdPxzPT3vrKOWM9/qgmsGmCpHhRMvugO8hFTAptW2RdxivtlRqWB7b1a7CXShwvewuoc2lnX3R5cGUgpGhhc2iCpHR5cGUIpXZhbHVlxCBkONQ3bYO1WlQtsI9mKgXP204AqROU7argVJO1I7hkCaN0YWfNAgKndmVyc2lvbgE=
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/baopham
