@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Python | :baopham]]></title>
   <link href="http://baopham.github.io/blog/categories/python/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-07-17T06:03:33-07:00</updated>
+  <updated>2016-07-24T05:37:40+08:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Project Euler: Practice Your Math and Programming Skills]]></title>
     <link href="http://baopham.github.io/blog/2012/01/25/project-euler-practice-your-math-and-programming-skills/"/>
-    <updated>2012-01-25T00:00:00-08:00</updated>
+    <updated>2012-01-25T00:00:00+08:00</updated>
     <id>http://baopham.github.io/blog/2012/01/25/project-euler-practice-your-math-and-programming-skills</id>
     <content type="html"><![CDATA[<p>I&rsquo;ve recently started to participate in this site <a href="http://projecteuler.net/">Project Euler</a>. It&rsquo;s a website with a series of mathematics/programming problems, ranging from easy to very hard. Some problems, if not solved using the right algorithm, can take more than 5 minutes to get the result. So it only matters if you use correct and efficient algorithms. These problems are meant to be solved in only less than a minute.</p>
 

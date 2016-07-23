@@ -181,15 +181,324 @@
 
 
 
-<span class="glyphicon glyphicon-calendar"></span> <time datetime="2014-05-29T21:30:24-07:00" pubdate data-updated="true">May 29<span>th</span>, 2014</time>
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2015-03-17T14:02:03+08:00" pubdate data-updated="true">Mar 17<span>th</span>, 2015</time>
         
-           | <a href="/blog/2014/05/29/a-command-line-interface-for-vundle/#disqus_thread"
-             data-disqus-identifier="http://baopham.github.io/blog/2014/05/29/a-command-line-interface-for-vundle/">Comments</a>
+           | <a href="/blog/2015/03/17/laravel-merge-flowjs-chunks-directly-to-s3/#disqus_thread"
+             data-disqus-identifier="http://baopham.github.io/blog/2015/03/17/laravel-merge-flowjs-chunks-directly-to-s3/">Comments</a>
         
       </p>
     
     
-      <h1 class="entry-title"><a href="/blog/2014/05/29/a-command-line-interface-for-vundle/">A Command Line Interface for Vundle</a></h1>
+      <h1 class="entry-title"><a href="/blog/2015/03/17/laravel-merge-flowjs-chunks-directly-to-s3/">Laravel - Merge Flowjs Chunks Directly to S3</a></h1>
+    
+  </header>
+
+
+  <div class="entry-content clearfix"><p><strong>Motivation</strong>: <a href="http://laravel.com/docs/5.0/filesystem">Laravel 5</a> now has support for Cloud storage.</p>
+
+<p><strong>Problem</strong>: <a href="https://github.com/flowjs/flow.js">Flowjs</a> library allows files to be uploaded in chunks making it possible to upload large files but by default it <a href="https://github.com/flowjs/flow-php-server/blob/84c928090c060238d15e89dd7e252acf8eff1140/src/Flow/File.php#L147">saves the final file to local storage</a>.</p>
+
+<p>We could extend this class so that it uses <a href="http://docs.aws.amazon.com/aws-sdk-php/guide/latest/feature-s3-stream-wrapper.html">S3 Stream Wrapper</a>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+<span class='line-number'>107</span>
+<span class='line-number'>108</span>
+<span class='line-number'>109</span>
+<span class='line-number'>110</span>
+<span class='line-number'>111</span>
+<span class='line-number'>112</span>
+<span class='line-number'>113</span>
+<span class='line-number'>114</span>
+<span class='line-number'>115</span>
+<span class='line-number'>116</span>
+<span class='line-number'>117</span>
+<span class='line-number'>118</span>
+<span class='line-number'>119</span>
+<span class='line-number'>120</span>
+<span class='line-number'>121</span>
+<span class='line-number'>122</span>
+<span class='line-number'>123</span>
+<span class='line-number'>124</span>
+<span class='line-number'>125</span>
+<span class='line-number'>126</span>
+<span class='line-number'>127</span>
+<span class='line-number'>128</span>
+<span class='line-number'>129</span>
+<span class='line-number'>130</span>
+<span class='line-number'>131</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span> <span class="k">namespace</span> <span class="nx">Bao\Flow</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">use</span> <span class="nx">Flow\ConfigInterface</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nx">Flow\RequestInterface</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nx">Flow\FileOpenException</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nx">Flow\FileLockException</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">use</span> <span class="nx">Illuminate\Support\Facades\Storage</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nx">League\Flysystem\FilesystemInterface</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">use</span> <span class="nx">Aws\S3\S3Client</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">use</span> <span class="nx">Exception</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">File</span> <span class="k">extends</span> <span class="nx">\Flow\File</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="sd">/**</span>
+</span><span class='line'><span class="sd">     * @var \Flow\RequestInterface</span>
+</span><span class='line'><span class="sd">     */</span>
+</span><span class='line'>    <span class="k">private</span> <span class="nv">$request</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="sd">/**</span>
+</span><span class='line'><span class="sd">     * @var \Flow\ConfigInterface</span>
+</span><span class='line'><span class="sd">     */</span>
+</span><span class='line'>    <span class="k">private</span> <span class="nv">$config</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="sd">/**</span>
+</span><span class='line'><span class="sd">     * @var \Aws\S3\S3Client</span>
+</span><span class='line'><span class="sd">     */</span>
+</span><span class='line'>    <span class="k">private</span> <span class="nv">$s3Client</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">ConfigInterface</span> <span class="nv">$config</span><span class="p">,</span> <span class="nx">RequestInterface</span> <span class="nv">$request</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nx">S3Client</span> <span class="nv">$s3Client</span> <span class="o">=</span> <span class="k">null</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">(</span><span class="nv">$config</span><span class="p">,</span> <span class="nv">$request</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">config</span> <span class="o">=</span> <span class="nv">$config</span><span class="p">;</span>
+</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">request</span> <span class="o">=</span> <span class="nv">$request</span><span class="p">;</span>
+</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">s3Client</span> <span class="o">=</span> <span class="nv">$s3Client</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="sd">/**</span>
+</span><span class='line'><span class="sd">     * Merge all chunks to single file</span>
+</span><span class='line'><span class="sd">     *</span>
+</span><span class='line'><span class="sd">     * @param string $destination final file location</span>
+</span><span class='line'><span class="sd">     *</span>
+</span><span class='line'><span class="sd">     * @throws FileLockException</span>
+</span><span class='line'><span class="sd">     * @throws FileOpenException</span>
+</span><span class='line'><span class="sd">     * @throws \Exception</span>
+</span><span class='line'><span class="sd">     *</span>
+</span><span class='line'><span class="sd">     * @return bool indicates if file was saved</span>
+</span><span class='line'><span class="sd">     */</span>
+</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">save</span><span class="p">(</span><span class="nv">$destination</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$toS3</span> <span class="o">=</span> <span class="o">!</span><span class="k">empty</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">s3Client</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$local</span> <span class="o">=</span> <span class="o">!</span><span class="nv">$toS3</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nv">$toS3</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">starts_with</span><span class="p">(</span><span class="nv">$destination</span><span class="p">,</span> <span class="s1">&#39;s3://&#39;</span><span class="p">))</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="c1">// @see http://docs.aws.amazon.com/aws-sdk-php/guide/latest/feature-s3-stream-wrapper.html</span>
+</span><span class='line'>            <span class="k">throw</span> <span class="k">new</span> <span class="nx">Exception</span><span class="p">(</span><span class="s1">&#39;Not a valid S3 protocol&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nv">$toS3</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">s3Client</span><span class="o">-&gt;</span><span class="na">registerStreamWrapper</span><span class="p">();</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nv">$fh</span> <span class="o">=</span> <span class="nb">fopen</span><span class="p">(</span><span class="nv">$destination</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$fh</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="k">throw</span> <span class="k">new</span> <span class="nx">FileOpenException</span><span class="p">(</span><span class="s1">&#39;failed to open destination file: &#39;</span> <span class="o">.</span> <span class="nv">$destination</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nv">$local</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nb">flock</span><span class="p">(</span><span class="nv">$fh</span><span class="p">,</span> <span class="nx">LOCK_EX</span> <span class="o">|</span> <span class="nx">LOCK_NB</span><span class="p">,</span> <span class="nv">$blocked</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>            <span class="c1">// @codeCoverageIgnoreStart</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="nv">$blocked</span><span class="p">)</span>
+</span><span class='line'>            <span class="p">{</span>
+</span><span class='line'>                <span class="c1">// Concurrent request has requested a lock.</span>
+</span><span class='line'>                <span class="c1">// File is being processed at the moment.</span>
+</span><span class='line'>                <span class="c1">// Warning: lock is not checked in windows.</span>
+</span><span class='line'>                <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>            <span class="c1">// @codeCoverageIgnoreEnd</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="k">throw</span> <span class="k">new</span> <span class="nx">FileLockException</span><span class="p">(</span><span class="s1">&#39;failed to lock file: &#39;</span> <span class="o">.</span> <span class="nv">$destination</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nv">$totalChunks</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">request</span><span class="o">-&gt;</span><span class="na">getTotalChunks</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">try</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="nv">$preProcessChunk</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">config</span><span class="o">-&gt;</span><span class="na">getPreprocessCallback</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="k">for</span> <span class="p">(</span><span class="nv">$i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;=</span> <span class="nv">$totalChunks</span><span class="p">;</span> <span class="nv">$i</span><span class="o">++</span><span class="p">)</span>
+</span><span class='line'>            <span class="p">{</span>
+</span><span class='line'>                <span class="nv">$file</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getChunkPath</span><span class="p">(</span><span class="nv">$i</span><span class="p">);</span>
+</span><span class='line'>                <span class="nv">$chunk</span> <span class="o">=</span> <span class="nb">fopen</span><span class="p">(</span><span class="nv">$file</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$chunk</span><span class="p">)</span>
+</span><span class='line'>                <span class="p">{</span>
+</span><span class='line'>                    <span class="k">throw</span> <span class="k">new</span> <span class="nx">FileOpenException</span><span class="p">(</span><span class="s1">&#39;failed to open chunk: &#39;</span> <span class="o">.</span> <span class="nv">$file</span><span class="p">);</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="k">if</span> <span class="p">(</span><span class="nv">$preProcessChunk</span> <span class="o">!==</span> <span class="k">null</span><span class="p">)</span>
+</span><span class='line'>                <span class="p">{</span>
+</span><span class='line'>                    <span class="nb">call_user_func</span><span class="p">(</span><span class="nv">$preProcessChunk</span><span class="p">,</span> <span class="nv">$chunk</span><span class="p">);</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="nb">stream_copy_to_stream</span><span class="p">(</span><span class="nv">$chunk</span><span class="p">,</span> <span class="nv">$fh</span><span class="p">);</span>
+</span><span class='line'>                <span class="nb">fclose</span><span class="p">(</span><span class="nv">$chunk</span><span class="p">);</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="k">catch</span> <span class="p">(</span><span class="nx">\Exception</span> <span class="nv">$e</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="nv">$local</span><span class="p">)</span> <span class="nb">flock</span><span class="p">(</span><span class="nv">$fh</span><span class="p">,</span> <span class="nx">LOCK_UN</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="nb">fclose</span><span class="p">(</span><span class="nv">$fh</span><span class="p">);</span>
+</span><span class='line'>            <span class="k">throw</span> <span class="nv">$e</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">config</span><span class="o">-&gt;</span><span class="na">getDeleteChunksOnSave</span><span class="p">())</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">deleteChunks</span><span class="p">();</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nv">$local</span><span class="p">)</span> <span class="nb">flock</span><span class="p">(</span><span class="nv">$fh</span><span class="p">,</span> <span class="nx">LOCK_UN</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nb">fclose</span><span class="p">(</span><span class="nv">$fh</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+        </article>
+      
+      
+        <article class="post">
+          
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2014-05-30T12:30:24+08:00" pubdate data-updated="true">May 30<span>th</span>, 2014</time>
+        
+           | <a href="/blog/2014/05/30/a-command-line-interface-for-vundle/#disqus_thread"
+             data-disqus-identifier="http://baopham.github.io/blog/2014/05/30/a-command-line-interface-for-vundle/">Comments</a>
+        
+      </p>
+    
+    
+      <h1 class="entry-title"><a href="/blog/2014/05/30/a-command-line-interface-for-vundle/">A Command Line Interface for Vundle</a></h1>
     
   </header>
 
@@ -200,7 +509,7 @@
   
   
     <footer>
-      <a class="btn btn-default" rel="full-article" href="/blog/2014/05/29/a-command-line-interface-for-vundle/">Read on &rarr;</a>
+      <a class="btn btn-default" rel="full-article" href="/blog/2014/05/30/a-command-line-interface-for-vundle/">Read on &rarr;</a>
     </footer>
   
 
@@ -226,15 +535,15 @@
 
 
 
-<span class="glyphicon glyphicon-calendar"></span> <time datetime="2014-05-14T20:05:26-07:00" pubdate data-updated="true">May 14<span>th</span>, 2014</time>
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2014-05-15T11:05:26+08:00" pubdate data-updated="true">May 15<span>th</span>, 2014</time>
         
-           | <a href="/blog/2014/05/14/tabrenderer-quick-preview-for-your-tabular-data/#disqus_thread"
-             data-disqus-identifier="http://baopham.github.io/blog/2014/05/14/tabrenderer-quick-preview-for-your-tabular-data/">Comments</a>
+           | <a href="/blog/2014/05/15/tabrenderer-quick-preview-for-your-tabular-data/#disqus_thread"
+             data-disqus-identifier="http://baopham.github.io/blog/2014/05/15/tabrenderer-quick-preview-for-your-tabular-data/">Comments</a>
         
       </p>
     
     
-      <h1 class="entry-title"><a href="/blog/2014/05/14/tabrenderer-quick-preview-for-your-tabular-data/">TabRenderer - Quick Preview for Your Tabular Data</a></h1>
+      <h1 class="entry-title"><a href="/blog/2014/05/15/tabrenderer-quick-preview-for-your-tabular-data/">TabRenderer - Quick Preview for Your Tabular Data</a></h1>
     
   </header>
 
@@ -243,7 +552,7 @@
   
   
     <footer>
-      <a class="btn btn-default" rel="full-article" href="/blog/2014/05/14/tabrenderer-quick-preview-for-your-tabular-data/">Read on &rarr;</a>
+      <a class="btn btn-default" rel="full-article" href="/blog/2014/05/15/tabrenderer-quick-preview-for-your-tabular-data/">Read on &rarr;</a>
     </footer>
   
 
@@ -269,15 +578,15 @@
 
 
 
-<span class="glyphicon glyphicon-calendar"></span> <time datetime="2014-01-02T08:05:30-08:00" pubdate data-updated="true">Jan 2<span>nd</span>, 2014</time>
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2014-01-03T00:05:30+08:00" pubdate data-updated="true">Jan 3<span>rd</span>, 2014</time>
         
-           | <a href="/blog/2014/01/02/thirsty-google-map-for-a-drinking-fountain/#disqus_thread"
-             data-disqus-identifier="http://baopham.github.io/blog/2014/01/02/thirsty-google-map-for-a-drinking-fountain/">Comments</a>
+           | <a href="/blog/2014/01/03/thirsty-google-map-for-a-drinking-fountain/#disqus_thread"
+             data-disqus-identifier="http://baopham.github.io/blog/2014/01/03/thirsty-google-map-for-a-drinking-fountain/">Comments</a>
         
       </p>
     
     
-      <h1 class="entry-title"><a href="/blog/2014/01/02/thirsty-google-map-for-a-drinking-fountain/">Thirsty? Google Map for a Drinking Fountain</a></h1>
+      <h1 class="entry-title"><a href="/blog/2014/01/03/thirsty-google-map-for-a-drinking-fountain/">Thirsty? Google Map for a Drinking Fountain</a></h1>
     
   </header>
 
@@ -288,7 +597,7 @@
   
   
     <footer>
-      <a class="btn btn-default" rel="full-article" href="/blog/2014/01/02/thirsty-google-map-for-a-drinking-fountain/">Read on &rarr;</a>
+      <a class="btn btn-default" rel="full-article" href="/blog/2014/01/03/thirsty-google-map-for-a-drinking-fountain/">Read on &rarr;</a>
     </footer>
   
 
@@ -314,7 +623,7 @@
 
 
 
-<span class="glyphicon glyphicon-calendar"></span> <time datetime="2012-01-25T00:00:00-08:00" pubdate data-updated="true">Jan 25<span>th</span>, 2012</time>
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2012-01-25T00:00:00+08:00" pubdate data-updated="true">Jan 25<span>th</span>, 2012</time>
         
            | <a href="/blog/2012/01/25/project-euler-practice-your-math-and-programming-skills/#disqus_thread"
              data-disqus-identifier="http://baopham.github.io/blog/2012/01/25/project-euler-practice-your-math-and-programming-skills/">Comments</a>
@@ -356,7 +665,7 @@
 
 
 
-<span class="glyphicon glyphicon-calendar"></span> <time datetime="2011-12-05T00:00:00-08:00" pubdate data-updated="true">Dec 5<span>th</span>, 2011</time>
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2011-12-05T00:00:00+08:00" pubdate data-updated="true">Dec 5<span>th</span>, 2011</time>
         
            | <a href="/blog/2011/12/05/chess/#disqus_thread"
              data-disqus-identifier="http://baopham.github.io/blog/2011/12/05/chess/">Comments</a>
@@ -403,7 +712,7 @@
 
 
 
-<span class="glyphicon glyphicon-calendar"></span> <time datetime="2011-11-27T00:00:00-08:00" pubdate data-updated="true">Nov 27<span>th</span>, 2011</time>
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2011-11-27T00:00:00+08:00" pubdate data-updated="true">Nov 27<span>th</span>, 2011</time>
         
            | <a href="/blog/2011/11/27/javascript-matrix-calculator/#disqus_thread"
              data-disqus-identifier="http://baopham.github.io/blog/2011/11/27/javascript-matrix-calculator/">Comments</a>
@@ -508,7 +817,7 @@
 
 
 
-<span class="glyphicon glyphicon-calendar"></span> <time datetime="2011-07-03T05:59:00-07:00" pubdate data-updated="true">Jul 3<span>rd</span>, 2011</time>
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2011-07-03T05:59:00+08:00" pubdate data-updated="true">Jul 3<span>rd</span>, 2011</time>
         
            | <a href="/blog/2011/07/03/javascript-and-canvas-conways-game-of-life/#disqus_thread"
              data-disqus-identifier="http://baopham.github.io/blog/2011/07/03/javascript-and-canvas-conways-game-of-life/">Comments</a>
@@ -605,15 +914,15 @@
   
   <div id="recent_posts" class="list-group">
     
-    <a class="list-group-item " href="/blog/2016/07/15/204-no-content/">204 No Content</a>
+    <a class="list-group-item " href="/blog/2016/07/23/schedule-running-full-tests/">Schedule Running Full Tests</a>
     
-    <a class="list-group-item " href="/blog/2016/07/03/tree-parser/">Tree Parser</a>
+    <a class="list-group-item " href="/blog/2016/07/16/204-no-content/">204 No Content</a>
+    
+    <a class="list-group-item " href="/blog/2016/07/04/tree-parser/">Tree Parser</a>
     
     <a class="list-group-item " href="/blog/2016/05/17/modelling-with-behat-examples/">Modelling With Behat and Laravel Examples</a>
     
-    <a class="list-group-item " href="/blog/2016/04/03/modelling-with-behat-and-laravel/">Modelling With Behat and Laravel</a>
-    
-    <a class="list-group-item " href="/blog/2016/04/03/behat-selenium-and-virtualbox/">Behat, Selenium and VirtualBox</a>
+    <a class="list-group-item " href="/blog/2016/04/04/modelling-with-behat-and-laravel/">Modelling With Behat and Laravel</a>
     
   </div>
 </section>
@@ -622,7 +931,7 @@
     <h3 class="panel-title">Tag Cloud</h3>
   </div>
   <div class="panel-body">
-    <span id="tag-cloud"><a class='text-primary' href='/blog/categories/angularjs' style='font-size: 110.0%;'>Angularjs</a> <a class='text-primary' href='/blog/categories/aws' style='font-size: 110.0%;'>AWS</a> <a class='text-danger' href='/blog/categories/behat' style='font-size: 130.0%;'>Behat</a> <a class='text-primary' href='/blog/categories/cloudformation' style='font-size: 110.0%;'>CloudFormation</a> <a class='text-primary' href='/blog/categories/dynamodb' style='font-size: 110.0%;'>DynamoDb</a> <a class='text-primary' href='/blog/categories/flowjs' style='font-size: 110.0%;'>Flowjs</a> <a class='text-success' href='/blog/categories/github' style='font-size: 120.0%;'>Github</a> <a class='text-success' href='/blog/categories/html5' style='font-size: 120.0%;'>HTML5</a> <a class='text-danger' href='/blog/categories/javascript' style='font-size: 150.0%;'>JavaScript</a> <a class='text-primary' href='/blog/categories/knockout-js' style='font-size: 110.0%;'>Knockout.js</a> <a class='text-danger' href='/blog/categories/laravel' style='font-size: 160.0%;'>Laravel</a> <a class='text-primary' href='/blog/categories/laravel-' style='font-size: 110.0%;'>Laravel,</a> <a class='text-success' href='/blog/categories/math' style='font-size: 120.0%;'>Math</a> <a class='text-primary' href='/blog/categories/node-js' style='font-size: 110.0%;'>Node.js</a> <a class='text-danger' href='/blog/categories/php' style='font-size: 160.0%;'>PHP</a> <a class='text-primary' href='/blog/categories/php-' style='font-size: 110.0%;'>PHP,</a> <a class='text-primary' href='/blog/categories/python' style='font-size: 110.0%;'>Python</a> <a class='text-success' href='/blog/categories/ruby' style='font-size: 120.0%;'>Ruby</a> <a class='text-danger' href='/blog/categories/s3' style='font-size: 130.0%;'>S3</a> <a class='text-primary' href='/blog/categories/selenium' style='font-size: 110.0%;'>Selenium</a> <a class='text-primary' href='/blog/categories/semantic-ui' style='font-size: 110.0%;'>Semantic-UI</a> <a class='text-primary' href='/blog/categories/symfony' style='font-size: 110.0%;'>Symfony</a> <a class='text-primary' href='/blog/categories/vim' style='font-size: 110.0%;'>Vim</a> <a class='text-primary' href='/blog/categories/virtualbox' style='font-size: 110.0%;'>VirtualBox</a> <a class='text-success' href='/blog/categories/web-development' style='font-size: 120.0%;'>Web Development</a> </span>
+    <span id="tag-cloud"><a class='text-primary' href='/blog/categories/angularjs' style='font-size: 108.57142857142857%;'>Angularjs</a> <a class='text-primary' href='/blog/categories/aws' style='font-size: 108.57142857142857%;'>AWS</a> <a class='text-danger' href='/blog/categories/behat' style='font-size: 125.71428571428572%;'>Behat</a> <a class='text-primary' href='/blog/categories/ci' style='font-size: 108.57142857142857%;'>CI</a> <a class='text-primary' href='/blog/categories/cloudformation' style='font-size: 108.57142857142857%;'>CloudFormation</a> <a class='text-primary' href='/blog/categories/dynamodb' style='font-size: 108.57142857142857%;'>DynamoDb</a> <a class='text-primary' href='/blog/categories/flowjs' style='font-size: 108.57142857142857%;'>Flowjs</a> <a class='text-success' href='/blog/categories/github' style='font-size: 117.14285714285714%;'>Github</a> <a class='text-success' href='/blog/categories/html5' style='font-size: 117.14285714285714%;'>HTML5</a> <a class='text-danger' href='/blog/categories/javascript' style='font-size: 142.85714285714286%;'>JavaScript</a> <a class='text-primary' href='/blog/categories/knockout-js' style='font-size: 108.57142857142857%;'>Knockout.js</a> <a class='text-danger' href='/blog/categories/laravel' style='font-size: 160.0%;'>Laravel</a> <a class='text-primary' href='/blog/categories/laravel-' style='font-size: 108.57142857142857%;'>Laravel,</a> <a class='text-success' href='/blog/categories/math' style='font-size: 117.14285714285714%;'>Math</a> <a class='text-primary' href='/blog/categories/node-js' style='font-size: 108.57142857142857%;'>Node.js</a> <a class='text-danger' href='/blog/categories/php' style='font-size: 151.42857142857144%;'>PHP</a> <a class='text-primary' href='/blog/categories/php-' style='font-size: 108.57142857142857%;'>PHP,</a> <a class='text-primary' href='/blog/categories/python' style='font-size: 108.57142857142857%;'>Python</a> <a class='text-success' href='/blog/categories/ruby' style='font-size: 117.14285714285714%;'>Ruby</a> <a class='text-danger' href='/blog/categories/s3' style='font-size: 125.71428571428572%;'>S3</a> <a class='text-primary' href='/blog/categories/selenium' style='font-size: 108.57142857142857%;'>Selenium</a> <a class='text-primary' href='/blog/categories/semantic-ui' style='font-size: 108.57142857142857%;'>Semantic-UI</a> <a class='text-primary' href='/blog/categories/symfony' style='font-size: 108.57142857142857%;'>Symfony</a> <a class='text-primary' href='/blog/categories/testing' style='font-size: 108.57142857142857%;'>Testing</a> <a class='text-primary' href='/blog/categories/vim' style='font-size: 108.57142857142857%;'>Vim</a> <a class='text-primary' href='/blog/categories/virtualbox' style='font-size: 108.57142857142857%;'>VirtualBox</a> <a class='text-success' href='/blog/categories/web-development' style='font-size: 117.14285714285714%;'>Web Development</a> </span>
   </div>
 </section>
 

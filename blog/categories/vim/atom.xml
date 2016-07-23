@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Vim | :baopham]]></title>
   <link href="http://baopham.github.io/blog/categories/vim/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-07-17T06:03:33-07:00</updated>
+  <updated>2016-07-24T05:37:40+08:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[A Command Line Interface for Vundle]]></title>
-    <link href="http://baopham.github.io/blog/2014/05/29/a-command-line-interface-for-vundle/"/>
-    <updated>2014-05-29T21:30:24-07:00</updated>
-    <id>http://baopham.github.io/blog/2014/05/29/a-command-line-interface-for-vundle</id>
+    <link href="http://baopham.github.io/blog/2014/05/30/a-command-line-interface-for-vundle/"/>
+    <updated>2014-05-30T12:30:24+08:00</updated>
+    <id>http://baopham.github.io/blog/2014/05/30/a-command-line-interface-for-vundle</id>
     <content type="html"><![CDATA[<p>I&rsquo;m a die hard fan of Vim and sometimes can be obsessed with trying out new plugins. I really like <a href="https://github.com/gmarik/Vundle.vim">Vundle</a> &ndash; a Vim plugin manager that simplifies plugin installation. I recently reorganized my <a href="https://github.com/baopham/vim/blob/master/vimrc">.vimrc</a> so that it&rsquo;s easier to keep track of my plugin configurations. My <a href="https://github.com/baopham/vim">.vim</a> folder now has a sub directory <code>settings</code> that contains different files for each plugin configuration:</p>
 
 <!--more-->

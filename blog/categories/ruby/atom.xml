@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ruby | :baopham]]></title>
   <link href="http://baopham.github.io/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-07-17T06:03:33-07:00</updated>
+  <updated>2016-07-24T05:37:40+08:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[A Command Line Interface for Vundle]]></title>
-    <link href="http://baopham.github.io/blog/2014/05/29/a-command-line-interface-for-vundle/"/>
-    <updated>2014-05-29T21:30:24-07:00</updated>
-    <id>http://baopham.github.io/blog/2014/05/29/a-command-line-interface-for-vundle</id>
+    <link href="http://baopham.github.io/blog/2014/05/30/a-command-line-interface-for-vundle/"/>
+    <updated>2014-05-30T12:30:24+08:00</updated>
+    <id>http://baopham.github.io/blog/2014/05/30/a-command-line-interface-for-vundle</id>
     <content type="html"><![CDATA[<p>I&rsquo;m a die hard fan of Vim and sometimes can be obsessed with trying out new plugins. I really like <a href="https://github.com/gmarik/Vundle.vim">Vundle</a> &ndash; a Vim plugin manager that simplifies plugin installation. I recently reorganized my <a href="https://github.com/baopham/vim/blob/master/vimrc">.vimrc</a> so that it&rsquo;s easier to keep track of my plugin configurations. My <a href="https://github.com/baopham/vim">.vim</a> folder now has a sub directory <code>settings</code> that contains different files for each plugin configuration:</p>
 
 <!--more-->
@@ -70,9 +70,9 @@ $ gem install vundle-cli
   
   <entry>
     <title type="html"><![CDATA[TabRenderer - Quick preview for your tabular data]]></title>
-    <link href="http://baopham.github.io/blog/2014/05/14/tabrenderer-quick-preview-for-your-tabular-data/"/>
-    <updated>2014-05-14T20:05:26-07:00</updated>
-    <id>http://baopham.github.io/blog/2014/05/14/tabrenderer-quick-preview-for-your-tabular-data</id>
+    <link href="http://baopham.github.io/blog/2014/05/15/tabrenderer-quick-preview-for-your-tabular-data/"/>
+    <updated>2014-05-15T11:05:26+08:00</updated>
+    <id>http://baopham.github.io/blog/2014/05/15/tabrenderer-quick-preview-for-your-tabular-data</id>
     <content type="html"><![CDATA[<p>I recently learned from a friend that <a href="https://help.github.com/articles/rendering-csv-and-tsv-data">Github renders tabular data</a> (.csv and .tsv) as interactive table, which is really neat. However, it won&rsquo;t work if there&rsquo;s a mismatched column or illegal quoting so I quickly built a <a href="http://tabrenderer.herokuapp.com/">tabrenderer</a> to help people preview their data before pushing them to Github. At first, I was going to use JavaScript to parse the data but was afraid that it will not work the same way as Github&rsquo;s parser. After browsing their repos, I thought it&rsquo;s very likely that they use Ruby to do this given how often they use Ruby for their own projects. <!--more-->Besides, Ruby has its built-in class <a href="http://ruby-doc.org/stdlib-1.9.2/libdoc/csv/rdoc/CSV.html">CSV</a> that takes care of almost everything.</p>
 
 <p>So far, <a href="http://tabrenderer.herokuapp.com/">tabrenderer</a> notifies users of errors that prevent the parser to work such as illegal quoting. It will jump to the row that has such errors but will not scream if there&rsquo;s a mismatched column (it will be obvious to the users though to see some rows don&rsquo;t have columns). The users can either upload their file or simply type the data in the text box.</p>

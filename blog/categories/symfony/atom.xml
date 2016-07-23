@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Symfony | :baopham]]></title>
   <link href="http://baopham.github.io/blog/categories/symfony/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-07-17T06:03:33-07:00</updated>
+  <updated>2016-07-24T05:37:40+08:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[204 No Content]]></title>
-    <link href="http://baopham.github.io/blog/2016/07/15/204-no-content/"/>
-    <updated>2016-07-15T19:56:11-07:00</updated>
-    <id>http://baopham.github.io/blog/2016/07/15/204-no-content</id>
+    <link href="http://baopham.github.io/blog/2016/07/16/204-no-content/"/>
+    <updated>2016-07-16T10:56:11+08:00</updated>
+    <id>http://baopham.github.io/blog/2016/07/16/204-no-content</id>
     <content type="html"><![CDATA[<p>Response codes such ass 200, 404, 500 are very common response codes. Each code has their own meanings and so of course make sure you use them correctly.</p>
 
 <p>I just discovered a case where our API wasn&rsquo;t returning a JSON and the Mule app started to throw exception when it called the API.</p>

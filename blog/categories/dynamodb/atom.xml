@@ -4,7 +4,7 @@
   <title><![CDATA[Category: DynamoDb | :baopham]]></title>
   <link href="http://baopham.github.io/blog/categories/dynamodb/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-07-17T06:03:33-07:00</updated>
+  <updated>2016-07-24T05:37:40+08:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[A DynamoDb wrapper for Laravel model]]></title>
     <link href="http://baopham.github.io/blog/2015/09/22/a-dynamodb-wrapper-for-laravel-model/"/>
-    <updated>2015-09-22T00:21:39-07:00</updated>
+    <updated>2015-09-22T15:21:39+08:00</updated>
     <id>http://baopham.github.io/blog/2015/09/22/a-dynamodb-wrapper-for-laravel-model</id>
     <content type="html"><![CDATA[<p>With this package <a href="https://packagist.org/packages/baopham/dynamodb">baopham/dynamodb</a>, you can do:</p>
 

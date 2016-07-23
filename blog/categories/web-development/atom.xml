@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Web Development | :baopham]]></title>
   <link href="http://baopham.github.io/blog/categories/web-development/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-07-17T06:03:33-07:00</updated>
+  <updated>2016-07-24T05:37:40+08:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[TabRenderer - Quick preview for your tabular data]]></title>
-    <link href="http://baopham.github.io/blog/2014/05/14/tabrenderer-quick-preview-for-your-tabular-data/"/>
-    <updated>2014-05-14T20:05:26-07:00</updated>
-    <id>http://baopham.github.io/blog/2014/05/14/tabrenderer-quick-preview-for-your-tabular-data</id>
+    <link href="http://baopham.github.io/blog/2014/05/15/tabrenderer-quick-preview-for-your-tabular-data/"/>
+    <updated>2014-05-15T11:05:26+08:00</updated>
+    <id>http://baopham.github.io/blog/2014/05/15/tabrenderer-quick-preview-for-your-tabular-data</id>
     <content type="html"><![CDATA[<p>I recently learned from a friend that <a href="https://help.github.com/articles/rendering-csv-and-tsv-data">Github renders tabular data</a> (.csv and .tsv) as interactive table, which is really neat. However, it won&rsquo;t work if there&rsquo;s a mismatched column or illegal quoting so I quickly built a <a href="http://tabrenderer.herokuapp.com/">tabrenderer</a> to help people preview their data before pushing them to Github. At first, I was going to use JavaScript to parse the data but was afraid that it will not work the same way as Github&rsquo;s parser. After browsing their repos, I thought it&rsquo;s very likely that they use Ruby to do this given how often they use Ruby for their own projects. <!--more-->Besides, Ruby has its built-in class <a href="http://ruby-doc.org/stdlib-1.9.2/libdoc/csv/rdoc/CSV.html">CSV</a> that takes care of almost everything.</p>
 
 <p>So far, <a href="http://tabrenderer.herokuapp.com/">tabrenderer</a> notifies users of errors that prevent the parser to work such as illegal quoting. It will jump to the row that has such errors but will not scream if there&rsquo;s a mismatched column (it will be obvious to the users though to see some rows don&rsquo;t have columns). The users can either upload their file or simply type the data in the text box.</p>
@@ -26,9 +26,9 @@
   
   <entry>
     <title type="html"><![CDATA[Thirsty? Google map for a drinking fountain]]></title>
-    <link href="http://baopham.github.io/blog/2014/01/02/thirsty-google-map-for-a-drinking-fountain/"/>
-    <updated>2014-01-02T08:05:30-08:00</updated>
-    <id>http://baopham.github.io/blog/2014/01/02/thirsty-google-map-for-a-drinking-fountain</id>
+    <link href="http://baopham.github.io/blog/2014/01/03/thirsty-google-map-for-a-drinking-fountain/"/>
+    <updated>2014-01-03T00:05:30+08:00</updated>
+    <id>http://baopham.github.io/blog/2014/01/03/thirsty-google-map-for-a-drinking-fountain</id>
     <content type="html"><![CDATA[<p>Or you can head over to <a href="http://vancouverfountains.herokuapp.com/" title="Vancouver Fountain Finder">Vancouver Fountain Finder</a> and search for the nearest drinking fountain in Vancouver, BC.</p>
 
 <p>This is a small project I built during the school break to learn <a href="http://nodejs.org/" title="Node.js">Node.js</a>. I have always wanted to learn <a href="http://nodejs.org/" title="Node.js">Node.js</a> and use <a href="gmap-v3">Google Maps API</a> so I tried to think of features that will let me learn new things as much as possible. Before this, I also built a simple <a href="http://bpmtimer.herokuapp.com/" title="Timer">timer</a> just to get started with <a href="http://nodejs.org/" title="Node.js">Node.js</a> and become familiar with <a href="http://knockoutjs.com/" title="Knockout.js">Knockout.js</a> and <a href="http://semantic-ui.com/" title="Semantic-UI">Semantic-UI</a>. <!--more-->I guess <a href="http://semantic-ui.com/" title="Semantic-UI">Semantic-UI</a> is still relatively new so I still prefer <a href="http://getbootstrap.com/" title="Bootstrap">Bootstrap</a> or maybe I am just biased&hellip; Anyway, a <a href="http://bpmtimer.herokuapp.com/" title="Timer">timer</a> because I saw my Math teacher struggling with the <a href="http://online-stopwatch.com/" title="Online Stopwatch">online stopwatch</a> before the exam&hellip; And the ads were quite distracting&hellip;</p>

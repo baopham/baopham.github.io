@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Flowjs | :baopham]]></title>
   <link href="http://baopham.github.io/blog/categories/flowjs/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-07-17T06:03:33-07:00</updated>
+  <updated>2016-07-24T05:37:40+08:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Laravel - Merge Flowjs chunks directly to S3]]></title>
-    <link href="http://baopham.github.io/blog/2015/03/16/laravel-merge-flowjs-chunks-directly-to-s3/"/>
-    <updated>2015-03-16T23:02:03-07:00</updated>
-    <id>http://baopham.github.io/blog/2015/03/16/laravel-merge-flowjs-chunks-directly-to-s3</id>
+    <link href="http://baopham.github.io/blog/2015/03/17/laravel-merge-flowjs-chunks-directly-to-s3/"/>
+    <updated>2015-03-17T14:02:03+08:00</updated>
+    <id>http://baopham.github.io/blog/2015/03/17/laravel-merge-flowjs-chunks-directly-to-s3</id>
     <content type="html"><![CDATA[<p><strong>Motivation</strong>: <a href="http://laravel.com/docs/5.0/filesystem">Laravel 5</a> now has support for Cloud storage.</p>
 
 <p><strong>Problem</strong>: <a href="https://github.com/flowjs/flow.js">Flowjs</a> library allows files to be uploaded in chunks making it possible to upload large files but by default it <a href="https://github.com/flowjs/flow-php-server/blob/84c928090c060238d15e89dd7e252acf8eff1140/src/Flow/File.php#L147">saves the final file to local storage</a>.</p>

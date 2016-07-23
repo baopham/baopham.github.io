@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Angularjs | :baopham]]></title>
   <link href="http://baopham.github.io/blog/categories/angularjs/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-07-17T06:03:33-07:00</updated>
+  <updated>2016-07-24T05:37:40+08:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Laravel + Angularjs: file upload pattern]]></title>
-    <link href="http://baopham.github.io/blog/2015/03/22/laravel-plus-angularjs-file-upload-pattern/"/>
-    <updated>2015-03-22T22:36:38-07:00</updated>
-    <id>http://baopham.github.io/blog/2015/03/22/laravel-plus-angularjs-file-upload-pattern</id>
+    <link href="http://baopham.github.io/blog/2015/03/23/laravel-plus-angularjs-file-upload-pattern/"/>
+    <updated>2015-03-23T13:36:38+08:00</updated>
+    <id>http://baopham.github.io/blog/2015/03/23/laravel-plus-angularjs-file-upload-pattern</id>
     <content type="html"><![CDATA[<p>The thing with uploading files via AJAX is that users can just keep uploading files to the server without having to save the form. This leaves a lot of junk files around if you don&rsquo;t clean them up later. But we don&rsquo;t want to delete the files that are actually being used. This means we need to keep records of uploaded files.</p>
 
 <p>This pattern is working for me &ndash; assuming we want to keep files on S3:</p>

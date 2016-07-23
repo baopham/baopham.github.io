@@ -4,7 +4,7 @@
   <title><![CDATA[:baopham]]></title>
   <link href="http://baopham.github.io/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-07-17T06:03:33-07:00</updated>
+  <updated>2016-07-24T05:37:40+08:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -14,10 +14,190 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Schedule Running Full Tests]]></title>
+    <link href="http://baopham.github.io/blog/2016/07/23/schedule-running-full-tests/"/>
+    <updated>2016-07-23T16:12:41+08:00</updated>
+    <id>http://baopham.github.io/blog/2016/07/23/schedule-running-full-tests</id>
+    <content type="html"><![CDATA[<p>Often time when your project starts to grow, the test suite also starts to get bigger, i.e slower CI.</p>
+
+<p>You will notice that there are tests that hardly ever fail. Maybe we shouldn&rsquo;t run these every commit? How about run these and the full test suite on schedule such as once a day?</p>
+
+<p>For a Laravel project that is hosted on Github, here is the idea:</p>
+
+<p><strong>1.</strong> Create a branch <code>ci-full-tests</code> off your main branch and set up your CI to run tests for this branch<br/>
+<strong>2.</strong> Get a Github OAuth token<br/>
+<strong>3.</strong> Create a console command to merge the main branch to <code>ci-full-tests</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">namespace</span> <span class="nx">App\Console\Commands</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">use</span> <span class="nx">GuzzleHttp\Client</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nx">Illuminate\Console\Command</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">TriggerCIToRunFullTests</span> <span class="k">extends</span> <span class="nx">Command</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="sd">/**</span>
+</span><span class='line'><span class="sd">    * The name and signature of the console command.</span>
+</span><span class='line'><span class="sd">    *</span>
+</span><span class='line'><span class="sd">    * @var string</span>
+</span><span class='line'><span class="sd">    */</span>
+</span><span class='line'>    <span class="k">protected</span> <span class="nv">$signature</span> <span class="o">=</span> <span class="s1">&#39;ci:full-tests&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="sd">/**</span>
+</span><span class='line'><span class="sd">    * The console command description.</span>
+</span><span class='line'><span class="sd">    *</span>
+</span><span class='line'><span class="sd">    * @var string</span>
+</span><span class='line'><span class="sd">    */</span>
+</span><span class='line'>    <span class="k">protected</span> <span class="nv">$description</span> <span class="o">=</span> <span class="s1">&#39;Trigger CI to run the full tests&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="sd">/**</span>
+</span><span class='line'><span class="sd">    * @var Client</span>
+</span><span class='line'><span class="sd">    */</span>
+</span><span class='line'>    <span class="k">protected</span> <span class="nv">$client</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="sd">/**</span>
+</span><span class='line'><span class="sd">    * Create a new command instance.</span>
+</span><span class='line'><span class="sd">    *</span>
+</span><span class='line'><span class="sd">    * @return void</span>
+</span><span class='line'><span class="sd">    */</span>
+</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">Client</span> <span class="nv">$client</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">client</span> <span class="o">=</span> <span class="nv">$client</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="sd">/**</span>
+</span><span class='line'><span class="sd">    * Execute the console command.</span>
+</span><span class='line'><span class="sd">    *</span>
+</span><span class='line'><span class="sd">    * @return mixed</span>
+</span><span class='line'><span class="sd">    */</span>
+</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">handle</span><span class="p">()</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">app</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">environment</span><span class="p">()</span> <span class="o">!==</span> <span class="s1">&#39;staging&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">client</span><span class="o">-&gt;</span><span class="na">post</span><span class="p">(</span><span class="s2">&quot;https://api.github.com/repos/YOUR_ORG/REPO_NAME/merges&quot;</span><span class="p">,</span> <span class="p">[</span>
+</span><span class='line'>            <span class="s1">&#39;headers&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
+</span><span class='line'>                <span class="s1">&#39;X-GitHub-Media-Type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;application/vnd.github.v3+json&#39;</span><span class="p">,</span>
+</span><span class='line'>                <span class="s1">&#39;Authorization&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;token &#39;</span> <span class="o">.</span> <span class="nx">env</span><span class="p">(</span><span class="s1">&#39;GITHUB_OAUTH_TOKEN&#39;</span><span class="p">),</span>
+</span><span class='line'>            <span class="p">],</span>
+</span><span class='line'>            <span class="s1">&#39;json&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
+</span><span class='line'>                <span class="s1">&#39;base&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;ci-full-tests&#39;</span><span class="p">,</span>
+</span><span class='line'>                <span class="s1">&#39;head&#39;</span> <span class="o">=&gt;</span> <span class="nx">env</span><span class="p">(</span><span class="s1">&#39;BRANCH_FOR_CODESHIP_FULL_TESTS&#39;</span><span class="p">,</span> <span class="s1">&#39;master&#39;</span><span class="p">),</span>
+</span><span class='line'>                <span class="s1">&#39;commit_message&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;[Schedule] Run full tests&#39;</span><span class="p">,</span>
+</span><span class='line'>            <span class="p">],</span>
+</span><span class='line'>        <span class="p">]);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>4.</strong> Schedule to run this command once a day</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">// app/Console/Kernel.php</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$schedule</span><span class="o">-&gt;</span><span class="na">command</span><span class="p">(</span><span class="s1">&#39;ci:full-tests&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">daily</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>5.</strong> Add an if condition in your CI bash script</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">ci_branch</span><span class="o">=</span><span class="sb">`</span>printenv GIT_BRANCH<span class="sb">`</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="nv">$ci_branch</span> <span class="o">==</span> <span class="s2">&quot;ci-full-tests&quot;</span> <span class="o">]]</span>
+</span><span class='line'><span class="k">then</span>
+</span><span class='line'><span class="k">    </span>vendor/bin/behat --tags<span class="o">=</span>~@wip
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="k">    </span>vendor/bin/behat --tags<span class="o">=</span><span class="s1">&#39;@important&#39;</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[204 No Content]]></title>
-    <link href="http://baopham.github.io/blog/2016/07/15/204-no-content/"/>
-    <updated>2016-07-15T19:56:11-07:00</updated>
-    <id>http://baopham.github.io/blog/2016/07/15/204-no-content</id>
+    <link href="http://baopham.github.io/blog/2016/07/16/204-no-content/"/>
+    <updated>2016-07-16T10:56:11+08:00</updated>
+    <id>http://baopham.github.io/blog/2016/07/16/204-no-content</id>
     <content type="html"><![CDATA[<p>Response codes such ass 200, 404, 500 are very common response codes. Each code has their own meanings and so of course make sure you use them correctly.</p>
 
 <p>I just discovered a case where our API wasn&rsquo;t returning a JSON and the Mule app started to throw exception when it called the API.</p>
@@ -88,9 +268,9 @@
   
   <entry>
     <title type="html"><![CDATA[Tree Parser]]></title>
-    <link href="http://baopham.github.io/blog/2016/07/03/tree-parser/"/>
-    <updated>2016-07-03T18:30:34-07:00</updated>
-    <id>http://baopham.github.io/blog/2016/07/03/tree-parser</id>
+    <link href="http://baopham.github.io/blog/2016/07/04/tree-parser/"/>
+    <updated>2016-07-04T09:30:34+08:00</updated>
+    <id>http://baopham.github.io/blog/2016/07/04/tree-parser</id>
     <content type="html"><![CDATA[<p>I just wrote a PHP library <a href="https://github.com/baopham/php-tree-parser">baopham/tree-parser</a> to parse a specific tree content to PHP objects.</p>
 
 <p>This library can parse this tree content:</p>
@@ -222,7 +402,7 @@
   <entry>
     <title type="html"><![CDATA[Modelling With Behat and Laravel Examples]]></title>
     <link href="http://baopham.github.io/blog/2016/05/17/modelling-with-behat-examples/"/>
-    <updated>2016-05-17T00:52:27-07:00</updated>
+    <updated>2016-05-17T15:52:27+08:00</updated>
     <id>http://baopham.github.io/blog/2016/05/17/modelling-with-behat-examples</id>
     <content type="html"><![CDATA[<p>Follow up from my previous <a href="http://baopham.github.io/blog/2016/04/03/modelling-with-behat-and-laravel/">post</a>, here is a example feature (similar to the feature from the <a href="http://stakeholderwhisperer.com/posts/2014/10/introducing-modelling-by-example">original post</a>)</p>
 
@@ -466,9 +646,9 @@
   
   <entry>
     <title type="html"><![CDATA[Modelling With Behat and Laravel]]></title>
-    <link href="http://baopham.github.io/blog/2016/04/03/modelling-with-behat-and-laravel/"/>
-    <updated>2016-04-03T23:17:34-07:00</updated>
-    <id>http://baopham.github.io/blog/2016/04/03/modelling-with-behat-and-laravel</id>
+    <link href="http://baopham.github.io/blog/2016/04/04/modelling-with-behat-and-laravel/"/>
+    <updated>2016-04-04T14:17:34+08:00</updated>
+    <id>http://baopham.github.io/blog/2016/04/04/modelling-with-behat-and-laravel</id>
     <content type="html"><![CDATA[<p>Here is an interesting read talking about how to &ldquo;do a Domain-Driven Design while doing Behaviour-Driven Development&rsquo;s red-green-refactor cycle&rdquo;: <a href="http://stakeholderwhisperer.com/posts/2014/10/introducing-modelling-by-example">Introducing Modelling by Example</a></p>
 
 <p>If you like the author&rsquo;s idea and want to apply this to your Laravel projects, here is something you can do to get most (if not all) Laravel PHPUnit helper methods in your Behat Domain Context class:</p>
@@ -602,9 +782,9 @@
   
   <entry>
     <title type="html"><![CDATA[Behat, Selenium and VirtualBox]]></title>
-    <link href="http://baopham.github.io/blog/2016/04/03/behat-selenium-and-virtualbox/"/>
-    <updated>2016-04-03T22:57:47-07:00</updated>
-    <id>http://baopham.github.io/blog/2016/04/03/behat-selenium-and-virtualbox</id>
+    <link href="http://baopham.github.io/blog/2016/04/04/behat-selenium-and-virtualbox/"/>
+    <updated>2016-04-04T13:57:47+08:00</updated>
+    <id>http://baopham.github.io/blog/2016/04/04/behat-selenium-and-virtualbox</id>
     <content type="html"><![CDATA[<p>If you want to run selenium server on the host machine and behat in VirtualBox, this setup could work for you:</p>
 
 <figure class='code'><figcaption><span>behat.yml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -638,7 +818,7 @@
   <entry>
     <title type="html"><![CDATA[AWS CloudFormation Reusable Variables]]></title>
     <link href="http://baopham.github.io/blog/2016/02/12/aws-cloudformation-reusable-variables/"/>
-    <updated>2016-02-12T07:46:33-08:00</updated>
+    <updated>2016-02-12T23:46:33+08:00</updated>
     <id>http://baopham.github.io/blog/2016/02/12/aws-cloudformation-reusable-variables</id>
     <content type="html"><![CDATA[<p>Here is a way to create reusable strings / numbers / etc. in CloudFormation.</p>
 
@@ -794,7 +974,7 @@
   <entry>
     <title type="html"><![CDATA[A DynamoDb Wrapper for Laravel Model]]></title>
     <link href="http://baopham.github.io/blog/2015/09/22/a-dynamodb-wrapper-for-laravel-model/"/>
-    <updated>2015-09-22T00:21:39-07:00</updated>
+    <updated>2015-09-22T15:21:39+08:00</updated>
     <id>http://baopham.github.io/blog/2015/09/22/a-dynamodb-wrapper-for-laravel-model</id>
     <content type="html"><![CDATA[<p>With this package <a href="https://packagist.org/packages/baopham/dynamodb">baopham/dynamodb</a>, you can do:</p>
 
@@ -856,7 +1036,7 @@
   <entry>
     <title type="html"><![CDATA[Laravel - Upload to a Non-default S3 Bucket]]></title>
     <link href="http://baopham.github.io/blog/2015/09/22/laravel-upload-to-a-non-default-s3-bucket/"/>
-    <updated>2015-09-22T00:11:45-07:00</updated>
+    <updated>2015-09-22T15:11:45+08:00</updated>
     <id>http://baopham.github.io/blog/2015/09/22/laravel-upload-to-a-non-default-s3-bucket</id>
     <content type="html"><![CDATA[<p>Very easy. Define a new &ldquo;disk&rdquo; in <code>config/filesystems.php</code>:</p>
 
@@ -912,9 +1092,9 @@
   
   <entry>
     <title type="html"><![CDATA[Laravel + Angularjs: File Upload Pattern]]></title>
-    <link href="http://baopham.github.io/blog/2015/03/22/laravel-plus-angularjs-file-upload-pattern/"/>
-    <updated>2015-03-22T22:36:38-07:00</updated>
-    <id>http://baopham.github.io/blog/2015/03/22/laravel-plus-angularjs-file-upload-pattern</id>
+    <link href="http://baopham.github.io/blog/2015/03/23/laravel-plus-angularjs-file-upload-pattern/"/>
+    <updated>2015-03-23T13:36:38+08:00</updated>
+    <id>http://baopham.github.io/blog/2015/03/23/laravel-plus-angularjs-file-upload-pattern</id>
     <content type="html"><![CDATA[<p>The thing with uploading files via AJAX is that users can just keep uploading files to the server without having to save the form. This leaves a lot of junk files around if you don&rsquo;t clean them up later. But we don&rsquo;t want to delete the files that are actually being used. This means we need to keep records of uploaded files.</p>
 
 <p>This pattern is working for me &ndash; assuming we want to keep files on S3:</p>
@@ -1293,9 +1473,9 @@
   
   <entry>
     <title type="html"><![CDATA[Laravel - Merge Flowjs Chunks Directly to S3]]></title>
-    <link href="http://baopham.github.io/blog/2015/03/16/laravel-merge-flowjs-chunks-directly-to-s3/"/>
-    <updated>2015-03-16T23:02:03-07:00</updated>
-    <id>http://baopham.github.io/blog/2015/03/16/laravel-merge-flowjs-chunks-directly-to-s3</id>
+    <link href="http://baopham.github.io/blog/2015/03/17/laravel-merge-flowjs-chunks-directly-to-s3/"/>
+    <updated>2015-03-17T14:02:03+08:00</updated>
+    <id>http://baopham.github.io/blog/2015/03/17/laravel-merge-flowjs-chunks-directly-to-s3</id>
     <content type="html"><![CDATA[<p><strong>Motivation</strong>: <a href="http://laravel.com/docs/5.0/filesystem">Laravel 5</a> now has support for Cloud storage.</p>
 
 <p><strong>Problem</strong>: <a href="https://github.com/flowjs/flow.js">Flowjs</a> library allows files to be uploaded in chunks making it possible to upload large files but by default it <a href="https://github.com/flowjs/flow-php-server/blob/84c928090c060238d15e89dd7e252acf8eff1140/src/Flow/File.php#L147">saves the final file to local storage</a>.</p>
@@ -1571,9 +1751,9 @@
   
   <entry>
     <title type="html"><![CDATA[A Command Line Interface for Vundle]]></title>
-    <link href="http://baopham.github.io/blog/2014/05/29/a-command-line-interface-for-vundle/"/>
-    <updated>2014-05-29T21:30:24-07:00</updated>
-    <id>http://baopham.github.io/blog/2014/05/29/a-command-line-interface-for-vundle</id>
+    <link href="http://baopham.github.io/blog/2014/05/30/a-command-line-interface-for-vundle/"/>
+    <updated>2014-05-30T12:30:24+08:00</updated>
+    <id>http://baopham.github.io/blog/2014/05/30/a-command-line-interface-for-vundle</id>
     <content type="html"><![CDATA[<p>I&rsquo;m a die hard fan of Vim and sometimes can be obsessed with trying out new plugins. I really like <a href="https://github.com/gmarik/Vundle.vim">Vundle</a> &ndash; a Vim plugin manager that simplifies plugin installation. I recently reorganized my <a href="https://github.com/baopham/vim/blob/master/vimrc">.vimrc</a> so that it&rsquo;s easier to keep track of my plugin configurations. My <a href="https://github.com/baopham/vim">.vim</a> folder now has a sub directory <code>settings</code> that contains different files for each plugin configuration:</p>
 
 <!--more-->
@@ -1630,9 +1810,9 @@ for confirmation unless the <code>--force</code> switch is on.</p></blockquote>
   
   <entry>
     <title type="html"><![CDATA[TabRenderer - Quick Preview for Your Tabular Data]]></title>
-    <link href="http://baopham.github.io/blog/2014/05/14/tabrenderer-quick-preview-for-your-tabular-data/"/>
-    <updated>2014-05-14T20:05:26-07:00</updated>
-    <id>http://baopham.github.io/blog/2014/05/14/tabrenderer-quick-preview-for-your-tabular-data</id>
+    <link href="http://baopham.github.io/blog/2014/05/15/tabrenderer-quick-preview-for-your-tabular-data/"/>
+    <updated>2014-05-15T11:05:26+08:00</updated>
+    <id>http://baopham.github.io/blog/2014/05/15/tabrenderer-quick-preview-for-your-tabular-data</id>
     <content type="html"><![CDATA[<p>I recently learned from a friend that <a href="https://help.github.com/articles/rendering-csv-and-tsv-data">Github renders tabular data</a> (.csv and .tsv) as interactive table, which is really neat. However, it won&rsquo;t work if there&rsquo;s a mismatched column or illegal quoting so I quickly built a <a href="http://tabrenderer.herokuapp.com/">tabrenderer</a> to help people preview their data before pushing them to Github. At first, I was going to use JavaScript to parse the data but was afraid that it will not work the same way as Github&rsquo;s parser. After browsing their repos, I thought it&rsquo;s very likely that they use Ruby to do this given how often they use Ruby for their own projects. <!--more-->Besides, Ruby has its built-in class <a href="http://ruby-doc.org/stdlib-1.9.2/libdoc/csv/rdoc/CSV.html">CSV</a> that takes care of almost everything.</p>
 
 <p>So far, <a href="http://tabrenderer.herokuapp.com/">tabrenderer</a> notifies users of errors that prevent the parser to work such as illegal quoting. It will jump to the row that has such errors but will not scream if there&rsquo;s a mismatched column (it will be obvious to the users though to see some rows don&rsquo;t have columns). The users can either upload their file or simply type the data in the text box.</p>
@@ -1641,9 +1821,9 @@ for confirmation unless the <code>--force</code> switch is on.</p></blockquote>
   
   <entry>
     <title type="html"><![CDATA[Thirsty? Google Map for a Drinking Fountain]]></title>
-    <link href="http://baopham.github.io/blog/2014/01/02/thirsty-google-map-for-a-drinking-fountain/"/>
-    <updated>2014-01-02T08:05:30-08:00</updated>
-    <id>http://baopham.github.io/blog/2014/01/02/thirsty-google-map-for-a-drinking-fountain</id>
+    <link href="http://baopham.github.io/blog/2014/01/03/thirsty-google-map-for-a-drinking-fountain/"/>
+    <updated>2014-01-03T00:05:30+08:00</updated>
+    <id>http://baopham.github.io/blog/2014/01/03/thirsty-google-map-for-a-drinking-fountain</id>
     <content type="html"><![CDATA[<p>Or you can head over to <a href="http://vancouverfountains.herokuapp.com/" title="Vancouver Fountain Finder">Vancouver Fountain Finder</a> and search for the nearest drinking fountain in Vancouver, BC.</p>
 
 <p>This is a small project I built during the school break to learn <a href="http://nodejs.org/" title="Node.js">Node.js</a>. I have always wanted to learn <a href="http://nodejs.org/" title="Node.js">Node.js</a> and use <a href="gmap-v3">Google Maps API</a> so I tried to think of features that will let me learn new things as much as possible. Before this, I also built a simple <a href="http://bpmtimer.herokuapp.com/" title="Timer">timer</a> just to get started with <a href="http://nodejs.org/" title="Node.js">Node.js</a> and become familiar with <a href="http://knockoutjs.com/" title="Knockout.js">Knockout.js</a> and <a href="http://semantic-ui.com/" title="Semantic-UI">Semantic-UI</a>. <!--more-->I guess <a href="http://semantic-ui.com/" title="Semantic-UI">Semantic-UI</a> is still relatively new so I still prefer <a href="http://getbootstrap.com/" title="Bootstrap">Bootstrap</a> or maybe I am just biased&hellip; Anyway, a <a href="http://bpmtimer.herokuapp.com/" title="Timer">timer</a> because I saw my Math teacher struggling with the <a href="http://online-stopwatch.com/" title="Online Stopwatch">online stopwatch</a> before the exam&hellip; And the ads were quite distracting&hellip;</p>
@@ -1655,7 +1835,7 @@ for confirmation unless the <code>--force</code> switch is on.</p></blockquote>
   <entry>
     <title type="html"><![CDATA[Project Euler: Practice Your Math and Programming Skills]]></title>
     <link href="http://baopham.github.io/blog/2012/01/25/project-euler-practice-your-math-and-programming-skills/"/>
-    <updated>2012-01-25T00:00:00-08:00</updated>
+    <updated>2012-01-25T00:00:00+08:00</updated>
     <id>http://baopham.github.io/blog/2012/01/25/project-euler-practice-your-math-and-programming-skills</id>
     <content type="html"><![CDATA[<p>I&rsquo;ve recently started to participate in this site <a href="http://projecteuler.net/">Project Euler</a>. It&rsquo;s a website with a series of mathematics/programming problems, ranging from easy to very hard. Some problems, if not solved using the right algorithm, can take more than 5 minutes to get the result. So it only matters if you use correct and efficient algorithms. These problems are meant to be solved in only less than a minute.</p>
 
@@ -1666,7 +1846,7 @@ for confirmation unless the <code>--force</code> switch is on.</p></blockquote>
   <entry>
     <title type="html"><![CDATA[Chess]]></title>
     <link href="http://baopham.github.io/blog/2011/12/05/chess/"/>
-    <updated>2011-12-05T00:00:00-08:00</updated>
+    <updated>2011-12-05T00:00:00+08:00</updated>
     <id>http://baopham.github.io/blog/2011/12/05/chess</id>
     <content type="html"><![CDATA[<p>Want to play some chess? Here is a chess board for you written in HTML5 using the drag and drop feature. Make sure your browser supports HTML5. Now drag away!</p>
 
@@ -1790,7 +1970,7 @@ Features that allow you to edit a page&rsquo;s section on the browser and store 
   <entry>
     <title type="html"><![CDATA[JavaScript: Matrix Calculator]]></title>
     <link href="http://baopham.github.io/blog/2011/11/27/javascript-matrix-calculator/"/>
-    <updated>2011-11-27T00:00:00-08:00</updated>
+    <updated>2011-11-27T00:00:00+08:00</updated>
     <id>http://baopham.github.io/blog/2011/11/27/javascript-matrix-calculator</id>
     <content type="html"><![CDATA[<div class="matrix-post">
   <p>A matrix calculator written in JavaScript :)</p>
@@ -1864,7 +2044,7 @@ Features that allow you to edit a page&rsquo;s section on the browser and store 
   <entry>
     <title type="html"><![CDATA[JavaScript and Canvas: Conway's Game of Life]]></title>
     <link href="http://baopham.github.io/blog/2011/07/03/javascript-and-canvas-conways-game-of-life/"/>
-    <updated>2011-07-03T05:59:00-07:00</updated>
+    <updated>2011-07-03T05:59:00+08:00</updated>
     <id>http://baopham.github.io/blog/2011/07/03/javascript-and-canvas-conways-game-of-life</id>
     <content type="html"><![CDATA[<p>Being inspired by my school project from CS111 <b>Introduction to Computation</b>, I implemented the game again in JavaScript and used HTML5 canvas to display the cells and animation (HTML5 browser support is required).</p>
 

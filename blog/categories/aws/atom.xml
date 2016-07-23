@@ -4,7 +4,7 @@
   <title><![CDATA[Category: AWS | :baopham]]></title>
   <link href="http://baopham.github.io/blog/categories/aws/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-07-17T06:03:33-07:00</updated>
+  <updated>2016-07-24T05:37:40+08:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[AWS CloudFormation reusable variables]]></title>
     <link href="http://baopham.github.io/blog/2016/02/12/aws-cloudformation-reusable-variables/"/>
-    <updated>2016-02-12T07:46:33-08:00</updated>
+    <updated>2016-02-12T23:46:33+08:00</updated>
     <id>http://baopham.github.io/blog/2016/02/12/aws-cloudformation-reusable-variables</id>
     <content type="html"><![CDATA[<p>Here is a way to create reusable strings / numbers / etc. in CloudFormation.</p>
 

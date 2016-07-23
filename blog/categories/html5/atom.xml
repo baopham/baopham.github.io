@@ -4,7 +4,7 @@
   <title><![CDATA[Category: HTML5 | :baopham]]></title>
   <link href="http://baopham.github.io/blog/categories/html5/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-07-17T06:03:33-07:00</updated>
+  <updated>2016-07-24T05:37:40+08:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Chess]]></title>
     <link href="http://baopham.github.io/blog/2011/12/05/chess/"/>
-    <updated>2011-12-05T00:00:00-08:00</updated>
+    <updated>2011-12-05T00:00:00+08:00</updated>
     <id>http://baopham.github.io/blog/2011/12/05/chess</id>
     <content type="html"><![CDATA[<p>Want to play some chess? Here is a chess board for you written in HTML5 using the drag and drop feature. Make sure your browser supports HTML5. Now drag away!</p>
 
@@ -140,7 +140,7 @@ Features that allow you to edit a page&rsquo;s section on the browser and store 
   <entry>
     <title type="html"><![CDATA[JavaScript and Canvas: Conway's Game of Life]]></title>
     <link href="http://baopham.github.io/blog/2011/07/03/javascript-and-canvas-conways-game-of-life/"/>
-    <updated>2011-07-03T05:59:00-07:00</updated>
+    <updated>2011-07-03T05:59:00+08:00</updated>
     <id>http://baopham.github.io/blog/2011/07/03/javascript-and-canvas-conways-game-of-life</id>
     <content type="html"><![CDATA[<p>Being inspired by my school project from CS111 <b>Introduction to Computation</b>, I implemented the game again in JavaScript and used HTML5 canvas to display the cells and animation (HTML5 browser support is required).</p>
 

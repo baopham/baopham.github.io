@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: CI | :baopham]]></title>
+  <link href="http://baopham.github.io/blog/categories/ci/atom.xml" rel="self"/>
+  <link href="http://baopham.github.io/"/>
+  <updated>2016-07-24T05:37:40+08:00</updated>
+  <id>http://baopham.github.io/</id>
+  <author>
+    <name><![CDATA[Bao Pham]]></name>
+    <email><![CDATA[gbaopham@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Schedule Running Full Tests]]></title>
+    <link href="http://baopham.github.io/blog/2016/07/23/schedule-running-full-tests/"/>
+    <updated>2016-07-23T16:12:41+08:00</updated>
+    <id>http://baopham.github.io/blog/2016/07/23/schedule-running-full-tests</id>
+    <content type="html"><![CDATA[<p>Often time when your project starts to grow, the test suite also starts to get bigger, i.e slower CI.</p>
+
+<p>You will notice that there are tests that hardly ever fail. Maybe we shouldn&rsquo;t run these every commit? How about run these and the full test suite on schedule such as once a day?</p>
+
+<p>For a Laravel project that is hosted on Github, here is the idea:</p>
+
+<p><strong>1.</strong> Create a branch <code>ci-full-tests</code> off your main branch and set up your CI to run tests for this branch<br/>
+<strong>2.</strong> Get a Github OAuth token<br/>
+<strong>3.</strong> Create a console command to merge the main branch to <code>ci-full-tests</code>:<br/>
+```php
+&lt;?php</p>
+
+<p>namespace App\Console\Commands;</p>
+
+<p>use GuzzleHttp\Client;
+use Illuminate\Console\Command;</p>
+
+<p>class TriggerCIToRunFullTests extends Command
+{</p>
+
+<pre><code>/**
+* The name and signature of the console command.
+*
+* @var string
+*/
+protected $signature = 'ci:full-tests';
+
+/**
+* The console command description.
+*
+* @var string
+*/
+protected $description = 'Trigger CI to run the full tests';
+
+/**
+* @var Client
+*/
+protected $client;
+
+/**
+* Create a new command instance.
+*
+* @return void
+*/
+public function __construct(Client $client)
+{
+    parent::__construct();
+
+    $this-&gt;client = $client;
+}
+
+/**
+* Execute the console command.
+*
+* @return mixed
+*/
+public function handle()
+{
+    if (app()-&gt;environment() !== 'staging') {
+        return;
+    }
+
+    $this-&gt;client-&gt;post("https://api.github.com/repos/YOUR_ORG/REPO_NAME/merges", [
+        'headers' =&gt; [
+            'X-GitHub-Media-Type' =&gt; 'application/vnd.github.v3+json',
+            'Authorization' =&gt; 'token ' . env('GITHUB_OAUTH_TOKEN'),
+        ],
+        'json' =&gt; [
+            'base' =&gt; 'ci-full-tests',
+            'head' =&gt; env('BRANCH_FOR_CODESHIP_FULL_TESTS', 'master'),
+            'commit_message' =&gt; '[Schedule] Run full tests',
+        ],
+    ]);
+}
+</code></pre>
+
+<p>}
+<code>
+**4.** Schedule to run this command once a day
+</code>php
+// app/Console/Kernel.php</p>
+
+<p>$schedule->command(&lsquo;ci:full-tests&rsquo;)&ndash;>daily();
+<code>
+**5.** Add an if condition in your CI bash script
+</code>bash
+ci_branch=<code>printenv GIT_BRANCH</code></p>
+
+<p>if [[ $ci_branch == &ldquo;ci-full-tests&rdquo; ]]
+then</p>
+
+<pre><code>vendor/bin/behat --tags=~@wip
+</code></pre>
+
+<p>else</p>
+
+<pre><code>vendor/bin/behat --tags='@important'
+</code></pre>
+
+<p>fi
+```</p>
+]]></content>
+  </entry>
+  
+</feed>
