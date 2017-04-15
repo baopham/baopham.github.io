@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Behat | :baopham]]></title>
   <link href="http://baopham.github.io/blog/categories/behat/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2016-09-30T21:35:00+08:00</updated>
+  <updated>2017-04-16T00:24:24+08:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -18,7 +18,7 @@
     <link href="http://baopham.github.io/blog/2016/05/17/modelling-with-behat-examples/"/>
     <updated>2016-05-17T15:52:27+08:00</updated>
     <id>http://baopham.github.io/blog/2016/05/17/modelling-with-behat-examples</id>
-    <content type="html"><![CDATA[<p>Follow up from my previous <a href="http://baopham.github.io/blog/2016/04/03/modelling-with-behat-and-laravel/">post</a>, here is a example feature (similar to the feature from the <a href="http://stakeholderwhisperer.com/posts/2014/10/introducing-modelling-by-example">original post</a>)</p>
+    <content type="html"><![CDATA[<p>Follow up from my previous <a href="http://baopham.github.io/blog/2016/04/03/modelling-with-behat-and-laravel/">post</a>, here is an example feature (similar to the feature from the <a href="http://stakeholderwhisperer.com/posts/2014/10/introducing-modelling-by-example">original post</a>)</p>
 
 <h3>behat.yml</h3>
 
@@ -165,7 +165,7 @@ protected function assertException(\Closure $closure, $exception)
 
 <p>```</p>
 
-<p>and if you follow my <a href="http://baopham.github.io/blog/2016/04/03/modelling-with-behat-and-laravel/">previous post</a>, the <code>assertEquals</code> is forwarded to the <code>PHPUnit_Framework_Assert</code> class.</p>
+<p>and if you follow my <a href="http://baopham.github.io/blog/2016/04/04/modelling-with-behat-and-laravel/">previous post</a>, the <code>assertEquals</code> is forwarded to the <code>PHPUnit_Framework_Assert</code> class.</p>
 ]]></content>
   </entry>
   
@@ -240,11 +240,11 @@ $this->be($user);</p>
 
 <p>$this->get(&lsquo;users&rsquo;);</p>
 
-<p>$this->post(&lsquo;users&rsquo;, [&lsquo;_token&rsquo; =>  csrf_token(), &lsquo;email&rsquo; => &lsquo;<a href="&#109;&#x61;&#105;&#x6c;&#116;&#111;&#x3a;&#102;&#x6f;&#x6f;&#64;&#x62;&#x61;&#x72;&#x2e;&#99;&#x6f;&#109;">&#x66;&#x6f;&#111;&#64;&#x62;&#x61;&#x72;&#x2e;&#x63;&#111;&#x6d;</a>&rsquo;]);</p>
+<p>$this->post(&lsquo;users&rsquo;, [&lsquo;_token&rsquo; =>  csrf_token(), &lsquo;email&rsquo; => &lsquo;<a href="&#109;&#x61;&#x69;&#x6c;&#116;&#111;&#58;&#102;&#111;&#x6f;&#x40;&#x62;&#x61;&#114;&#46;&#x63;&#111;&#x6d;">&#102;&#111;&#111;&#64;&#98;&#x61;&#x72;&#46;&#x63;&#x6f;&#109;</a>&rsquo;]);</p>
 
 <p>$this->expectsJobs(SendInvitationEmail::class);</p>
 
-<p>$this->seeInDatabase(&lsquo;users&rsquo;, [&lsquo;email&rsquo; => &lsquo;<a href="&#109;&#x61;&#105;&#x6c;&#x74;&#x6f;&#58;&#x66;&#111;&#111;&#x40;&#x62;&#97;&#114;&#x2e;&#x63;&#x6f;&#x6d;">&#102;&#x6f;&#x6f;&#64;&#98;&#x61;&#x72;&#x2e;&#99;&#111;&#x6d;</a>&rsquo;]);
+<p>$this->seeInDatabase(&lsquo;users&rsquo;, [&lsquo;email&rsquo; => &lsquo;<a href="&#109;&#97;&#105;&#x6c;&#x74;&#111;&#x3a;&#x66;&#111;&#111;&#x40;&#x62;&#x61;&#114;&#46;&#x63;&#111;&#x6d;">&#102;&#x6f;&#x6f;&#64;&#98;&#97;&#114;&#x2e;&#x63;&#111;&#109;</a>&rsquo;]);
 ```</p>
 ]]></content>
   </entry>

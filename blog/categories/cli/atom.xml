@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: CLI | :baopham]]></title>
+  <link href="http://baopham.github.io/blog/categories/cli/atom.xml" rel="self"/>
+  <link href="http://baopham.github.io/"/>
+  <updated>2017-04-16T00:24:24+08:00</updated>
+  <id>http://baopham.github.io/</id>
+  <author>
+    <name><![CDATA[Bao Pham]]></name>
+    <email><![CDATA[gbaopham@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[CLI To Manage Your Vim Plugins]]></title>
+    <link href="http://baopham.github.io/blog/2017/04/15/cli-to-manage-your-vim-plugins/"/>
+    <updated>2017-04-15T23:18:43+08:00</updated>
+    <id>http://baopham.github.io/blog/2017/04/15/cli-to-manage-your-vim-plugins</id>
+    <content type="html"><![CDATA[<p>This is a follow up to my <a href="http://baopham.github.io/blog/2014/05/30/a-command-line-interface-for-vundle/">previous post</a>. I recently switched to <a href="https://github.com/junegunn/vim-plug">vim-plug</a> which I think is nicer to use. You can keep all dependencies together in one line and specify post-install commands, which is not possible with <a href="https://github.com/VundleVim/Vundle.vim">Vundle</a>.</p>
+
+<p>And so, my <a href="https://github.com/baopham/vundle-cli">vundle-cli</a> is now obsolete for my own use. I have to write another CLI and this time it will take care of multiple Vim plugin managers: <a href="https://github.com/baopham/vimplugin-cli">vimplugin-cli</a></p>
+
+<p><img src="http://baopham.github.io/images/vimplugin-cli.gif" alt="VimPlugin CLI gif" class="center"/></p>
+]]></content>
+  </entry>
+  
+</feed>
