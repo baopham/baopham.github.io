@@ -6,7 +6,7 @@ comments: true
 categories: [Behat, PHP, Laravel]
 ---
 
-Follow up from my previous [post](http://baopham.github.io/blog/2016/04/03/modelling-with-behat-and-laravel/), here is a example feature (similar to the feature from the [original post](http://stakeholderwhisperer.com/posts/2014/10/introducing-modelling-by-example))
+Follow up from my previous [post](http://baopham.github.io/blog/2016/04/03/modelling-with-behat-and-laravel/), here is an example feature (similar to the feature from the [original post](http://stakeholderwhisperer.com/posts/2014/10/introducing-modelling-by-example))
 
 ### behat.yml
 
@@ -140,4 +140,4 @@ where the method `assertException` is a custom method:
     }
 ```
 
-and if you follow my [previous post](http://baopham.github.io/blog/2016/04/03/modelling-with-behat-and-laravel/), the `assertEquals` is forwarded to the `PHPUnit_Framework_Assert` class.
+and if you follow my [previous post](http://baopham.github.io/blog/2016/04/04/modelling-with-behat-and-laravel/), the `assertEquals` is forwarded to the `PHPUnit_Framework_Assert` class.
