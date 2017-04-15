@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Behat | :baopham]]></title>
   <link href="http://baopham.github.io/blog/categories/behat/atom.xml" rel="self"/>
   <link href="http://baopham.github.io/"/>
-  <updated>2017-04-16T00:24:24+08:00</updated>
+  <updated>2017-04-16T00:28:30+08:00</updated>
   <id>http://baopham.github.io/</id>
   <author>
     <name><![CDATA[Bao Pham]]></name>
@@ -240,11 +240,11 @@ $this->be($user);</p>
 
 <p>$this->get(&lsquo;users&rsquo;);</p>
 
-<p>$this->post(&lsquo;users&rsquo;, [&lsquo;_token&rsquo; =>  csrf_token(), &lsquo;email&rsquo; => &lsquo;<a href="&#109;&#x61;&#x69;&#x6c;&#116;&#111;&#58;&#102;&#111;&#x6f;&#x40;&#x62;&#x61;&#114;&#46;&#x63;&#111;&#x6d;">&#102;&#111;&#111;&#64;&#98;&#x61;&#x72;&#46;&#x63;&#x6f;&#109;</a>&rsquo;]);</p>
+<p>$this->post(&lsquo;users&rsquo;, [&lsquo;_token&rsquo; =>  csrf_token(), &lsquo;email&rsquo; => &lsquo;<a href="&#x6d;&#97;&#x69;&#x6c;&#116;&#111;&#58;&#102;&#111;&#111;&#x40;&#98;&#97;&#x72;&#46;&#99;&#x6f;&#109;">&#x66;&#111;&#x6f;&#64;&#x62;&#97;&#x72;&#x2e;&#x63;&#x6f;&#109;</a>&rsquo;]);</p>
 
 <p>$this->expectsJobs(SendInvitationEmail::class);</p>
 
-<p>$this->seeInDatabase(&lsquo;users&rsquo;, [&lsquo;email&rsquo; => &lsquo;<a href="&#109;&#97;&#105;&#x6c;&#x74;&#111;&#x3a;&#x66;&#111;&#111;&#x40;&#x62;&#x61;&#114;&#46;&#x63;&#111;&#x6d;">&#102;&#x6f;&#x6f;&#64;&#98;&#97;&#114;&#x2e;&#x63;&#111;&#109;</a>&rsquo;]);
+<p>$this->seeInDatabase(&lsquo;users&rsquo;, [&lsquo;email&rsquo; => &lsquo;<a href="&#109;&#97;&#x69;&#108;&#x74;&#111;&#58;&#x66;&#111;&#111;&#x40;&#x62;&#x61;&#114;&#x2e;&#99;&#111;&#x6d;">&#x66;&#x6f;&#111;&#64;&#98;&#x61;&#x72;&#46;&#99;&#x6f;&#109;</a>&rsquo;]);
 ```</p>
 ]]></content>
   </entry>
