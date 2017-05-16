@@ -91,6 +91,12 @@
         <lastmod>2017-04-16T00:23:54+08:00</lastmod>
     </url>
     <url>
+        <loc>
+            http://baopham.github.io/blog/2017/05/16/go-get-unable-to-connect-to-go-dot-googlesource-dot-com/
+        </loc>
+        <lastmod>2017-05-16T19:25:30+08:00</lastmod>
+    </url>
+    <url>
         <loc>http://baopham.github.io/404.html</loc>
         <lastmod>2017-04-16T00:23:54+08:00</lastmod>
     </url>
@@ -120,7 +126,7 @@
     </url>
     <url>
         <loc>http://baopham.github.io/assets/bootstrap/</loc>
-        <lastmod>2017-04-16T00:23:54+08:00</lastmod>
+        <lastmod>2017-05-16T19:25:30+08:00</lastmod>
     </url>
     <url>
         <loc>http://baopham.github.io/assets/bootstrap/javascript.html</loc>
@@ -128,7 +134,7 @@
     </url>
     <url>
         <loc>http://baopham.github.io/blog/archives/</loc>
-        <lastmod>2017-04-16T00:23:54+08:00</lastmod>
+        <lastmod>2017-05-16T19:25:30+08:00</lastmod>
     </url>
     <url>
         <loc>http://baopham.github.io/blog/tags/</loc>
@@ -136,7 +142,7 @@
     </url>
     <url>
         <loc>http://baopham.github.io/</loc>
-        <lastmod>2017-04-16T00:23:54+08:00</lastmod>
+        <lastmod>2017-05-16T19:25:30+08:00</lastmod>
     </url>
     <url>
         <loc>http://baopham.github.io/privacy/</loc>
